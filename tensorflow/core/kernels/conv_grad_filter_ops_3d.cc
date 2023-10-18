@@ -702,8 +702,7 @@ void LaunchConvBackpropFilterOpImpl(
   OP_REQUIRES(context, stream, errors::Internal("No GPU stream available."));
 
   if (DataTypeToEnum<T>::value == DT_BFLOAT16 &&
-      !stream->GetCudaComputeCapability().IsAtLeast(
-          se::CudaComputeCapability::AMPERE)) {
+        IsBF16NotSupportedInOps(stream)) {
     context->SetStatus(errors::Unimplemented(
         "Conv3DBackpropFilter for GPU with bfloat16 is only supported "
         "with cuDNN on Ampere GPUs or later."));
