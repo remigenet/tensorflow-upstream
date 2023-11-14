@@ -61,14 +61,12 @@ class GrpcDispatcherImpl : public DispatcherService::Service {
   HANDLER(Snapshot);
   HANDLER(GetSnapshotSplit);
   HANDLER(GetSnapshotStreams);
-  HANDLER(DisableCompressionAtRuntime);
 #undef HANDLER
 
  private:
   DataServiceDispatcherImpl impl_;
 
-  GrpcDispatcherImpl(const GrpcDispatcherImpl&) = delete;
-  void operator=(const GrpcDispatcherImpl&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GrpcDispatcherImpl);
 };
 
 }  // namespace data

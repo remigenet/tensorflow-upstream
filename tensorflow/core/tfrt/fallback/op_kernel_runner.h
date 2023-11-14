@@ -145,8 +145,7 @@ struct OpKernelRunState {
 
   OpKernelRunState() = default;
   OpKernelRunState(absl::Span<const tensorflow::TensorValue> tensor_values,
-                   const OpKernelContext::Params& p,
-                   tensorflow::DeviceBase* device = nullptr) {
+                   const OpKernelContext::Params& p) {
     // `input_tf_tensor_values` contains the reference to all tensor used,
     // while `input_tf_tensors` only contains those needs ownership so their
     // sizes may not match. For this copy assignment, we conservatively copy all
@@ -167,7 +166,6 @@ struct OpKernelRunState {
     // Clear eigen_gpu_device to ensure OpKernelContext constructor will make a
     // new eigen GPU device.
     params.eigen_gpu_device = nullptr;
-    if (device != nullptr) params.device = device;
   }
 
   OpKernelRunState(const OpKernelRunState& other) = delete;

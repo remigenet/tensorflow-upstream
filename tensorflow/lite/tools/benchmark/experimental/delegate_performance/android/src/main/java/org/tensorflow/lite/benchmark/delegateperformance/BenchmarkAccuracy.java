@@ -23,6 +23,8 @@ public interface BenchmarkAccuracy {
    *
    * @param context the context to use for finding the test models and exporting reports
    * @param tfliteSettingsJsonFiles the list of paths to delegate JSON configurations
+   * @return {@code true} if the benchmark was successfully initialized and executed. Otherwise,
+   *     returns {@code false}.
    */
-  void benchmark(Context context, String[] tfliteSettingsJsonFiles);
+  boolean benchmark(Context context, String[] tfliteSettingsJsonFiles);
 }

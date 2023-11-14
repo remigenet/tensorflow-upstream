@@ -286,8 +286,7 @@ class AudioMicrofrontendOp : public OpKernel {
   bool zero_padding_;
   int out_scale_;
 
-  AudioMicrofrontendOp(const AudioMicrofrontendOp&) = delete;
-  void operator=(const AudioMicrofrontendOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(AudioMicrofrontendOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("AudioMicrofrontend")

@@ -29,8 +29,7 @@ void AddQuantizationPasses(mlir::PassManager& pass_manager,
   if (quantization_options.quantization_method()
           .has_preset_quantization_method()) {
     quantization_options_ =
-        mlir::quant::stablehlo::FillPresetQuantizationOptions(
-            quantization_options);
+        mlir::stablehlo::FillPresetQuantizationOptions(quantization_options);
   }
 
   // TODO(b/276999414): Add activation and bias quantization component as
@@ -48,7 +47,9 @@ void AddQuantizationPasses(mlir::PassManager& pass_manager,
     }
   }
   pass_manager.addNestedPass<mlir::func::FuncOp>(
-      mlir::quant::stablehlo::CreateQuantizeWeightPass(weight_component));
+      mlir::stablehlo::CreatePrepareSrqQuantizePass(quantization_options_));
+  pass_manager.addNestedPass<mlir::func::FuncOp>(
+      mlir::stablehlo::CreateQuantizeWeightPass(weight_component));
 }
 
 }  // namespace quantization

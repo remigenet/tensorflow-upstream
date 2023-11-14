@@ -199,8 +199,7 @@ class InitializeTableFromDatasetOp : public AsyncOpKernel {
   }
 
  private:
-  InitializeTableFromDatasetOp(const InitializeTableFromDatasetOp&) = delete;
-  void operator=(const InitializeTableFromDatasetOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InitializeTableFromDatasetOp);
 
   data::BackgroundWorker background_worker_;
 };

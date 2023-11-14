@@ -22,7 +22,7 @@ limitations under the License.
 #include <string>
 
 #include "absl/memory/memory.h"
-#include "Eigen/Core"  // from @eigen_archive
+#include "third_party/eigen3/Eigen/Core"
 #include "tensorflow/lite/core/api/error_reporter.h"
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"

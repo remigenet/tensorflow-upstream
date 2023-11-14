@@ -173,10 +173,6 @@ class MlirV1CompatOptimizationPassRegistry {
     return pass_ ? pass_.get() : nullptr;
   }
 
-  // Free the memory allocated for the single pass.
-  // This method is used for testing mostly.
-  void ClearPass() { pass_.reset(); }
-
  private:
   std::unique_ptr<MlirV1CompatOptimizationPass> pass_{};
 };

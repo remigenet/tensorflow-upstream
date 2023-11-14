@@ -16,7 +16,8 @@ limitations under the License.
 #include "mlir/Support/LogicalResult.h"  // from @llvm-project
 #include "tensorflow/compiler/mlir/quantization/stablehlo/quantization_options.pb.h"
 
-namespace mlir::quant::stablehlo {
+namespace mlir {
+namespace stablehlo {
 
 using ::stablehlo::quantization::CustomQuantizationMethod;
 using ::stablehlo::quantization::PresetQuantizationMethod;
@@ -130,4 +131,5 @@ LogicalResult GetActivationBitWidth(QuantizationOptions quantization_options,
   return failure();
 }
 
-}  // namespace mlir::quant::stablehlo
+}  // namespace stablehlo
+}  // namespace mlir

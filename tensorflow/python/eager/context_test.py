@@ -18,7 +18,7 @@ import weakref
 from absl.testing import parameterized
 import numpy as np
 
-from xla.service import hlo_pb2
+from tensorflow.compiler.xla.service import hlo_pb2
 from tensorflow.python.eager import context
 from tensorflow.python.eager import def_function
 from tensorflow.python.framework import constant_op
@@ -203,8 +203,6 @@ class ContextTest(test.TestCase, parameterized.TestCase):
     result = test_func.experimental_get_compiler_ir(a)(stage=stage)
     self.assertNotEmpty(result)
     if stage == 'optimized_hlo_proto_serialized':
-      if test.is_built_with_rocm():
-        self.skipTest('Currently failing on ROCm due to mismatch')
       hlo_proto = hlo_pb2.HloProto.FromString(result)
       allocations = hlo_proto.buffer_assignment.buffer_allocations
       buffer_size = sum(

@@ -49,8 +49,7 @@ class XlaCaseOp : public XlaOpKernel {
   void Compile(XlaOpKernelContext* ctx) override;
 
  private:
-  XlaCaseOp(const XlaCaseOp&) = delete;
-  void operator=(const XlaCaseOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaCaseOp);
 
   // If the branch_index input is a constant: prunes out all but the branch
   // corrresponding to that constant branch index, and returns that branch and

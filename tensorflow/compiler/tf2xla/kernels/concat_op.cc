@@ -15,17 +15,15 @@ limitations under the License.
 
 // XLA-specific Concat Ops.
 
-#include <cstdint>
 #include <limits>
 #include <vector>
 
-#include "tensorflow/compiler/tf2xla/kernels/shape_util.h"
 #include "tensorflow/compiler/tf2xla/type_util.h"
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/literal_util.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/literal_util.h"
 #include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
@@ -42,7 +40,7 @@ namespace {
 // --------------------------------------------------------------------------
 class ConcatBaseOp : public XlaOpKernel {
  public:
-  ConcatBaseOp(OpKernelConstruction* c, int64_t axis_index)
+  ConcatBaseOp(OpKernelConstruction* c, int axis_index)
       : XlaOpKernel(c), axis_index_(axis_index) {}
 
   void Compile(XlaOpKernelContext* ctx) override {
@@ -62,7 +60,7 @@ class ConcatBaseOp : public XlaOpKernel {
     const int input_dims = shapes[0].dims();
     const TensorShape& input_shape = shapes[0];
 
-    int64_t axis = concat_dim < 0 ? concat_dim + input_dims : concat_dim;
+    int32_t axis = concat_dim < 0 ? concat_dim + input_dims : concat_dim;
     OP_REQUIRES(ctx, 0 <= axis && axis < input_dims,
                 errors::InvalidArgument(
                     "ConcatOp : Expected concatenating dimensions in the range "
@@ -116,15 +114,13 @@ class ConcatV2Op : public ConcatBaseOp {
 REGISTER_XLA_OP(Name("Concat").CompileTimeConstantInput("concat_dim"),
                 ConcatOp);
 REGISTER_XLA_OP(Name("ConcatV2")
-                    .TypeConstraint("Tidx", {DT_INT32, DT_INT64})
+                    .TypeConstraint("Tidx", DT_INT32)
                     .CompileTimeConstantInput("axis"),
                 ConcatV2Op);
 
 class ConcatOffsetOp : public XlaOpKernel {
  public:
-  explicit ConcatOffsetOp(OpKernelConstruction* ctx) : XlaOpKernel(ctx) {
-    OP_REQUIRES_OK(ctx, ctx->GetAttr("shape_type", &shape_type_));
-  }
+  explicit ConcatOffsetOp(OpKernelConstruction* ctx) : XlaOpKernel(ctx) {}
 
   void Compile(XlaOpKernelContext* ctx) override {
     const TensorShape concat_dim_shape = ctx->InputShape(0);
@@ -172,7 +168,7 @@ class ConcatOffsetOp : public XlaOpKernel {
     OP_REQUIRES(ctx, FastBoundsCheck(axis, inp0_rank),
                 errors::InvalidArgument("Concat dim is out of range: ", axis,
                                         " vs. ", inp0_rank));
-    int64_t offset = 0;
+    int32_t offset = 0;
     for (int i = 0; i < N; ++i) {
       const TensorShape inp_shape = ctx->InputShape(1 + i);
       OP_REQUIRES(ctx, inp0_rank == inp_shape.num_elements(),
@@ -184,39 +180,31 @@ class ConcatOffsetOp : public XlaOpKernel {
           ctx, ctx->ConstantInputAsIntVector(
                    1 + i, &inp_dims, xla::ValueInferenceMode::kUpperBound));
 
-      std::vector<int64_t> output_dims(inp0_rank);
+      Tensor out_constant(DT_INT32, TensorShape({inp0_rank}));
+      auto out_vec = out_constant.vec<int32>();
       for (int64_t j = 0; j < inp0_rank; ++j) {
         if (j == axis) {
-          output_dims[j] = offset;
+          out_vec(j) = offset;
           offset += inp_dims[j];
         } else {
-          const int64_t inp0_element = inp0_dims[j];
-          const int64_t inp_element = inp_dims[j];
+          const int32_t inp0_element = inp0_dims[j];
+          const int32_t inp_element = inp_dims[j];
           OP_REQUIRES(ctx, inp0_element == inp_element,
                       errors::InvalidArgument(
                           "All dimensions except ", axis, " must match. Input ",
                           i, " has shape [", absl::StrJoin(inp_dims, " "),
                           "] and doesn't match input 0 with shape [",
                           absl::StrJoin(inp0_dims, " "), "]."));
-          output_dims[j] = 0;
+          out_vec(j) = 0;
         }
       }
-      TensorShape out_shape;
-      OP_REQUIRES_OK(ctx,
-                     TensorShape::BuildTensorShape(output_dims, &out_shape));
-      Tensor out_constant(shape_type_, TensorShape({inp0_rank}));
-      OP_REQUIRES_OK(ctx, TensorShapeToConstant(out_shape, &out_constant));
 
       ctx->SetConstantOutput(i, out_constant);
     }
   }
-
- private:
-  DataType shape_type_;
 };
 
 REGISTER_XLA_OP(Name("ConcatOffset")
-                    .TypeConstraint("shape_type", {DT_INT32, DT_INT64})
                     .CompileTimeConstantInput("concat_dim")
                     .CompileTimeConstantInput("shape"),
                 ConcatOffsetOp);

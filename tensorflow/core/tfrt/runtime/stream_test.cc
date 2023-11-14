@@ -14,26 +14,16 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow/core/tfrt/runtime/stream.h"
 
-#include <cstdint>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "absl/container/flat_hash_map.h"
-#include "absl/log/check.h"
-#include "absl/log/log.h"
-#include "absl/memory/memory.h"
-#include "absl/time/clock.h"
-#include "absl/time/time.h"
-#include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/tensor_testutil.h"
 #include "tensorflow/core/tfrt/saved_model/saved_model_testutil.h"
-#include "tensorflow/core/tfrt/utils/thread_pool.h"
-#include "tsl/platform/env.h"
-#include "tsl/platform/statusor.h"
+#include "tensorflow/tsl/platform/env.h"
+#include "tensorflow/tsl/platform/statusor.h"
 
 namespace tensorflow {
 namespace tfrt_stub {
@@ -45,13 +35,13 @@ using ::testing::ElementsAreArray;
 using ::testing::Pair;
 using ::testing::UnorderedElementsAre;
 
-class TestStreamInterface : public StreamControllerInterface {
+class TestStreamInterface : public StreamInterface {
  public:
-  TestStreamInterface() : StreamControllerInterface("test_address") {}
+  TestStreamInterface() : StreamInterface("test_address") {}
 };
 
 const bool kUnused = []() {
-  GetGlobalStreamInterfaceFactory().RegisterController(
+  GetGlobalStreamInterfaceFactory().Register(
       []() { return std::make_unique<TestStreamInterface>(); });
   return true;
 }();
@@ -77,9 +67,8 @@ TEST(StreamTest, Simple) {
     auto thread = absl::WrapUnique(tsl::Env::Default()->StartThread(
         tsl::ThreadOptions(), "fake_stream_client", [&]() {
           for (const auto& map : expected) {
-            TfThreadPool thread_pool(/*name=*/"test", /*num_threads=*/4);
-            CHECK_OK(GetGlobalStreamCallbackRegistry().Invoke(
-                &thread_pool, callback_id, step_id, {map, absl::Now()}));
+            CHECK_OK(GetGlobalStreamCallbackRegistry().Write(
+                callback_id, step_id, {map, absl::Now()}));
           }
         }));
   }
@@ -100,7 +89,6 @@ TEST(StreamTest, MultipleWriters) {
   std::vector<absl::flat_hash_map<std::string, std::vector<int32_t>>> outputs;
 
   {
-    TfThreadPool thread_pool(/*name=*/"test", /*num_threads=*/4);
     TF_ASSERT_OK_AND_ASSIGN(
         auto scoped_stream_callback,
         GetGlobalStreamCallbackRegistry().Register(
@@ -118,12 +106,11 @@ TEST(StreamTest, MultipleWriters) {
          {{"c", AsTensor<int32_t>({300})}}};
 
     for (const auto& p : expected) {
-      tsl::Env::Default()->SchedClosure([&, callback_id, step_id, p]() {
-        TfThreadPool thread_pool(/*name=*/"test", /*num_threads=*/4);
+      tsl::Env::Default()->SchedClosure([callback_id, step_id, p]() {
         // The stream callback may be dropped early, and in that case we ignore
         // the error.
         GetGlobalStreamCallbackRegistry()
-            .Invoke(&thread_pool, callback_id, step_id, {p, absl::Now()})
+            .Write(callback_id, step_id, {p, absl::Now()})
             .IgnoreError();
       });
     }

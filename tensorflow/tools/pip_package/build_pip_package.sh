@@ -37,7 +37,7 @@ function cp_external() {
 
   pushd .
   cd "$src_dir"
-  for f in `find . ! -type d ! -name '*.py' ! -path '*local_config_cuda*' ! -path '*local_config_tensorrt*' ! -path '*pypi*' ! -path '*python_x86_64*' ! -path '*python_aarch64*' ! -path '*local_config_syslibs*' ! -path '*org_tensorflow*' ! -path '*llvm-project/llvm/*' ! -path '*local_tsl*' ! -path '*local_xla*'`; do
+  for f in `find . ! -type d ! -name '*.py' ! -path '*local_config_cuda*' ! -path '*local_config_tensorrt*' ! -path '*pypi*' ! -path '*python_x86_64*' ! -path '*python_aarch64*' ! -path '*local_config_syslibs*' ! -path '*org_tensorflow*' ! -path '*llvm-project/llvm/*'`; do
     mkdir -p "${dest_dir}/$(dirname ${f})"
     cp "${f}" "${dest_dir}/$(dirname ${f})/"
   done
@@ -83,15 +83,10 @@ function copy_xla_aot_runtime_sources() {
     if [ ! -z "$candidate_file" ]; then
       file=$candidate_file
     fi
-
-    # For XLA/TSL, we need to remove the prefix "../local_{xla|tsl}/".
-    dst_file=$file
-    dst_file=${dst_file#"../local_xla/"}
-    dst_file=${dst_file#"../local_tsl/"}
-
+    dn=$(dirname $file)
     if test -f "$file"; then
-      mkdir -p "${dst_dir}/$(dirname $dst_file)"
-      cp $file "${dst_dir}/${dst_file}"
+      mkdir -p "${dst_dir}/${dn}"
+      cp $file "${dst_dir}/${file}"
     else
       echo "Missing xla source file: ${file}" 1>&2
     fi
@@ -122,7 +117,7 @@ function reorganize_includes() {
   move_to_root_if_exists external/com_google_protobuf/src/google
   rm -rf external/com_google_protobuf/python
 
-  cp -R external/ml_dtypes ./
+  cp -R external/ml_dtypes/include ./
 
   popd
 }
@@ -215,23 +210,6 @@ function prepare_src() {
     cp -L \
       bazel-bin/tensorflow/tools/pip_package/build_pip_package.runfiles/org_tensorflow/LICENSE \
       "${TMPDIR}"
-    # Check if it is a tpu build
-    if [[ ${TPU_BUILD} == "1" ]]; then
-      # Check if libtpu.so exists
-      if [[ -f "./tensorflow/lib/libtpu.so" ]]; then
-        if [[ ! -L "${RUNFILES}/tensorflow/lib/libtpu.so" ]]; then
-          mkdir "$(real_path ${RUNFILES}/tensorflow/lib)"
-          ln -s $(real_path ./tensorflow/lib/libtpu.so) $(real_path ${RUNFILES}/tensorflow/lib/libtpu.so)
-          echo "Created symlink: $(real_path ./tensorflow/lib/libtpu.so) -> \
-            $(real_path ${RUNFILES}/tensorflow/lib/libtpu.so)"
-        else
-          echo "Symlink already exists: ${RUNFILES}/tensorflow/lib/libtpu.so"
-        fi
-      else
-        echo "Libtpu.so is not found in $(real_path ./tensorflow/lib/)"
-        exit 1
-      fi
-    fi
     cp -LR \
       bazel-bin/tensorflow/tools/pip_package/build_pip_package.runfiles/org_tensorflow/tensorflow \
       "${TMPDIR}"
@@ -258,16 +236,27 @@ function prepare_src() {
       bazel-bin/tensorflow/tools/pip_package/build_pip_package.runfiles/org_tensorflow \
       "${XLA_AOT_RUNTIME_SOURCES}"
     # Copy MKL libs over so they can be loaded at runtime
+    # TODO(b/271299337): shared libraries that depend on libml_dtypes.so.so have
+    # their NEEDED and RUNPATH set corresponding to a dependency on
+    # RUNFILES/_solib_local/libtensorflow_Stsl_Spython_Slib_Score_Slibml_dtypes.so.so,
+    # which is a symlink to tensorflow/tsl/python/lib/core/libml_dtypes.so in
+    # the Bazel build tree. We do not export the file in _solib_local (nor
+    # symlinks in general, I think Python wheels have poor support for them?)
     so_lib_dir=$(ls $RUNFILES | grep solib)
     if is_macos; then
+      chmod +rw ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
       chmod +rw ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
+      install_name_tool -change "@loader_path/../../../../../${so_lib_dir}//libtensorflow_Stsl_Spython_Slib_Score_Slibml_Udtypes.so.dylib" "@loader_path/libml_dtypes.so.dylib" ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
+      install_name_tool -change "@loader_path/../../${so_lib_dir}//libtensorflow_Stsl_Spython_Slib_Score_Slibml_Udtypes.so.dylib" "@loader_path/../tsl/python/lib/core/libml_dtypes.so.dylib" ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
     else
+      chmod +rw ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
       chmod +rw ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
-      chmod +rw ${TMPDIR}/tensorflow/compiler/mlir/quantization/tensorflow/python/pywrap_quantize_model.so
-      patchelf --set-rpath $(patchelf --print-rpath ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so):\$ORIGIN/../../tensorflow/tsl/python/lib/core ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
-      patchelf --set-rpath $(patchelf --print-rpath ${TMPDIR}/tensorflow/compiler/mlir/quantization/tensorflow/python/pywrap_quantize_model.so):\$ORIGIN/../../../../../python ${TMPDIR}/tensorflow/compiler/mlir/quantization/tensorflow/python/pywrap_quantize_model.so
+      patchelf --replace-needed libtensorflow_Stsl_Spython_Slib_Score_Slibml_Udtypes.so.so libml_dtypes.so.so ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
+      patchelf --replace-needed libtensorflow_Stsl_Spython_Slib_Score_Slibml_Udtypes.so.so libml_dtypes.so.so ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
+      patchelf --set-rpath $(patchelf --print-rpath ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so):\$ORIGIN ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
+      patchelf --set-rpath $(patchelf --print-rpath ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so):\$ORIGIN/../tsl/python/lib/core ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
+      patchelf --shrink-rpath ${TMPDIR}/tensorflow/tsl/python/lib/core/pywrap_ml_dtypes.so
       patchelf --shrink-rpath ${TMPDIR}/tensorflow/python/_pywrap_tensorflow_internal.so
-      patchelf --shrink-rpath ${TMPDIR}/tensorflow/compiler/mlir/quantization/tensorflow/python/pywrap_quantize_model.so
     fi
     mkl_so_dir=$(ls ${RUNFILES}/${so_lib_dir} | grep mkl) || true
     if [ -n "${mkl_so_dir}" ]; then
@@ -276,30 +265,8 @@ function prepare_src() {
     fi
   fi
 
-  # Move vendored files into proper locations
-  # This is required because TSL/XLA don't publish their own wheels
-  # We copy from bazel-bin/tensorflow instead of bazel-bin/internal to copy
-  # headers from TSL/XLA into tensorflow so that InstallHeaders can move
-  # them back into tensorflow/include
-  if is_windows; then
-    cp -RLn bazel-bin/tensorflow/tools/pip_package/build_pip_package.exe.runfiles/local_tsl/tsl/ ${TMPDIR}/tensorflow
-    cp -RLn bazel-bin/tensorflow/tools/pip_package/build_pip_package.exe.runfiles/local_xla/xla/ ${TMPDIR}/tensorflow/compiler
-  else
-    cp -RLn bazel-bin/tensorflow/tools/pip_package/build_pip_package.runfiles/local_tsl/tsl ${TMPDIR}/tensorflow
-    cp -RLn bazel-bin/tensorflow/tools/pip_package/build_pip_package.runfiles/local_xla/xla ${TMPDIR}/tensorflow/compiler
-  fi
-  # Fix the proto stubs
-  if is_macos; then
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i '' 's/from tsl\./from tensorflow.tsl./' {} \;
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i '' 's/from local_xla\.xla/from tensorflow.compiler.xla/' {} \;
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i '' 's/from xla/from tensorflow.compiler.xla/' {} \;
-  else
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i'' 's/from tsl\./from tensorflow.tsl./' {} \;
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i'' 's/from local_xla\.xla/from tensorflow.compiler.xla/' {} \;
-    find ${TMPDIR}/tensorflow/ -name "*.py" -type f -exec sed -i'' 's/from xla/from tensorflow.compiler.xla/' {} \;
-  fi
-
   mkdir -p ${TMPDIR}/third_party
+  cp -R $RUNFILES/third_party/eigen3 ${TMPDIR}/third_party
   cp -LR $RUNFILES/../local_config_cuda/cuda/_virtual_includes/cuda_headers_virtual/third_party/gpus ${TMPDIR}/third_party
   cp $RUNFILES/tensorflow/tools/pip_package/THIRD_PARTY_NOTICES.txt "${TMPDIR}/tensorflow"
 
@@ -363,6 +330,7 @@ function build_wheel() {
 
   rm -f MANIFEST
   echo $(date) : "=== Building wheel"
+  $FULL_DIR -m pip install wheel
   $FULL_DIR setup.py bdist_wheel ${PKG_NAME_FLAG} >/dev/null
   mkdir -p ${DEST}
   cp dist/* ${DEST}
@@ -384,7 +352,6 @@ function usage() {
   echo "  Options:"
   echo "    --project_name <name> set project name to name"
   echo "    --cpu                 build tensorflow_cpu"
-  echo "    --tpu                 build tensorflow_tpu"
   echo "    --gpudirect           build tensorflow_gpudirect"
   echo "    --rocm                build tensorflow_rocm"
   echo "    --nightly_flag        build tensorflow nightly"
@@ -396,7 +363,6 @@ function main() {
   PKG_NAME_FLAG=""
   PROJECT_NAME=""
   CPU_BUILD=0
-  TPU_BUILD=0
   GPUDIRECT_BUILD=0
   ROCM_BUILD=0
   NIGHTLY_BUILD=0
@@ -411,8 +377,6 @@ function main() {
       NIGHTLY_BUILD=1
     elif [[ "$1" == "--cpu" ]]; then
       CPU_BUILD=1
-    elif [[ "$1" == "--tpu" ]]; then
-      TPU_BUILD=1
     elif [[ "$1" == "--gpudirect" ]]; then
       GPUDIRECT_BUILD=1
     elif [[ "$1" == "--rocm" ]]; then
@@ -440,8 +404,8 @@ function main() {
     fi
   done
 
-  if [[ $(( TPU_BUILD + CPU_BUILD + GPUDIRECT_BUILD + ROCM_BUILD )) -gt "1" ]]; then
-    echo "Only one of [--tpu, --cpu, --gpudirect, --rocm] may be provided."
+  if [[ $(( CPU_BUILD + GPUDIRECT_BUILD + ROCM_BUILD )) -gt "1" ]]; then
+    echo "Only one of [--cpu, --gpudirect, --rocm] may be provided."
     usage
     exit 1
   fi
@@ -472,8 +436,6 @@ function main() {
     PKG_NAME_FLAG="--project_name tf_nightly_rocm"
   elif [[ ${NIGHTLY_BUILD} == "1" && ${CPU_BUILD} == "1" ]]; then
     PKG_NAME_FLAG="--project_name tf_nightly_cpu"
-  elif [[ ${NIGHTLY_BUILD} == "1" && ${TPU_BUILD} == "1" ]]; then
-    PKG_NAME_FLAG="--project_name tf_nightly_tpu"
   elif [[ ${NIGHTLY_BUILD} == "1" ]]; then
     PKG_NAME_FLAG="--project_name tf_nightly"
   elif [[ ${GPUDIRECT_BUILD} == "1" ]]; then
@@ -482,8 +444,6 @@ function main() {
     PKG_NAME_FLAG="--project_name tensorflow_rocm"
   elif [[ ${CPU_BUILD} == "1" ]]; then
     PKG_NAME_FLAG="--project_name tensorflow_cpu"
-  elif [[ ${TPU_BUILD} == "1" ]]; then
-    PKG_NAME_FLAG="--project_name tensorflow_tpu"
   fi
 
   build_wheel "$SRCDIR" "$DSTDIR" "$PKG_NAME_FLAG"

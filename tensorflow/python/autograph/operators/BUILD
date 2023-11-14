@@ -30,9 +30,7 @@ py_strict_library(
 py_strict_library(
     name = "exceptions",
     srcs = ["exceptions.py"],
-    visibility = [
-        "//visibility:private",  # Only private by automation, not intent. Owner may accept CLs adding visibility. See go/scheuklappen#explicit-private.
-    ],
+    visibility = ["//tensorflow:__subpackages__"],
     deps = [
         "//tensorflow/python/framework:tensor_util",
         "//tensorflow/python/ops:control_flow_assert",
@@ -59,9 +57,7 @@ py_strict_library(
 py_strict_library(
     name = "logical",
     srcs = ["logical.py"],
-    visibility = [
-        "//visibility:private",  # Only private by automation, not intent. Owner may accept CLs adding visibility. See go/scheuklappen#explicit-private.
-    ],
+    visibility = ["//tensorflow:__subpackages__"],
     deps = [
         "//tensorflow/python/framework:tensor_util",
         "//tensorflow/python/ops:cond",
@@ -94,9 +90,7 @@ py_strict_library(
 py_strict_library(
     name = "conditional_expressions",
     srcs = ["conditional_expressions.py"],
-    visibility = [
-        "//visibility:private",  # Only private by automation, not intent. Owner may accept CLs adding visibility. See go/scheuklappen#explicit-private.
-    ],
+    visibility = ["//tensorflow:__subpackages__"],
     deps = [
         ":control_flow",
         "//tensorflow/python/autograph/utils:tensors",
@@ -129,6 +123,7 @@ py_strict_library(
         "//tensorflow/python/ops:math_ops",
         "//tensorflow/python/ops:tensor_array_ops",
         "//tensorflow/python/ops:while_loop",
+        "//tensorflow/python/ops/ragged:ragged_tensor",
         "//tensorflow/python/types:distribute",
         "//tensorflow/python/util:nest",
         "//tensorflow/python/util:variable_utils",
@@ -139,9 +134,7 @@ py_strict_library(
 py_strict_library(
     name = "slices",
     srcs = ["slices.py"],
-    visibility = [
-        "//visibility:private",  # Only private by automation, not intent. Owner may accept CLs adding visibility. See go/scheuklappen#explicit-private.
-    ],
+    visibility = ["//tensorflow:__subpackages__"],
     deps = [
         "//tensorflow/python/framework:dtypes",
         "//tensorflow/python/framework:tensor_util",

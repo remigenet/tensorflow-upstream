@@ -50,8 +50,7 @@ class TfOpRoofLineCostEstimator
   absl::flat_hash_set<std::string>
       unsupported_ops_;  // summary for unsupported ops.
 
-  TfOpRoofLineCostEstimator(const TfOpRoofLineCostEstimator&) = delete;
-  void operator=(const TfOpRoofLineCostEstimator&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TfOpRoofLineCostEstimator);
 };
 
 }  // namespace profiler

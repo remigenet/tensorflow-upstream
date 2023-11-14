@@ -16,10 +16,6 @@ tf_python_pybind_extension(
         "ops.cc",
         "types.cc",
     ],
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "mlir_wrapper.pyi",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/compiler/mlir/tensorflow",
@@ -38,10 +34,6 @@ tf_python_pybind_extension(
 tf_python_pybind_extension(
     name = "filecheck_wrapper",
     srcs = ["filecheck_wrapper.cc"],
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "filecheck_wrapper.pyi",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/python/lib/core:pybind11_lib",

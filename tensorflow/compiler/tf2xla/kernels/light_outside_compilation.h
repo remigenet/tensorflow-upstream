@@ -16,12 +16,11 @@ limitations under the License.
 #ifndef TENSORFLOW_COMPILER_TF2XLA_KERNELS_LIGHT_OUTSIDE_COMPILATION_H_
 #define TENSORFLOW_COMPILER_TF2XLA_KERNELS_LIGHT_OUTSIDE_COMPILATION_H_
 
+#include <functional>
 #include <map>
 
-#include "tensorflow/compiler/tf2xla/kernels/callback.pb.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/core/platform/status.h"
-
 namespace tensorflow {
 
 // Using std::map as the maps are presumed to be tiny, and we want a
@@ -55,9 +54,7 @@ class LightOutsideCompilationOp : public XlaOpKernel {
  private:
   Status CompileToCustomCallCallingTfKernel(int graph_def_version,
                                             const NodeDef& node_def,
-                                            XlaOpKernelContext* ctx);
-  static Status CallTfKernel(void* stream_handle, void** buffers,
-                             const char* opaque, int opaque_len);
+                                            XlaOpKernelContext* ctx) const;
 
   NodeDef def_;
   int graph_def_version_;

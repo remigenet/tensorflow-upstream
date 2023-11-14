@@ -256,8 +256,7 @@ class ImageData {
   mutable bool pyramid_sqrt2_computed_[kNumPyramidLevels * 2];
   mutable Image<uint8_t>* pyramid_sqrt2_[kNumPyramidLevels * 2];
 
-  ImageData(const ImageData&) = delete;
-  void operator=(const ImageData&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ImageData);
 };
 
 }  // namespace tf_tracking

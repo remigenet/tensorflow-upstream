@@ -134,8 +134,7 @@ class InitializableLookupTable : public LookupInterface {
     virtual int64_t total_size() const = 0;
 
    private:
-    InitTableIterator(const InitTableIterator&) = delete;
-    void operator=(const InitTableIterator&) = delete;
+    TF_DISALLOW_COPY_AND_ASSIGN(InitTableIterator);
   };
 
   InitializableLookupTable* GetInitializableLookupTable() override {
@@ -255,8 +254,7 @@ class KeyValueTensorIterator
   }
 
  private:
-  KeyValueTensorIterator(const KeyValueTensorIterator&) = delete;
-  void operator=(const KeyValueTensorIterator&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(KeyValueTensorIterator);
 
   const Tensor* keys_;    // Doesn't own it.
   const Tensor* values_;  // Doesn't own it.

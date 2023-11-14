@@ -34,7 +34,7 @@ limitations under the License.
 #include "tensorflow/core/profiler/protobuf/op_profile.pb.h"
 #include "tensorflow/core/profiler/utils/math_utils.h"
 #include "tensorflow/core/profiler/utils/op_metrics_db_utils.h"
-#include "tsl/profiler/convert/xla_op_utils.h"
+#include "tensorflow/tsl/profiler/convert/xla_op_utils.h"
 
 namespace tensorflow {
 namespace profiler {
@@ -150,13 +150,18 @@ void FinalizeDeduplicatedNodes(bool by_program, Node* root) {
 // This is only for convolutions, not other HLOs, categories or whole programs.
 // TODO(b/243596435) Find a permanent fix to this problem.
 int64_t GetComputationSize(Node node) {
-  if (node.has_xla() && node.xla().computation_primitive_size() > 0) {
-    return node.xla().computation_primitive_size();
+  int64_t computation_size = 0;
+  for (const auto& child : node.children()) {
+    if (GetComputationSize(child) != 0) {
+      computation_size = GetComputationSize(child);
+    }
   }
-  for (auto child_iter = node.children().rbegin();
-       child_iter != node.children().rend(); ++child_iter) {
-    if (const int64_t computation_size = GetComputationSize(*child_iter))
+  if (node.has_xla()) {
+    if (node.xla().computation_primitive_size() > 0) {
+      return node.xla().computation_primitive_size();
+    } else {
       return computation_size;
+    }
   }
   return 0;
 }
@@ -236,6 +241,14 @@ void PopulateOpMetricsNode(
   double sram_wr_bytes = GibiToGiga(sram_wr_gibibytes_per_second) *
                          PicoToNano(op_metrics.time_ps());
 
+  // Check if number of bytes is consistent.
+  const auto total_bytes = op_metrics.bytes_accessed();
+  if ((hbm_bytes + sram_rd_bytes + sram_wr_bytes) < (0.99 * total_bytes)) {
+    // If inconsistent, assume total_bytes are all off-chip.
+    hbm_bytes = total_bytes;
+    sram_rd_bytes = 0;
+    sram_wr_bytes = 0;
+  }
   metrics->add_raw_bytes_accessed_array(hbm_bytes);
   metrics->add_raw_bytes_accessed_array(sram_rd_bytes);
   metrics->add_raw_bytes_accessed_array(sram_wr_bytes);

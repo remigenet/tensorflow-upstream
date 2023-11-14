@@ -1514,10 +1514,10 @@ class TensorArrayTraceType(trace.TraceType):
   def placeholder_value(self, placeholder_context):
     return self._value
 
-  def flatten(self):
+  def _flatten(self):
     return [tensor_lib.TensorSpec([], dtypes.variant)]
 
-  def from_tensors(self, tensors):
+  def _from_tensors(self, tensors):
     return next(tensors)
 
   def __eq__(self, other):

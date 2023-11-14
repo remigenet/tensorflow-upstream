@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "absl/status/status.h"
+#include "tensorflow/core/platform/errors.h"
+#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/tpu/tpu_api_dlsym_initializer.h"
 
 // Reminder: Update tpu_api_dlsym_initializer_windows.cc if you are adding new
 // publicly visible methods.
@@ -21,8 +23,8 @@ limitations under the License.
 namespace tensorflow {
 namespace tpu {
 
-absl::Status InitializeTpuLibrary(void* library_handle) {
-  return absl::UnimplementedError(
+Status InitializeTpuLibrary(void* library_handle) {
+  return errors::Unimplemented(
       "Loading TPU library is not supported on Windows.");
 }
 

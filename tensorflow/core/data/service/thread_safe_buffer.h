@@ -56,8 +56,7 @@ class ThreadSafeBuffer final {
   std::deque<StatusOr<T>> results_ TF_GUARDED_BY(mu_);
   Status status_ TF_GUARDED_BY(mu_) = OkStatus();
 
-  ThreadSafeBuffer(const ThreadSafeBuffer&) = delete;
-  void operator=(const ThreadSafeBuffer&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ThreadSafeBuffer);
 };
 
 template <class T>

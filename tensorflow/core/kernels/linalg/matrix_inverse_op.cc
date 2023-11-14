@@ -19,8 +19,8 @@ limitations under the License.
 #define EIGEN_USE_GPU
 #endif
 
-#include "Eigen/Core"  // from @eigen_archive
-#include "Eigen/LU"  // from @eigen_archive
+#include "third_party/eigen3/Eigen/Core"
+#include "third_party/eigen3/Eigen/LU"
 #include "tensorflow/core/framework/kernel_def_builder.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor_shape.h"
@@ -32,7 +32,7 @@ limitations under the License.
 
 #if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
 #include "rocm/rocm_config.h"
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/kernels/linalg/eye_functor.h"
 #include "tensorflow/core/kernels/transpose_functor.h"
 #include "tensorflow/core/util/gpu_solvers.h"
@@ -81,8 +81,7 @@ class MatrixInverseOp : public LinearAlgebraOp<Scalar> {
  private:
   bool adjoint_;
 
-  MatrixInverseOp(const MatrixInverseOp&) = delete;
-  void operator=(const MatrixInverseOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixInverseOp);
 };
 
 // For Eigen::half, compute inverse via float32 - otherwise precision is
@@ -124,8 +123,7 @@ class MatrixInverseOp<Eigen::half> : public LinearAlgebraOp<Eigen::half> {
  private:
   bool adjoint_;
 
-  MatrixInverseOp(const MatrixInverseOp&) = delete;
-  void operator=(const MatrixInverseOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixInverseOp);
 };
 
 

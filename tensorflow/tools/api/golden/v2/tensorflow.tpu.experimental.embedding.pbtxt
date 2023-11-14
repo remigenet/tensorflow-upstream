@@ -25,10 +25,6 @@ tf_module {
     mtype: "<type \'type\'>"
   }
   member {
-    name: "RowIdInitializer"
-    mtype: "<type \'type\'>"
-  }
-  member {
     name: "SGD"
     mtype: "<type \'type\'>"
   }
@@ -42,10 +38,6 @@ tf_module {
   }
   member {
     name: "TPUEmbeddingV0"
-    mtype: "<type \'type\'>"
-  }
-  member {
-    name: "TPUEmbeddingV2"
     mtype: "<type \'type\'>"
   }
   member {

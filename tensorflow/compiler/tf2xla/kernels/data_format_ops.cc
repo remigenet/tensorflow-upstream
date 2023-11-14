@@ -20,8 +20,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/slicing.h"
-#include "xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/client/lib/slicing.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/lib/core/errors.h"
 #include "tensorflow/core/util/tensor_format.h"
 
@@ -79,8 +79,7 @@ class DataFormatDimMapOp : public XlaOpKernel {
  private:
   std::vector<int32> dst_idx_;
 
-  DataFormatDimMapOp(const DataFormatDimMapOp&) = delete;
-  void operator=(const DataFormatDimMapOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DataFormatDimMapOp);
 };
 
 REGISTER_XLA_OP(
@@ -179,8 +178,7 @@ class DataFormatVecPermuteOp : public XlaOpKernel {
   string src_format_;
   string dst_format_;
 
-  DataFormatVecPermuteOp(const DataFormatVecPermuteOp&) = delete;
-  void operator=(const DataFormatVecPermuteOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DataFormatVecPermuteOp);
 };
 
 REGISTER_XLA_OP(

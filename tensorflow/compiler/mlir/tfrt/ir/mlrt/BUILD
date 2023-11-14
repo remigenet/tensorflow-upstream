@@ -15,6 +15,8 @@ td_library(
     visibility = [
         # copybara:uncomment "//learning/brain/tfrt/mlir:__subpackages__",
         "//learning/infra/mira/distributed:__subpackages__",
+        "//tensorflow/compiler/mlir/tfrt:__subpackages__",
+        "//tensorflow/core/tfrt/mlrt:__subpackages__",
     ],
     deps = [
         "@llvm-project//mlir:OpBaseTdFiles",
@@ -89,7 +91,7 @@ td_library(
     ],
     includes = ["."],
     visibility = [
-        "//visibility:private",  # Only private by automation, not intent. Owner may accept CLs adding visibility. See go/scheuklappen#explicit-private.
+        "//tensorflow/core/tfrt/mlrt:__subpackages__",
     ],
     deps = [
         ":mlrt_td_files",
@@ -159,6 +161,7 @@ cc_library(
         # copybara:uncomment "//learning/brain/experimental/tfrt/mlrt/application/tensorflow/tests:__subpackages__",
         # copybara:uncomment "//learning/infra/mira/distributed:__subpackages__",
         "//tensorflow/compiler/mlir/tfrt:__subpackages__",
+        "//tensorflow/core/tfrt/mlrt:__subpackages__",
     ],
     deps = [
         ":mlrt_ops",
@@ -177,7 +180,10 @@ cc_library(
     name = "tf_mlrt_tpu_ops",
     srcs = ["tf_mlrt_tpu_ops.cc"],
     hdrs = ["tf_mlrt_tpu_ops.h"],
-    visibility = ["//tensorflow/compiler/mlir/tfrt/transforms/mlrt:__subpackages__"],
+    visibility = [
+        "//tensorflow/compiler/mlir/tfrt/transforms/mlrt:__subpackages__",
+        "//tensorflow/core/tfrt/mlrt:__subpackages__",
+    ],
     deps = [
         ":mlrt_ops",
         ":tf_mlrt_ops",

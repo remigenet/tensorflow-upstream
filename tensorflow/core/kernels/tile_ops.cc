@@ -23,7 +23,7 @@ limitations under the License.
 
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 
 #include "tensorflow/core/framework/numeric_op.h"
 #include "tensorflow/core/framework/op_kernel.h"
@@ -256,8 +256,7 @@ class TileOp : public OpKernel {
                   const gtl::ArraySlice<Tmultiples> multiples_array,
                   Tensor* result);
 
-  TileOp(const TileOp&) = delete;
-  void operator=(const TileOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TileOp);
 };
 
 template <typename Device, typename Tmultiples>
@@ -509,8 +508,7 @@ class TileGradientOp : public OpKernel {
         context->input(0).tensor<T, NDIM>(), reduce_dim, reshape_dim);
   }
 
-  TileGradientOp(const TileGradientOp&) = delete;
-  void operator=(const TileGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TileGradientOp);
 };
 
 template <typename Device, typename Tmultiples>

@@ -429,8 +429,7 @@ class SparseConditionalAccumulator
     return true;
   }
 
-  SparseConditionalAccumulator(const SparseConditionalAccumulator&) = delete;
-  void operator=(const SparseConditionalAccumulator&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SparseConditionalAccumulator);
 };
 
 }  // namespace tensorflow

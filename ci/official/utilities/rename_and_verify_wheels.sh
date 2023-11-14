@@ -20,23 +20,17 @@
 set -euxo pipefail
 
 DIR=$1
-find "$DIR" -iname "*.whl" | while read wheel; do
+for wheel in $DIR/*.whl; do
   echo "Checking and renaming $wheel..."
-  wheel=$(realpath "$wheel")
-  # Repair wheel based upon name/architecture, fallback to x86
-  if [[ $wheel == *"aarch64.whl" ]]; then
-    time python3 -m auditwheel repair --plat manylinux2014_aarch64 "$wheel" --wheel-dir "$DIR" 2>&1 | tee check.txt
-  else
-    time python3 -m auditwheel repair --plat manylinux2014_x86_64 "$wheel" --wheel-dir "$DIR" 2>&1 | tee check.txt
-  fi
+  time python3 -m auditwheel repair --plat manylinux2014_x86_64 "$wheel" --wheel-dir build 2>&1 | tee check.txt
 
   # We don't need the original wheel if it was renamed
-  new_wheel=$(awk '/Fixed-up wheel written to/ {print $NF}' check.txt)
+  new_wheel=$(grep --extended-regexp --only-matching '\S+.whl' check.txt | tail -n 1)
   if [[ "$new_wheel" != "$wheel" ]]; then
     rm "$wheel"
     wheel="$new_wheel"
   fi
   rm check.txt
 
-  TF_WHEEL="$wheel" BUILD_DIR="$DIR" bats ./ci/official/utilities/wheel_verification.bats --timing
+  TF_WHEEL="$wheel" bats ./ci/official/utilities/wheel_verification.bats --timing
 done

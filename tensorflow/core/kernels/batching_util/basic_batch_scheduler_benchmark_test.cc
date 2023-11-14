@@ -57,8 +57,7 @@ class UniformLoadInjector : public LoadInjector {
                   int64_t average_injection_interval_micros) const override;
 
  private:
-  UniformLoadInjector(const UniformLoadInjector&) = delete;
-  void operator=(const UniformLoadInjector&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(UniformLoadInjector);
 };
 
 void UniformLoadInjector::InjectLoad(

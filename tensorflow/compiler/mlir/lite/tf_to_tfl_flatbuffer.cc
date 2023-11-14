@@ -23,8 +23,6 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/strings/str_cat.h"
 #include "absl/types/span.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
@@ -46,7 +44,6 @@ limitations under the License.
 #include "tensorflow/compiler/mlir/lite/stablehlo/serializer/flatbuffer_export.h"
 #include "tensorflow/compiler/mlir/lite/stablehlo/transforms/op_stat_pass.h"
 #include "tensorflow/compiler/mlir/lite/stablehlo/transforms/stablehlo_tfl_pass.h"
-#include "tensorflow/compiler/mlir/lite/stablehlo/transforms/stablehlo_util.h"
 #include "tensorflow/compiler/mlir/lite/stablehlo/transforms/transforms.h"
 #include "tensorflow/compiler/mlir/lite/tf_tfl_passes.h"
 #include "tensorflow/compiler/mlir/lite/transforms/passes.h"
@@ -68,7 +65,7 @@ limitations under the License.
 #include "tensorflow/lite/python/metrics/converter_error_data.pb.h"
 #include "tensorflow/lite/tools/optimize/quantize_weights.h"
 #include "tensorflow/lite/tools/optimize/reduced_precision_support.h"
-#include "tsl/platform/statusor.h"
+#include "tensorflow/tsl/platform/statusor.h"
 
 namespace tensorflow {
 namespace {
@@ -234,8 +231,7 @@ Status ConvertTFExecutorToStablehloFlatbuffer(
     mlir::PassManager& pass_manager, mlir::ModuleOp module, bool export_to_mlir,
     mlir::StatusScopedDiagnosticHandler& statusHandler,
     const toco::TocoFlags& toco_flags, const mlir::TFL::PassConfig& pass_config,
-    std::optional<tensorflow::Session*> session, std::string* result,
-    const std::unordered_set<std::string>& saved_model_tags) {
+    std::optional<tensorflow::Session*> session, std::string* result) {
   // Currently, TF quantization only support dynamic range quant, as such
   // when toco flag post training quantization is specified with converting to
   // stablehlo, we automatically enable dynamic range quantization
@@ -256,9 +252,9 @@ Status ConvertTFExecutorToStablehloFlatbuffer(
 
       tensorflow::quantization::QuantizationOptions quantization_options;
 
-      quantization_options.mutable_quantization_method()->set_preset_method(
-          tensorflow::quantization::QuantizationMethod::
-              METHOD_DYNAMIC_RANGE_INT8);
+      quantization_options.mutable_quantization_method()
+          ->set_experimental_method(
+              tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE);
       quantization_options.set_op_set(
           tensorflow::quantization::UNIFORM_QUANTIZED);
       quantization_options.set_min_num_elements_for_weights(
@@ -275,8 +271,7 @@ Status ConvertTFExecutorToStablehloFlatbuffer(
   mlir::odml::AddTFToStablehloPasses(pass_manager, /*skip_resize*/ true,
                                      /*smuggle_disallowed_ops*/ true);
   // Print out a detailed report of non-converted stats.
-  pass_manager.addPass(mlir::odml::createPrintOpStatsPass(
-      mlir::odml::GetAcceptedStableHLODialects()));
+  pass_manager.addPass(mlir::odml::createPrintOpStatsPass());
   mlir::odml::AddStablehloOptimizationPasses(pass_manager);
   if (toco_flags.has_quantization_options()) {
     stablehlo::quantization::AddQuantizationPasses(
@@ -286,27 +281,16 @@ Status ConvertTFExecutorToStablehloFlatbuffer(
     return statusHandler.ConsumeStatus();
   }
 
-  if (export_to_mlir) {
+  // for now always output mlir
+  if (/*export_to_mlir*/ /* DISABLES CODE */ (true)) {
     llvm::raw_string_ostream os(*result);
     module.print(os);
     return statusHandler.ConsumeStatus();
   }
 
-  // Write MLIR Stablehlo dialect into FlatBuffer
-  OpOrArgLocNameMapper op_or_arg_name_mapper;
-  tflite::FlatbufferExportOptions options;
-  options.toco_flags = toco_flags;
-  options.saved_model_tags = saved_model_tags;
-  options.op_or_arg_name_mapper = &op_or_arg_name_mapper;
-  options.metadata[tflite::kModelUseStablehloTensorKey] = "true";
-  if (!tflite::MlirToFlatBufferTranslateFunction(module, options, result,
-                                                 true)) {
-    auto s = statusHandler.ConsumeStatus();
-    std::string message = "Could not translate MLIR to FlatBuffer.";
-    if (!s.ok()) {
-      absl::StrAppend(&message, " ", s.ToString());
-    }
-    return absl::UnknownError(message);
+  mlir::odml::FlatbufferExportOptions options;
+  if (!mlir::odml::MlirToFlatBufferTranslateFunction(module, options, result)) {
+    return statusHandler.ConsumeStatus();
   }
 
   return OkStatus();
@@ -317,8 +301,7 @@ Status ConvertTFExecutorToTFLOrFlatbuffer(
     const toco::TocoFlags& toco_flags, const mlir::TFL::PassConfig& pass_config,
     const std::unordered_set<std::string>& saved_model_tags,
     llvm::StringRef saved_model_dir,
-    std::optional<tensorflow::Session*> session, std::string* result,
-    bool serialize_stablehlo_ops) {
+    std::optional<tensorflow::Session*> session, std::string* result) {
   // Explicitly disable dumping Op details on failures.
   module.getContext()->printOpOnDiagnostic(false);
 
@@ -359,7 +342,7 @@ Status ConvertTFExecutorToTFLOrFlatbuffer(
     // return to avoid adding TFL converter path
     return ConvertTFExecutorToStablehloFlatbuffer(
         pass_manager, module, export_to_mlir, statusHandler, toco_flags,
-        pass_config, session, result, saved_model_tags);
+        pass_config, session, result);
   }
 
   tensorflow::AddPreVariableFreezingTFToTFLConversionPasses(pass_config,
@@ -414,14 +397,6 @@ Status ConvertTFExecutorToTFLOrFlatbuffer(
     return statusHandler.ConsumeStatus();
   }
 
-  pass_manager.clear();
-  // Print out a detailed report of ops that are not converted to TFL ops.
-  pass_manager.addPass(mlir::odml::createPrintOpStatsPass(
-      mlir::odml::GetAcceptedTFLiteDialects()));
-  if (failed(pass_manager.run(module))) {
-    return statusHandler.ConsumeStatus();
-  }
-
   if (export_to_mlir) {
     llvm::raw_string_ostream os(*result);
     module.print(os);
@@ -441,14 +416,9 @@ Status ConvertTFExecutorToTFLOrFlatbuffer(
     options.metadata.insert(
         MetadataForReducedPrecisionSupport(quant_specs.support_mask));
   }
-  if (!tflite::MlirToFlatBufferTranslateFunction(
-          module, options, &translated_result, serialize_stablehlo_ops)) {
-    auto s = statusHandler.ConsumeStatus();
-    std::string message = "Could not translate MLIR to FlatBuffer.";
-    if (!s.ok()) {
-      absl::StrAppend(&message, " ", s.ToString());
-    }
-    return absl::UnknownError(message);
+  if (!tflite::MlirToFlatBufferTranslateFunction(module, options,
+                                                 &translated_result)) {
+    return statusHandler.ConsumeStatus();
   }
 
   // TODO(b/176267167): Quantize flex fallback in the MLIR pipeline

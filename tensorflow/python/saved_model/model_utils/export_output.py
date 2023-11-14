@@ -423,3 +423,4 @@ class EvalOutput(_SupervisedOutput):
 
   def _get_signature_def_fn(self):
     return signature_def_utils.supervised_eval_signature_def
+# LINT.ThenChange(//keras/saving/utils_v1/export_output.py)

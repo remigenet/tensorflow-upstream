@@ -54,9 +54,9 @@ limitations under the License.
 #include "tensorflow/core/profiler/lib/scoped_memory_debug_annotation.h"
 #include "tensorflow/core/protobuf/transport_options.pb.h"
 #include "tensorflow/core/protobuf/worker.pb.h"
-#include "tsl/distributed_runtime/rpc/async_service_interface.h"
-#include "tsl/distributed_runtime/rpc/grpc_call.h"
-#include "tsl/protobuf/rpc_options.pb.h"
+#include "tensorflow/tsl/distributed_runtime/rpc/async_service_interface.h"
+#include "tensorflow/tsl/distributed_runtime/rpc/grpc_call.h"
+#include "tensorflow/tsl/protobuf/rpc_options.pb.h"
 
 namespace tensorflow {
 
@@ -361,8 +361,7 @@ class GrpcWorkerServiceThread {
 
   mutex shutdown_mu_;
   bool is_shutdown_ TF_GUARDED_BY(shutdown_mu_);
-  GrpcWorkerServiceThread(const GrpcWorkerServiceThread&) = delete;
-  void operator=(const GrpcWorkerServiceThread&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GrpcWorkerServiceThread);
 };
 
 class GrpcWorkerService : public tsl::AsyncServiceInterface {
@@ -412,8 +411,7 @@ class GrpcWorkerService : public tsl::AsyncServiceInterface {
   mutex service_shutdown_mu_;
   bool is_shutdown_ TF_GUARDED_BY(service_shutdown_mu_);
 
-  GrpcWorkerService(const GrpcWorkerService&) = delete;
-  void operator=(const GrpcWorkerService&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GrpcWorkerService);
 };
 
 }  // namespace

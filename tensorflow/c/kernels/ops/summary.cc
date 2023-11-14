@@ -46,7 +46,7 @@ void Register_ScalarSummaryOp() {
 }
 
 TF_ATTRIBUTE_UNUSED static bool SummaryScalarOpRegistered = []() {
-  if (&TF_NewStatus != nullptr && SHOULD_REGISTER_OP("ScalarSummary")) {
+  if (SHOULD_REGISTER_OP("ScalarSummary")) {
     Register_ScalarSummaryOp();
   }
   return true;

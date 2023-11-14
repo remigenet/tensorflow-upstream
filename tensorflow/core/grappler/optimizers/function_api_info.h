@@ -60,8 +60,7 @@ class FunctionApiInfo {
   DataTypeVector input_arg_dtypes_;
   DataTypeVector output_arg_dtypes_;
 
-  FunctionApiInfo(const FunctionApiInfo&) = delete;
-  void operator=(const FunctionApiInfo&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FunctionApiInfo);
 };
 
 // A collection of information for function and the interface it implements.
@@ -96,8 +95,7 @@ class FunctionLibraryApiInfo {
   absl::flat_hash_map<string, std::vector<string>> intf_to_forward_funcs_;
   absl::flat_hash_map<string, std::vector<string>> intf_to_backward_funcs_;
 
-  FunctionLibraryApiInfo(const FunctionLibraryApiInfo&) = delete;
-  void operator=(const FunctionLibraryApiInfo&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FunctionLibraryApiInfo);
 };
 
 }  // end namespace grappler

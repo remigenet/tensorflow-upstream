@@ -16,7 +16,7 @@ py_strict_library(
         "//tensorflow/python/autograph/pyct:gast_util",
         "//tensorflow/python/autograph/pyct:templates",
         "//tensorflow/python/autograph/pyct:transformer",
-        "@pypi_gast//:pkg",
+        "@gast_archive//:gast",
     ],
 )
 
@@ -32,6 +32,6 @@ py_strict_test(
         "//tensorflow/python/autograph/pyct:parser",
         "//tensorflow/python/autograph/pyct:transformer",
         "//tensorflow/python/platform:client_testlib",
-        "@pypi_gast//:pkg",
+        "@gast_archive//:gast",
     ],
 )

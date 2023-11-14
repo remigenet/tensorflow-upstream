@@ -196,8 +196,7 @@ class StatelessRandomPoissonOp : public StatelessRandomOpBase {
   }
 
  private:
-  StatelessRandomPoissonOp(const StatelessRandomPoissonOp&) = delete;
-  void operator=(const StatelessRandomPoissonOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessRandomPoissonOp);
 };
 
 #define REGISTER(DEVICE, TYPE)                                              \

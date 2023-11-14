@@ -19,7 +19,6 @@ cuda_py_strict_test(
         "//tensorflow/python/ops/linalg/sparse:conjugate_gradient",
         "//tensorflow/python/platform:client_testlib",
         "//third_party/py/numpy",
-        "@absl_py//absl/testing:parameterized",
     ],
 )
 

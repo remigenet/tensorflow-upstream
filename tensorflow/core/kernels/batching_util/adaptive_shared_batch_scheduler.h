@@ -284,8 +284,7 @@ class AdaptiveSharedBatchScheduler
   // Current adjustment size (as a fraction of in_flight_batches_limit_).
   double step_size_multiplier_ TF_GUARDED_BY(mu_) = kMaxStepSizeMultiplier;
 
-  AdaptiveSharedBatchScheduler(const AdaptiveSharedBatchScheduler&) = delete;
-  void operator=(const AdaptiveSharedBatchScheduler&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(AdaptiveSharedBatchScheduler);
 };
 
 //////////////////////////////////////////////////////////
@@ -337,8 +336,7 @@ class ASBSQueue : public BatchScheduler<TaskType> {
   int64_t num_enqueued_batches_ TF_GUARDED_BY(mu_) = 0;
   int64_t num_enqueued_tasks_ TF_GUARDED_BY(mu_) = 0;
   mutable mutex mu_;
-  ASBSQueue(const ASBSQueue&) = delete;
-  void operator=(const ASBSQueue&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ASBSQueue);
 };
 
 // Batch which remembers when and by whom it was created.
@@ -367,8 +365,7 @@ class ASBSBatch : public Batch<TaskType> {
   const int64_t creation_time_micros_;
   const int64_t schedulable_time_micros_;
   const uint64 traceme_context_id_;
-  ASBSBatch(const ASBSBatch&) = delete;
-  void operator=(const ASBSBatch&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ASBSBatch);
 };
 }  // namespace internal
 

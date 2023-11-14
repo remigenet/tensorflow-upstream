@@ -106,8 +106,6 @@ TF_CALL_QUANTIZED_TYPES(REGISTER);
 TF_CALL_bool(REGISTER);
 TF_CALL_float8_e5m2(REGISTER);
 TF_CALL_float8_e4m3fn(REGISTER);
-TF_CALL_int4(REGISTER);
-TF_CALL_uint4(REGISTER);
 
 REGISTER_KERNEL_BUILDER(
     Name(kDeviceArgOp).Device(DEVICE_DEFAULT).TypeConstraint<int32>("T"),
@@ -148,8 +146,6 @@ REGISTER(Variant);
 TF_CALL_bool(REGISTER);
 TF_CALL_float8_e5m2(REGISTER);
 TF_CALL_float8_e4m3fn(REGISTER);
-TF_CALL_int4(REGISTER);
-TF_CALL_uint4(REGISTER);
 
 REGISTER_KERNEL_BUILDER(Name(kRetOp)
                             .Device(DEVICE_DEFAULT)
@@ -275,8 +271,7 @@ class SymbolicGradientOp : public AsyncOpKernel {
   }
 
  private:
-  SymbolicGradientOp(const SymbolicGradientOp&) = delete;
-  void operator=(const SymbolicGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SymbolicGradientOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name(kGradientOp).Device(DEVICE_CPU),

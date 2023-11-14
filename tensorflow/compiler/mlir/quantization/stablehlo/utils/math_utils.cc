@@ -17,7 +17,8 @@ limitations under the License.
 
 #include <cmath>
 
-namespace mlir::quant::stablehlo {
+namespace mlir {
+namespace stablehlo {
 
 // Borrowed from:
 // https://github.com/tensorflow/tensorflow/blob/57946ceb4b6119d6d0f49abbb2e3d1636a3b83a0/tensorflow/lite/kernels/internal/quantization_util.cc#L53
@@ -48,4 +49,5 @@ LogicalResult QuantizeMultiplier(double double_multiplier,
   return success();
 }
 
-}  // namespace mlir::quant::stablehlo
+}  // namespace stablehlo
+}  // namespace mlir

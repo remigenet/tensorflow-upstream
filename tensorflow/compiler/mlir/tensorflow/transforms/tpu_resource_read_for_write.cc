@@ -124,7 +124,7 @@ void TPUResourceReadForWritePass::runOnOperation() {
       block.addArgument(read_operand.getType(), loc);
 
     func.setType(FunctionType::get(&getContext(), block.getArgumentTypes(),
-                                   func.getResultTypes()));
+                                   func.getCallableResults()));
     cluster_func.erase();
   }
 }

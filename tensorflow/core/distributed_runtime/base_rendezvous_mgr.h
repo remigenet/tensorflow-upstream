@@ -40,7 +40,7 @@ limitations under the License.
 #include "tensorflow/core/platform/thread_annotations.h"
 #include "tensorflow/core/platform/types.h"
 #include "tensorflow/core/util/device_name_utils.h"
-#include "tsl/platform/refcount.h"
+#include "tensorflow/tsl/platform/refcount.h"
 
 namespace tensorflow {
 
@@ -110,8 +110,7 @@ class BaseRendezvousMgr : public RendezvousMgrInterface {
 
   tsl::core::RefCountPtr<BaseRemoteRendezvous> FindOrCreate(int64_t step_id);
 
-  BaseRendezvousMgr(const BaseRendezvousMgr&) = delete;
-  void operator=(const BaseRendezvousMgr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(BaseRendezvousMgr);
 };
 
 // RemoteRendezvous is a Rendezvous which can handle either
@@ -271,8 +270,7 @@ class BaseRemoteRendezvous : public RemoteRendezvous {
   // Must be called only if fully initialized.
   void RecvLocalAsyncInternal(const ParsedKey& parsed, DoneCallback done);
 
-  BaseRemoteRendezvous(const BaseRemoteRendezvous&) = delete;
-  void operator=(const BaseRemoteRendezvous&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(BaseRemoteRendezvous);
 };
 
 class BaseRecvTensorCall {
@@ -287,8 +285,7 @@ class BaseRecvTensorCall {
   virtual Status status() const = 0;
 
  private:
-  BaseRecvTensorCall(const BaseRecvTensorCall&) = delete;
-  void operator=(const BaseRecvTensorCall&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(BaseRecvTensorCall);
 };
 
 }  // end namespace tensorflow

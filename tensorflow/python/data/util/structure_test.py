@@ -29,6 +29,7 @@ from tensorflow.python.data.util import structure
 from tensorflow.python.framework import combinations
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
+from tensorflow.python.framework import ops
 from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import tensor
 from tensorflow.python.framework import tensor_shape
@@ -496,7 +497,7 @@ def _test_to_batched_tensor_list_combinations():
 @dataclasses.dataclass
 class MaskedTensor:
   mask: bool
-  value: tensor.Tensor
+  value: ops.Tensor
 
   def __tf_flatten__(self):
     metadata = (self.mask,)

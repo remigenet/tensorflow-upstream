@@ -3,7 +3,6 @@
 #   and provide TensorRT operators and converter package.
 #   APIs are meant to change over time.
 
-# Placeholder: load py_proto_library
 load("//tensorflow:strict.default.bzl", "py_strict_library")
 load("//tensorflow/core/platform:rules_cc.bzl", "cc_library")
 load(
@@ -22,7 +21,7 @@ load(
     "tf_proto_library",
 )
 load(
-    "@local_tsl//tsl/platform/default:cuda_build_defs.bzl",
+    "//tensorflow/tsl/platform/default:cuda_build_defs.bzl",
     "cuda_rpath_flags",
 )
 load("@local_config_tensorrt//:build_defs.bzl", "if_tensorrt")
@@ -76,7 +75,7 @@ cc_library(
     deps = if_tensorrt([
         "@local_config_tensorrt//:tensorrt_headers",
         "//tensorflow/core:lib",
-        "@local_xla//xla/stream_executor/platform:dso_loader",
+        "//tensorflow/compiler/xla/stream_executor/platform:dso_loader",
     ]),
 )
 
@@ -107,11 +106,11 @@ tf_cuda_cc_test(
     deps = [
         ":trt_logging",
         ":utils",
+        "//tensorflow/compiler/xla/stream_executor/gpu:gpu_init",
         "//tensorflow/core:lib",
         "//tensorflow/core:test",
         "//tensorflow/core:test_main",
         "//tensorflow/core/platform:stream_executor",
-        "@local_xla//xla/stream_executor/gpu:gpu_init",
     ] + if_tensorrt([
         ":tensorrt_lib",
     ]) + select({
@@ -368,11 +367,11 @@ tf_cuda_cc_test(
         "//tensorflow/core/kernels:array",
         "//tensorflow/core/kernels:function_ops",
         "//tensorflow/core/kernels:ops_testutil",
+        "//third_party/eigen3",
         "@com_google_absl//absl/container:inlined_vector",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
         "@com_google_googletest//:gtest",
-        "@eigen_archive//:eigen3",
     ] + if_tensorrt([
         "@local_config_cuda//cuda:cuda_headers",
     ]),
@@ -1005,7 +1004,7 @@ tf_cuda_library(
         ":common_utils",
         ":tensorrt_lib",
         ":op_converter_registry",
-        "@local_xla//xla/stream_executor/platform:dso_loader",
+        "//tensorflow/compiler/xla/stream_executor/platform:dso_loader",
     ]),
 )
 
@@ -1017,10 +1016,6 @@ pybind_extension(
         "//conditions:default": ["//tensorflow:libtensorflow_framework.so.%s" % VERSION],
         "//tensorflow:windows": [],
     }),
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "_pywrap_py_utils.pyi",
-    ],
     static_deps = [
         "@bazel_tools//:__subpackages__",
         "@boringssl//:__subpackages__",
@@ -1055,16 +1050,14 @@ pybind_extension(
         "@snappy//:__subpackages__",
         "//:__subpackages__",
         "@zlib//:__subpackages__",
-        "@local_tsl//tsl:__subpackages__",
-        "@local_xla//xla:__subpackages__",
     ],
     deps = [
         ":common_utils",
         ":py_utils",
+        "//tensorflow/compiler/xla/stream_executor",
         "//tensorflow/core/platform:env",
         "//tensorflow/core/platform:logging",
         "//tensorflow/core/platform:status",
-        "@local_xla//xla/stream_executor",
         "@pybind11",
     ],
 )

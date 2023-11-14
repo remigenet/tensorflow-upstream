@@ -465,8 +465,6 @@ createSubgroupsByElemType(
       all_reduce_new_groups.push_back(elem_type_pair.second);
     }
   }
-  VLOG(4) << "current number of groups: " << all_reduce_new_groups.size()
-          << " after grouping by element type.";
   return all_reduce_new_groups;
 }
 
@@ -474,7 +472,7 @@ std::vector<std::vector<mlir::TF::DTensorAllReduceOp>>
 createSubgroupsByReductionAttr(
     std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_groups) {
   std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_new_groups;
-  // Combine all-reduces of the same reduction attribute.
+  // Combine all-reduces of the same element type.
   for (const auto& all_reduce_group : all_reduce_groups) {
     llvm::DenseMap<llvm::StringRef, std::vector<mlir::TF::DTensorAllReduceOp>>
         all_reduces_by_attr_reduce_op;
@@ -487,8 +485,6 @@ createSubgroupsByReductionAttr(
       all_reduce_new_groups.push_back(all_reduces_for_reduce_op_attr.second);
     }
   }
-  VLOG(4) << "current number of groups: " << all_reduce_new_groups.size()
-          << " after grouping by reduction attribute.";
   return all_reduce_new_groups;
 }
 
@@ -496,8 +492,9 @@ std::vector<std::vector<mlir::TF::DTensorAllReduceOp>>
 createSubgroupsByGroupAssignment(
     std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_groups) {
   std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_new_groups;
-  // Combine all-reduces of the group assignment.
+  // Combine all-reduces of the same element type.
   for (const auto& all_reduce_group : all_reduce_groups) {
+    // Combine all-reduces of the same group assignment.
     std::vector<mlir::Value> group_assignments;
     llvm::DenseMap<mlir::Value, std::vector<mlir::TF::DTensorAllReduceOp>>
         all_reduces_by_group_assignment;
@@ -519,8 +516,6 @@ createSubgroupsByGroupAssignment(
       all_reduce_new_groups.push_back(all_reduce_group_to_merge.second);
     }
   }
-  VLOG(4) << "current number of groups: " << all_reduce_new_groups.size()
-          << " after grouping by group assignment.";
   return all_reduce_new_groups;
 }
 
@@ -535,7 +530,8 @@ std::vector<std::vector<mlir::TF::DTensorAllReduceOp>>
 createSubgroupsByExtendedNumOps(
     std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_groups,
     int group_size) {
-  VLOG(4) << "max number of ops in a all-reduce group: " << group_size;
+  VLOG(4) << "max group size: " << group_size;
+  VLOG(4) << "current number of groups: " << all_reduce_groups.size();
   // Disable extended grouping if group size is set to zero
   if (group_size <= 0) return all_reduce_groups;
   std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_new_groups;
@@ -560,8 +556,7 @@ createSubgroupsByExtendedNumOps(
         all_reduce_group.begin() + (num_groups - 1) * group_size,
         all_reduce_group.end()));
   }
-  VLOG(4) << "current number of groups: " << all_reduce_new_groups.size()
-          << " after grouping by extended num ops size.";
+  VLOG(4) << "new number of groups: " << all_reduce_new_groups.size();
   return all_reduce_new_groups;
 }
 
@@ -580,6 +575,7 @@ createSubgroupsByTopoDist(
     int topo_dist) {
   // Disable extended grouping if topological distance is set to zero or less
   if (topo_dist <= 0) return all_reduce_groups;
+  VLOG(4) << "current number of groups: " << all_reduce_groups.size();
   std::vector<std::vector<mlir::TF::DTensorAllReduceOp>> all_reduce_new_groups;
 
   // Further break down the current all_reduced_groups by topological distance
@@ -626,8 +622,7 @@ createSubgroupsByTopoDist(
     }
     all_reduce_new_groups.push_back(new_group);
   }
-  VLOG(4) << "current number of groups: " << all_reduce_new_groups.size()
-          << " after grouping by topological distance.";
+  VLOG(4) << "new number of groups: " << all_reduce_new_groups.size();
   return all_reduce_new_groups;
 }
 
@@ -690,8 +685,6 @@ struct DTensorAllReduceCombineOptimization
       });
 
       if (ordered_all_reduces.size() > 1) {
-        VLOG(2) << ordered_all_reduces.size()
-                << " all-reduce ops eligible for combine optimization.";
         // Build side effect analysis to identify indirect dependencies between
         // all eligible all_reduce operations
         mlir::TF::SideEffectAnalysis side_effect_analysis(module);
@@ -701,6 +694,9 @@ struct DTensorAllReduceCombineOptimization
         // so that independent ops can be merged
         auto all_reduce_groups =
             createIndependentReduceOpsGroups(ordered_all_reduces, info);
+
+        VLOG(2) << ordered_all_reduces.size() << " all-reduce ops in "
+                << all_reduce_groups.size() << " groups";
 
         all_reduce_groups = createSubgroupsByElemType(all_reduce_groups);
         all_reduce_groups = createSubgroupsByReductionAttr(all_reduce_groups);
@@ -756,10 +752,6 @@ struct DTensorAllReduceCombineOptimization
                     // Within the block, use the group's actual sorting.
                     return lhs[0]->isBeforeInBlock(rhs[0]);
                   });
-
-        VLOG(2) << ordered_all_reduces.size() << " all-reduce ops in "
-                << all_reduce_groups.size() << " groups";
-
         for (auto& reduce_group : all_reduce_groups) {
           if (reduce_group.size() > 1) {
             VLOG(4) << "Combining following reduce ops into one: ------------";

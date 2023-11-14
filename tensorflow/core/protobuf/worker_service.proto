@@ -39,47 +39,30 @@ option go_package = "github.com/tensorflow/tensorflow/tensorflow/go/core/protobu
 
 service WorkerService {
   // See worker.proto for details.
-  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
 
   // See worker.proto for details.
   rpc CreateWorkerSession(CreateWorkerSessionRequest)
-      returns (CreateWorkerSessionResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+      returns (CreateWorkerSessionResponse);
 
   // See worker.proto for details.
   rpc DeleteWorkerSession(DeleteWorkerSessionRequest)
-      returns (DeleteWorkerSessionResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+      returns (DeleteWorkerSessionResponse);
 
   // See worker.proto for details.
-  rpc RegisterGraph(RegisterGraphRequest) returns (RegisterGraphResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc RegisterGraph(RegisterGraphRequest) returns (RegisterGraphResponse);
 
   // See worker.proto for details.
-  rpc DeregisterGraph(DeregisterGraphRequest)
-      returns (DeregisterGraphResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc DeregisterGraph(DeregisterGraphRequest) returns (DeregisterGraphResponse);
 
   // See worker.proto for details.
-  rpc RunGraph(RunGraphRequest) returns (RunGraphResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc RunGraph(RunGraphRequest) returns (RunGraphResponse);
 
   // See worker.proto for details.
-  rpc CleanupGraph(CleanupGraphRequest) returns (CleanupGraphResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc CleanupGraph(CleanupGraphRequest) returns (CleanupGraphResponse);
 
   // See worker.proto for details.
-  rpc CleanupAll(CleanupAllRequest) returns (CleanupAllResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc CleanupAll(CleanupAllRequest) returns (CleanupAllResponse);
 
   // See worker.proto for details.
   rpc RecvTensor(RecvTensorRequest) returns (RecvTensorResponse) {
@@ -88,39 +71,24 @@ service WorkerService {
 
   // See worker.proto for details.
   rpc MarkRecvFinished(MarkRecvFinishedRequest)
-      returns (MarkRecvFinishedResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+      returns (MarkRecvFinishedResponse);
 
   // See worker.proto for details.
-  rpc Logging(LoggingRequest) returns (LoggingResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc Logging(LoggingRequest) returns (LoggingResponse);
 
   // See worker.proto for details.
-  rpc Tracing(TracingRequest) returns (TracingResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc Tracing(TracingRequest) returns (TracingResponse);
 
   // See worker.proto for details.
-  rpc RecvBuf(RecvBufRequest) returns (RecvBufResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc RecvBuf(RecvBufRequest) returns (RecvBufResponse) {}
 
   // See worker.proto for details.
-  rpc GetStepSequence(GetStepSequenceRequest)
-      returns (GetStepSequenceResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc GetStepSequence(GetStepSequenceRequest) returns (GetStepSequenceResponse);
 
   // See worker.proto for details.
-  rpc CompleteGroup(CompleteGroupRequest) returns (CompleteGroupResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+  rpc CompleteGroup(CompleteGroupRequest) returns (CompleteGroupResponse);
 
   // See worker.proto for details.
   rpc CompleteInstance(CompleteInstanceRequest)
-      returns (CompleteInstanceResponse) {
-    // [AUTOMATION]: Internal rpc option goes here.
-  }
+      returns (CompleteInstanceResponse);
 }

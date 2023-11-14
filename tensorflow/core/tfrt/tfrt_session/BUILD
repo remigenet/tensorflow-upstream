@@ -1,6 +1,5 @@
-load("//tensorflow:strict.default.bzl", "py_strict_library")
 load("//tensorflow:tensorflow.bzl", "if_google", "tf_cc_shared_test")
-load("//tensorflow:tensorflow.default.bzl", "tf_py_strict_test")
+load("//tensorflow:tensorflow.default.bzl", "tf_py_test")
 
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
@@ -45,12 +44,12 @@ cc_library(
         "//tensorflow/core/tfrt/runtime:tf_threadpool_concurrent_work_queue",
         "//tensorflow/core/tfrt/runtime:work_queue_interface",
         "//tensorflow/core/tfrt/utils",
+        "//tensorflow/tsl/platform:errors",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/log:die_if_null",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/synchronization",
         "@com_google_absl//absl/time",
-        "@local_tsl//tsl/platform:errors",
         "@tf_runtime//:core_runtime",
     ] + if_google([
         "//learning/brain/tfrt/tpu:tfrttpu_alwayslink",
@@ -93,7 +92,7 @@ tf_cc_shared_test(
 )
 
 # copybara:uncomment_begin(C++ Global registration not working in python, b/290988709)
-# py_strict_library(
+# py_library(
 #     name = "tfrt_session_py",
 #     srcs_version = "PY3",
 #     visibility = ["//visibility:public"],
@@ -102,7 +101,7 @@ tf_cc_shared_test(
 #     ],
 # )
 #
-# tf_py_strict_test(
+# tf_py_test(
 #     name = "tfrt_session_python_test",
 #     srcs = ["tfrt_session_python_test.py"],
 #     python_version = "PY3",

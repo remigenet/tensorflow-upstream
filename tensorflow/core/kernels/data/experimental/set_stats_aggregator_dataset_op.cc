@@ -75,9 +75,7 @@ class StatsAggregatorWithTagAndPrefix : public StatsAggregator {
   std::shared_ptr<StatsAggregator> wrapped_;
   string tag_;
   string prefix_;
-  StatsAggregatorWithTagAndPrefix(const StatsAggregatorWithTagAndPrefix&) =
-      delete;
-  void operator=(const StatsAggregatorWithTagAndPrefix&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatsAggregatorWithTagAndPrefix);
 };
 
 class SetStatsAggregatorDatasetOp : public UnaryDatasetOpKernel {
@@ -88,9 +86,8 @@ class SetStatsAggregatorDatasetOp : public UnaryDatasetOpKernel {
   void MakeDataset(OpKernelContext* ctx, DatasetBase* input,
                    DatasetBase** output) override {
     core::RefCountPtr<StatsAggregatorResource> resource;
-    ResourceHandle handle;
-    OP_REQUIRES_OK(ctx, HandleFromInput(ctx, 1, &handle));
-    OP_REQUIRES_OK(ctx, LookupResource(ctx, handle, &resource));
+    OP_REQUIRES_OK(ctx,
+                   LookupResource(ctx, HandleFromInput(ctx, 1), &resource));
     tstring tag;
     OP_REQUIRES_OK(ctx, ParseScalarArgument(ctx, "tag", &tag));
     tstring prefix;

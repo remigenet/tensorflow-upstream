@@ -16,7 +16,7 @@ limitations under the License.
 // This transformation pass convert dense tensor to sparse format.
 
 #include "absl/memory/memory.h"
-#include "Eigen/Core"  // from @eigen_archive
+#include "third_party/eigen3/Eigen/Core"
 #include "mlir/Dialect/Func/IR/FuncOps.h"  // from @llvm-project
 #include "mlir/IR/Attributes.h"  // from @llvm-project
 #include "mlir/IR/Builders.h"  // from @llvm-project

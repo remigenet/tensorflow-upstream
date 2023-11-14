@@ -20,7 +20,7 @@ package(
 cc_library(
     name = "exact_uniform_int",
     hdrs = ["exact_uniform_int.h"],
-    deps = ["@local_tsl//tsl/lib/random:exact_uniform_int"],
+    deps = ["//tensorflow/tsl/lib/random:exact_uniform_int"],
 )
 
 cc_library(
@@ -38,8 +38,8 @@ cc_library(
         "//tensorflow/core/platform:logging",
         "//tensorflow/core/platform:macros",
         "//tensorflow/core/platform:types",
-        "@eigen_archive//:eigen3",
-        "@local_tsl//tsl/lib/random:philox",
+        "//tensorflow/tsl/lib/random:philox",
+        "//third_party/eigen3",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_library(
     ],
     deps = [
         ":philox_random",
-        "@local_tsl//tsl/lib/random:random_distributions_utils",
+        "//tensorflow/tsl/lib/random:random_distributions_utils",
     ],
 )
 
@@ -64,7 +64,7 @@ cc_library(
         "//tensorflow/core:__pkg__",
         "//tensorflow/lite:__subpackages__",
     ],
-    deps = ["@local_tsl//tsl/lib/random:philox_random"],
+    deps = ["//tensorflow/tsl/lib/random:philox_random"],
 )
 
 cc_library(
@@ -93,7 +93,7 @@ cc_library(
         "//tensorflow/core/platform:logging",
         "//tensorflow/core/platform:macros",
         "//tensorflow/core/platform:types",
-        "@local_tsl//tsl/lib/random:weighted_picker",
+        "//tensorflow/tsl/lib/random:weighted_picker",
     ],
 )
 
@@ -109,7 +109,7 @@ filegroup(
         "random_distributions_utils.h",
         "simple_philox.h",
         "weighted_picker.h",
-        "@local_tsl//tsl/lib/random:mobile_srcs_only_runtime",
+        "//tensorflow/tsl/lib/random:mobile_srcs_only_runtime",
     ],
 )
 
@@ -121,7 +121,7 @@ filegroup(
         "random_distributions.h",
         "random_distributions_utils.h",
         "simple_philox.h",
-        "@local_tsl//tsl/lib/random:legacy_lib_random_headers",
+        "//tensorflow/tsl/lib/random:legacy_lib_random_headers",
     ],
     visibility = ["//tensorflow/core:__pkg__"],
 )
@@ -133,7 +133,7 @@ filegroup(
         "random_distributions.h",
         "random_distributions_utils.h",
         "weighted_picker.h",
-        "@local_tsl//tsl/lib/random:legacy_lib_internal_public_random_headers",
+        "//tensorflow/tsl/lib/random:legacy_lib_internal_public_random_headers",
     ],
     visibility = ["//tensorflow/core:__pkg__"],
 )
@@ -149,7 +149,7 @@ filegroup(
         "random_distributions_utils.h",
         "simple_philox.h",
         "weighted_picker.h",
-        "@local_tsl//tsl/lib/random:legacy_lib_random_all_headers",
+        "//tensorflow/tsl/lib/random:legacy_lib_random_all_headers",
     ],
     visibility = ["//tensorflow/core:__pkg__"],
 )

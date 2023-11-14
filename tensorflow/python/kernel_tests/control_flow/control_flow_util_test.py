@@ -72,7 +72,7 @@ class ControlFlowUtilTest(test.TestCase):
 
     self.assertFalse(control_flow_util.IsLoopExit(test_ops.int_output().op))
 
-  def build_test_graph(self) -> ops.Graph:
+  def build_test_graph(self):
     g = ops.Graph()
     with g.as_default():
 

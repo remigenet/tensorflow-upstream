@@ -66,6 +66,7 @@ bool IsControlFlowOp(const std::string& tensorflow_op) {
       tensorflow_op == "NextIteration" || tensorflow_op == "RefNextIteration") {
     return true;
   }
+  // TODO(ycling): Also check how to handle Variable ops and Assign ops.
   return false;
 }
 

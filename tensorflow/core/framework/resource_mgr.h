@@ -266,8 +266,7 @@ class ResourceMgr {
     core::RefCountPtr<ResourceBase> GetResource() const;
 
    private:
-    ResourceAndName(const ResourceAndName&) = delete;
-    void operator=(const ResourceAndName&) = delete;
+    TF_DISALLOW_COPY_AND_ASSIGN(ResourceAndName);
   };
   typedef absl::flat_hash_map<Key, ResourceAndName, KeyHash, KeyEqual>
       Container;
@@ -323,8 +322,7 @@ class ResourceMgr {
   // Map from type hash_code to type name.
   std::unordered_map<uint64, string> debug_type_names_ TF_GUARDED_BY(mu_);
 
-  ResourceMgr(const ResourceMgr&) = delete;
-  void operator=(const ResourceMgr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ResourceMgr);
 };
 
 // Makes a resource handle with the specified type for a given container /

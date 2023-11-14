@@ -28,11 +28,14 @@ limitations under the License.
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/types.pb.h"
 #include "tensorflow/core/protobuf/snapshot.pb.h"
-#include "tsl/lib/core/status_test_util.h"
-#include "tsl/lib/io/compression.h"
-#include "tsl/platform/env.h"
-#include "tsl/platform/status_matchers.h"
-#include "tsl/platform/test.h"
+#include "tensorflow/tsl/lib/core/status_test_util.h"
+#include "tensorflow/tsl/lib/io/compression.h"
+#include "tensorflow/tsl/platform/env.h"
+#include "tensorflow/tsl/platform/errors.h"
+#include "tensorflow/tsl/platform/status.h"
+#include "tensorflow/tsl/platform/status_matchers.h"
+#include "tensorflow/tsl/platform/statusor.h"
+#include "tensorflow/tsl/platform/test.h"
 
 namespace tensorflow {
 namespace data {
@@ -70,22 +73,22 @@ class TestSnapshotCluster {
   std::unique_ptr<DataServiceDispatcherClient> dispatcher_client_;
 };
 
-absl::Status WaitForFileExists(const std::string& file_path) {
+tsl::Status WaitForFileExists(const std::string& file_path) {
   while (true) {
-    absl::Status status = Env::Default()->FileExists(file_path);
+    tsl::Status status = Env::Default()->FileExists(file_path);
     if (!absl::IsNotFound(status)) {
       TF_RETURN_IF_ERROR(status);
     }
     if (status.ok()) {
-      return absl::OkStatus();
+      return tsl::OkStatus();
     }
     Env::Default()->SleepForMicroseconds(
         absl::ToInt64Microseconds(absl::Seconds(1)));
   }
-  return absl::OkStatus();
+  return tsl::OkStatus();
 }
 
-absl::Status WaitForSnapshotComplete(const std::string& base_path) {
+tsl::Status WaitForSnapshotComplete(const std::string& base_path) {
   return WaitForFileExists(SnapshotDoneFilePath(base_path));
 }
 

@@ -283,9 +283,9 @@ std::optional<Value> convertTFConv3DCommon(
 
 // Lowers Gather operator to a sequence of TOSA ops.
 std::optional<Value> convertGatherOp(PatternRewriter& rewriter, Operation* op,
-                                     Value params_value, Value indices_value,
-                                     int32_t batch_dims, int32_t axis,
-                                     bool tosaOnly = true);
+                                     Value result_value, Value params_value,
+                                     Value indices_value, int32_t batch_dims,
+                                     int32_t axis);
 
 // Lowers GatherNd operator to a sequence of TOSA ops.
 std::optional<Value> convertGatherNdOp(PatternRewriter& rewriter, Operation* op,

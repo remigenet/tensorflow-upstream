@@ -124,8 +124,7 @@ class Coordinator {
   std::vector<std::unique_ptr<RunnerInterface>> runners_
       TF_GUARDED_BY(runners_lock_);
 
-  Coordinator(const Coordinator&) = delete;
-  void operator=(const Coordinator&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Coordinator);
 };
 
 }  // namespace tensorflow

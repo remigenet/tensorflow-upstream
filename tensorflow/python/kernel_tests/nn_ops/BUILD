@@ -294,7 +294,6 @@ cuda_py_strict_test(
     shard_count = 4,
     tags = [
         "no_mac_arm64",
-		"no_rocm",
         "optonly",  # times out
     ],
     deps = [
@@ -477,11 +476,8 @@ cuda_py_strict_test(
         "no_cuda_asan",  # Size limit: b/192505612
     ],
     deps = [
-        "//tensorflow/python/compat",
         "//tensorflow/python/framework:constant_op",
-        "//tensorflow/python/framework:dtypes",
         "//tensorflow/python/framework:for_generated_wrappers",
-        "//tensorflow/python/framework:ops",
         "//tensorflow/python/framework:sparse_tensor",
         "//tensorflow/python/framework:test_lib",
         "//tensorflow/python/ops:array_ops",
@@ -489,13 +485,10 @@ cuda_py_strict_test(
         "//tensorflow/python/ops:data_flow_ops",
         "//tensorflow/python/ops:embedding_ops",
         "//tensorflow/python/ops:gradient_checker",
-        "//tensorflow/python/ops:gradients",
         "//tensorflow/python/ops:init_ops",
         "//tensorflow/python/ops:linalg_ops",
         "//tensorflow/python/ops:math_ops",
         "//tensorflow/python/ops:partitioned_variables",
-        "//tensorflow/python/ops:resource_variable_ops",
-        "//tensorflow/python/ops:sort_ops",
         "//tensorflow/python/ops:state_ops",
         "//tensorflow/python/ops:variable_scope",
         "//tensorflow/python/ops:variables",

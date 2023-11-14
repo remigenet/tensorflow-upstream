@@ -37,7 +37,7 @@ namespace tensorflow {
   static ProcessState* instance = new ProcessState;
   static absl::once_flag f;
   absl::call_once(f, []() {
-    AllocatorFactoryRegistry::singleton()->SetProcessState(instance);
+    AllocatorFactoryRegistry::singleton()->process_state_ = instance;
   });
 
   return instance;

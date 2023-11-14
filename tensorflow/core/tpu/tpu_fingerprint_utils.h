@@ -16,15 +16,12 @@ limitations under the License.
 #ifndef TENSORFLOW_CORE_TPU_TPU_FINGERPRINT_UTILS_H_
 #define TENSORFLOW_CORE_TPU_TPU_FINGERPRINT_UTILS_H_
 
-#include <cstdint>
-
 #include "tensorflow/core/framework/function.h"
-#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/lib/core/status.h"
 
 namespace tensorflow {
 // Computes a fingerprint of the contents of `library`.
 Status FingerprintFunctionLibrary(const FunctionLibraryDefinition& library,
-                                  uint64_t& fingerprint);
+                                  uint64* fingerprint);
 }  // namespace tensorflow
-
 #endif  // TENSORFLOW_CORE_TPU_TPU_FINGERPRINT_UTILS_H_

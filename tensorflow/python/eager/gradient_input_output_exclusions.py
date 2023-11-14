@@ -97,10 +97,6 @@ _EXCLUDED_OPS = [
     "CopyToMeshGrad",
     "Relayout",
     "RelayoutLike",
-    # Debug ops that similarly only appear in OSS, and fails the test in OSS.
-    "DebugGradientIdentity",
-    "DebugGradientRefIdentity",
-    "DebugIdentityV2",
 ]
 
 

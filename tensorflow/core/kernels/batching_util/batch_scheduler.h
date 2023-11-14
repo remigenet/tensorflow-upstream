@@ -142,8 +142,7 @@ class Batch {
   // The TracMe context id.
   const uint64 traceme_context_id_;
 
-  Batch(const Batch&) = delete;
-  void operator=(const Batch&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Batch);
 };
 
 // An abstract batch scheduler class. Collects individual tasks into batches,

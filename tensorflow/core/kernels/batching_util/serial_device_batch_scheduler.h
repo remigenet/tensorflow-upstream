@@ -188,8 +188,7 @@ class SerialDeviceBatchScheduler : public std::enable_shared_from_this<
 
   mutex mu_;
 
-  SerialDeviceBatchScheduler(const SerialDeviceBatchScheduler&) = delete;
-  void operator=(const SerialDeviceBatchScheduler&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SerialDeviceBatchScheduler);
 };
 
 //////////////////////////////////////////////////////////
@@ -234,8 +233,7 @@ class SDBSQueue : public BatchScheduler<TaskType> {
   int64_t num_enqueued_batches_ TF_GUARDED_BY(mu_) = 0;
   int64_t num_enqueued_tasks_ TF_GUARDED_BY(mu_) = 0;
   mutable mutex mu_;
-  SDBSQueue(const SDBSQueue&) = delete;
-  void operator=(const SDBSQueue&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SDBSQueue);
 };
 
 // Batch which remembers when and by whom it was created.
@@ -254,8 +252,7 @@ class SDBSBatch : public Batch<TaskType> {
  private:
   SDBSQueue<TaskType>* queue_;
   const int64_t creation_time_micros_;
-  SDBSBatch(const SDBSBatch&) = delete;
-  void operator=(const SDBSBatch&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SDBSBatch);
 };
 }  // namespace internal
 

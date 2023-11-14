@@ -1,5 +1,4 @@
-load("//tensorflow:tensorflow.default.bzl", "tf_py_strict_test")
-load("//tensorflow:strict.default.bzl", "py_strict_binary", "py_strict_library")
+load("//tensorflow:tensorflow.bzl", "py_binary", "tf_py_test")
 
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
@@ -79,7 +78,7 @@ cc_library(
 )
 
 # Compatibility stub. Remove when internal customers moved.
-py_strict_library(
+py_library(
     name = "tensorflow_wrap_toco",
     srcs = ["tensorflow_wrap_toco.py"],
     srcs_version = "PY3",
@@ -93,7 +92,7 @@ py_strict_library(
     ],
 )
 
-py_strict_binary(
+py_binary(
     name = "toco_from_protos",
     srcs = ["toco_from_protos.py"],
     python_version = "PY3",
@@ -107,7 +106,7 @@ py_strict_binary(
     ],
 )
 
-tf_py_strict_test(
+tf_py_test(
     name = "toco_from_protos_test",
     srcs = ["toco_from_protos_test.py"],
     python_version = "PY3",
@@ -118,7 +117,6 @@ tf_py_strict_test(
         "//tensorflow:tensorflow_py",
         "//tensorflow/lite/toco:model_flags_proto_py",
         "//tensorflow/lite/toco:toco_flags_proto_py",
-        "//tensorflow/lite/toco:types_proto_py",
         "//tensorflow/python/platform:resource_loader",
         "//tensorflow/python/platform:test",
     ],

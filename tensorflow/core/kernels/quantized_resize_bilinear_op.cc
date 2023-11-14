@@ -738,8 +738,7 @@ class QuantizedResizeBilinearOp : public OpKernel {
   bool align_corners_;
   bool half_pixel_centers_;
 
-  QuantizedResizeBilinearOp<T>(const QuantizedResizeBilinearOp<T>&) = delete;
-  void operator=(const QuantizedResizeBilinearOp<T>&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(QuantizedResizeBilinearOp<T>);
 };
 
 #define REGISTER_CPU_KERNEL(type)                         \

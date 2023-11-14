@@ -152,8 +152,7 @@ class TridiagonalSolveOp : public LinearAlgebraOp<Scalar> {
   }
 
  private:
-  TridiagonalSolveOp(const TridiagonalSolveOp&) = delete;
-  void operator=(const TridiagonalSolveOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TridiagonalSolveOp);
 
   // Adjust pivot such that neither 'rhs[i,:] / pivot' nor '1 / pivot' cause
   // overflow, where i numerates the multiple right-hand-sides. During the

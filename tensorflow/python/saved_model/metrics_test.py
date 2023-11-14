@@ -144,14 +144,16 @@ class MetricsTests(test.TestCase):
 
   def test_save_sets_write_path_and_singleprint_metric(self):
     exported_dir = self._create_save_v2_model()
-    singleprint = fingerprinting.read_fingerprint(exported_dir).singleprint()
+    fingerprint = fingerprinting.read_fingerprint(exported_dir)
+    singleprint = fingerprint.singleprint()
     path_and_singleprint_metric = metrics.GetWritePathAndSingleprint()
     self.assertEqual(path_and_singleprint_metric, (exported_dir, singleprint))
 
   def test_save_sets_read_path_and_singleprint_metric(self):
     exported_dir = self._create_save_v2_model()
     load.load(exported_dir)
-    singleprint = fingerprinting.read_fingerprint(exported_dir).singleprint()
+    fingerprint = fingerprinting.read_fingerprint(exported_dir)
+    singleprint = fingerprint.singleprint()
     path_and_singleprint_metric = metrics.GetReadPathAndSingleprint()
     self.assertEqual(path_and_singleprint_metric, (exported_dir, singleprint))
 

@@ -262,8 +262,7 @@ class TextFileLineIterator
     return OkStatus();
   }
 
-  TextFileLineIterator(const TextFileLineIterator&) = delete;
-  void operator=(const TextFileLineIterator&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TextFileLineIterator);
 };
 
 Status GetTableHandle(StringPiece input_name, OpKernelContext* ctx,

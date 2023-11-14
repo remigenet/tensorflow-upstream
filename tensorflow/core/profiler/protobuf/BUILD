@@ -1,4 +1,3 @@
-# Placeholder: load py_proto_library
 load("//tensorflow/core/platform:build_config.bzl", "tf_proto_library")
 
 package(
@@ -32,11 +31,11 @@ tf_proto_library(
     cc_api_version = 2,
     make_default_target_header_only = True,
     protodeps = [
-        "@local_tsl//tsl/profiler/protobuf:xplane_proto",
+        "//tensorflow/tsl/profiler/protobuf:xplane_proto",
     ],
     visibility = [":friends"],
     exports = [
-        "@local_tsl//tsl/profiler/protobuf:xplane_proto",
+        "//tensorflow/tsl/profiler/protobuf:xplane_proto",
     ],
 )
 
@@ -81,7 +80,6 @@ tf_proto_library(
     protodeps = [
         ":diagnostics_proto",
         ":input_pipeline_proto",
-        ":power_metrics_proto",
     ],
     visibility = [
         ":friends",
@@ -91,13 +89,6 @@ tf_proto_library(
 tf_proto_library(
     name = "op_metrics_proto",
     srcs = ["op_metrics.proto"],
-    cc_api_version = 2,
-    visibility = [":friends"],
-)
-
-tf_proto_library(
-    name = "power_metrics_proto",
-    srcs = ["power_metrics.proto"],
     cc_api_version = 2,
     visibility = [":friends"],
 )
@@ -119,7 +110,6 @@ tf_proto_library(
     protodeps = [
         ":diagnostics_proto",
         ":pod_stats_proto",
-        ":topology_proto",
     ],
     visibility = [":friends"],
 )
@@ -150,7 +140,6 @@ tf_proto_library(
         ":diagnostics_proto",
         ":kernel_stats_proto",
         ":op_metrics_proto",
-        ":power_metrics_proto",
         ":steps_db_proto",
         ":tf_function_proto",
     ],
@@ -260,13 +249,6 @@ tf_proto_library(
 tf_proto_library(
     name = "trace_events_raw_proto",
     srcs = ["trace_events_raw.proto"],
-    cc_api_version = 2,
-    visibility = [":friends"],
-)
-
-tf_proto_library(
-    name = "dcn_slack_analysis_proto",
-    srcs = ["dcn_slack_analysis.proto"],
     cc_api_version = 2,
     visibility = [":friends"],
 )

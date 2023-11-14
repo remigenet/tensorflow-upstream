@@ -78,14 +78,11 @@ uint8* Decode(const void* srcdata, int datasize,
   if (DGifSlurp(gif_file) != GIF_OK) {
     *error_string = absl::StrCat("failed to slurp gif file: ",
                                  GifErrorStringNonNull(gif_file->Error));
-    // Stop load if no images are detected or the allocation of the last image
-    // buffer was failed.
-    if (gif_file->ImageCount <= 0 ||
-        gif_file->SavedImages[gif_file->ImageCount - 1].RasterBits == NULL) {
+    // Only stop load if no images are detected.
+    if (gif_file->ImageCount <= 0) {
       return nullptr;
     }
-
-    LOG(ERROR) << *error_string;
+    LOG(WARNING) << *error_string;
   }
 
   if (gif_file->ImageCount <= 0) {

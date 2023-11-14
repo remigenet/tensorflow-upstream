@@ -14,7 +14,7 @@
 # ==============================================================================
 """Tests for call_trees module."""
 
-import types
+import imp
 
 from tensorflow.python.autograph.converters import call_trees
 from tensorflow.python.autograph.converters import functions
@@ -214,7 +214,7 @@ class CallTreesTest(converter_testing.TestCase):
 
     tracking_list = []
 
-    pdb = types.ModuleType('fake_pdb')
+    pdb = imp.new_module('fake_pdb')
     pdb.set_trace = lambda: tracking_list.append(1)
 
     def f():

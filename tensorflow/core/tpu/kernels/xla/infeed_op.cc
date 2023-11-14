@@ -21,11 +21,11 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/type_util.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/stream_executor/tpu/c_api_conversions.h"
-#include "xla/stream_executor/tpu/c_api_decl.h"
-#include "xla/stream_executor/tpu/tpu_api.h"
-#include "xla/util.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/c_api_conversions.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/c_api_decl.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/tpu_api.h"
+#include "tensorflow/compiler/xla/util.h"
 #include "tensorflow/core/framework/kernel_def_builder.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/tpu/tpu_defs.h"
@@ -107,8 +107,7 @@ class InfeedDequeueOp : public XlaOpKernel {
   DataType dtype_;
   xla::Shape xla_shape_;
 
-  InfeedDequeueOp(const InfeedDequeueOp&) = delete;
-  void operator=(const InfeedDequeueOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InfeedDequeueOp);
 };
 
 REGISTER_XLA_OP(Name("InfeedDequeue"), InfeedDequeueOp);
@@ -157,8 +156,7 @@ class InfeedDequeueTupleOp : public XlaOpKernel {
   std::vector<xla::Shape> xla_shapes_;
   xla::Shape tuple_shape_;
 
-  InfeedDequeueTupleOp(const InfeedDequeueTupleOp&) = delete;
-  void operator=(const InfeedDequeueTupleOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InfeedDequeueTupleOp);
 };
 
 REGISTER_XLA_OP(Name("InfeedDequeueTuple"), InfeedDequeueTupleOp);

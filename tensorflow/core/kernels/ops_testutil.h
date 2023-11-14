@@ -203,8 +203,7 @@ class OpsTestBase : public ::testing::Test {
   SessionMetadata session_metadata_;
 
  private:
-  OpsTestBase(const OpsTestBase&) = delete;
-  void operator=(const OpsTestBase&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(OpsTestBase);
 };
 
 }  // namespace tensorflow

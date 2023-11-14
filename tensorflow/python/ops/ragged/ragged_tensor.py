@@ -63,11 +63,8 @@ _convert_row_partition = RowPartition._convert_row_partition
 
 
 @tf_export("RaggedTensor")
-class RaggedTensor(
-    composite_tensor.CompositeTensor,
-    internal_types.NativeObject,
-    internal_types.RaggedTensor,
-):
+class RaggedTensor(composite_tensor.CompositeTensor,
+                   internal_types.NativeObject):
   """Represents a ragged tensor.
 
   A `RaggedTensor` is a tensor with one or more *ragged dimensions*, which are
@@ -926,7 +923,7 @@ class RaggedTensor(
     value_shape = self._values.shape[1:]
     return tensor_shape.TensorShape([nrows, ncols]).concatenate(value_shape)
 
-  def get_shape(self) -> tensor_shape.TensorShape:
+  def get_shape(self):
     """The statically known shape of this ragged tensor.
 
     Returns:
@@ -2318,8 +2315,7 @@ def match_row_splits_dtypes(*tensors, **kwargs):
 # ===============================================================================
 @tf_export("RaggedTensorSpec")
 @type_spec_registry.register("tf.RaggedTensorSpec")
-class RaggedTensorSpec(
-    type_spec.BatchableTypeSpec, internal_types.RaggedTensorSpec):
+class RaggedTensorSpec(type_spec.BatchableTypeSpec):
   """Type specification for a `tf.RaggedTensor`."""
 
   __slots__ = [
@@ -3142,8 +3138,3 @@ Ragged = typing.Union[RaggedTensor, ragged_tensor_value.RaggedTensorValue]
 # or a value that can be converted to a tensor (e.g. np.array).
 # TODO(edloper): Add Variable to TensorLike, and remove it from here.
 RaggedOrDense = typing.Union[Ragged, core_types.TensorLike]
-
-# RaggedTensor must import ragged_ops to ensure that all dispatched ragged ops
-# are registered. Ragged ops import RaggedTensor, so import at bottom of the
-# file to avoid a partially-initialized module error.
-from tensorflow.python.ops.ragged import ragged_ops  # pylint: disable=unused-import, g-bad-import-order, g-import-not-at-top

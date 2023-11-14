@@ -28,7 +28,7 @@ limitations under the License.
 #include "tensorflow/core/platform/mutex.h"
 #include "tensorflow/core/platform/status.h"
 #include "tensorflow/core/platform/thread_annotations.h"
-#include "tsl/distributed_runtime/coordination/coordination_service_agent.h"
+#include "tensorflow/tsl/distributed_runtime/coordination/coordination_service_agent.h"
 
 namespace tensorflow {
 
@@ -50,8 +50,7 @@ namespace tensorflow {
 //   }
 class BarrierProxy {
  public:
-  BarrierProxy(const BarrierProxy&) = delete;
-  void operator=(const BarrierProxy&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(BarrierProxy);
   // Construct a BarrierProxy connected to the coordination service via `agent`.
   // `tasks` specifies all participating coordinated tasks and
   // `num_local_threads` specifies the number of threads in this task to
@@ -97,8 +96,7 @@ class BarrierProxy {
 //   Status s = barrier_mgr.Wait(agent, task, num_local_threads, key, timeout);
 class BarrierProxyManager {
  public:
-  BarrierProxyManager(const BarrierProxyManager&) = delete;
-  void operator=(const BarrierProxyManager&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(BarrierProxyManager);
   BarrierProxyManager() = default;
   ~BarrierProxyManager() = default;
 

@@ -18,61 +18,47 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
 #include "tensorflow/core/framework/tensor.h"
-#include "tsl/platform/env.h"
-#include "tsl/platform/protobuf.h"
+#include "tensorflow/tsl/platform/env.h"
+#include "tensorflow/tsl/platform/protobuf.h"
+#include "tensorflow/tsl/platform/status.h"
 
 namespace tensorflow {
 namespace data {
 
 // Atomically writes `str` to `filename`. Overwrites existing contents if the
 // file already exists.
-absl::Status AtomicallyWriteStringToFile(absl::string_view filename,
-                                         absl::string_view str, tsl::Env* env);
+tsl::Status AtomicallyWriteStringToFile(absl::string_view filename,
+                                        absl::string_view str, tsl::Env* env);
 
 // Atomically writes the binary representation of `proto` to `filename`.
 // Overwrites existing contents if the file already exists.
-absl::Status AtomicallyWriteBinaryProto(absl::string_view filename,
-                                        const tsl::protobuf::Message& proto,
-                                        tsl::Env* env);
+tsl::Status AtomicallyWriteBinaryProto(absl::string_view filename,
+                                       const tsl::protobuf::Message& proto,
+                                       tsl::Env* env);
 
 // Atomically writes the text representation of `proto` to `filename`.
 // Overwrites existing contents if the file already exists.
-absl::Status AtomicallyWriteTextProto(absl::string_view filename,
-                                      const tsl::protobuf::Message& proto,
-                                      tsl::Env* env);
+tsl::Status AtomicallyWriteTextProto(absl::string_view filename,
+                                     const tsl::protobuf::Message& proto,
+                                     tsl::Env* env);
 
 // Atomically writes `tensor` to `filename` in TFRecord format. Overwrites
 // existing contents if the file already exists.
-absl::Status AtomicallyWriteTFRecords(absl::string_view filename,
-                                      const std::vector<Tensor>& tensors,
-                                      absl::string_view compression,
-                                      tsl::Env* env);
-
-// Same as the above function, except using the specified `temp_file` for
-// renaming. This is used in corner cases where multiple temp files could lead
-// to race conditions.
-absl::Status AtomicallyWriteTFRecords(absl::string_view filename,
-                                      const std::vector<Tensor>& tensors,
-                                      absl::string_view compression,
-                                      absl::string_view temp_file,
-                                      tsl::Env* env);
+tsl::Status AtomicallyWriteTFRecords(absl::string_view filename,
+                                     const std::vector<Tensor>& tensors,
+                                     absl::string_view compression,
+                                     tsl::Env* env);
 
 // Returns the relative paths of the children of `directory`, ignoring temporary
 // files. Returns an empty vector if the directory does not have any children.
-absl::StatusOr<std::vector<std::string>> GetChildren(
-    absl::string_view directory, tsl::Env* env);
+tsl::StatusOr<std::vector<std::string>> GetChildren(absl::string_view directory,
+                                                    tsl::Env* env);
 
 // Returns true if `filename` is a temporary file and should be ignored in
 // normal data processing.
 bool IsTemporaryFile(absl::string_view filename);
-
-// If `filename` is a temporary file, returns the actual file name. Otherwise,
-// returns an internal error.
-absl::StatusOr<std::string> ParseTemporaryFile(absl::string_view filename);
 
 }  // namespace data
 }  // namespace tensorflow

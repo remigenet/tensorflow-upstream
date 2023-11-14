@@ -16,8 +16,6 @@
 # Description:
 #   Contains the Keras Mixed Precision API (TensorFlow version).
 
-load("//tensorflow:py.default.bzl", "py_library")
-
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
     default_visibility = [
@@ -54,8 +52,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         ":device_compatibility_check",
-        "//tensorflow/python/framework:dtypes",
-        "//tensorflow/python/platform:tf_logging",
+        "//tensorflow/python/framework",
         "//tensorflow/python/training/experimental:mixed_precision_global_state",
     ],
 )
@@ -91,7 +88,6 @@ py_library(
         "//tensorflow/python/framework:ops",
         "//tensorflow/python/framework:tensor_conversion",
         "//tensorflow/python/framework:tensor_conversion_registry",
-        "//tensorflow/python/framework:tensor_shape",
         "//tensorflow/python/keras/distribute",
         "//tensorflow/python/ops:math_ops",
         "//tensorflow/python/ops:resource_variable_ops",
@@ -135,8 +131,7 @@ py_library(
     srcs = ["test_util.py"],
     srcs_version = "PY3",
     deps = [
-        "//tensorflow/python/framework:dtypes",
-        "//tensorflow/python/framework:ops",
+        "//tensorflow/python/framework",
         "//tensorflow/python/framework:tensor_conversion",
         "//tensorflow/python/keras",
         "//tensorflow/python/ops:cond",

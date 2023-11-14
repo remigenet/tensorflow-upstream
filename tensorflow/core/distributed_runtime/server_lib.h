@@ -86,8 +86,7 @@ class ServerInterface {
   virtual Status StopCoordinationService() = 0;
 
  private:
-  ServerInterface(const ServerInterface&) = delete;
-  void operator=(const ServerInterface&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ServerInterface);
 };
 
 class ServerFactory {

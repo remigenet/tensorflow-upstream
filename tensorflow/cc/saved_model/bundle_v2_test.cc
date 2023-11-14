@@ -15,24 +15,22 @@ limitations under the License.
 
 #include "tensorflow/cc/saved_model/bundle_v2.h"
 
-#include <algorithm>
 #include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/strings/match.h"
+#include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 #include "json/json.h"
 #include "json/reader.h"
 #include "json/value.h"
 #include "tensorflow/cc/saved_model/metrics.h"
+#include "tensorflow/core/lib/core/status_test_util.h"
 #include "tensorflow/core/platform/path.h"
 #include "tensorflow/core/platform/test.h"
-#include "tensorflow/core/protobuf/trackable_object_graph.pb.h"
-#include "tsl/lib/core/status_test_util.h"
-#include "tsl/platform/statusor.h"
+#include "tensorflow/core/protobuf/fingerprint.pb.h"
+#include "tensorflow/tsl/lib/core/status_test_util.h"
 
 namespace tensorflow {
 namespace {
@@ -51,14 +49,14 @@ class BundleV2Test : public ::testing::Test {
     TF_ASSERT_OK(bundle->VisitObjectsToRestore(
         [&](int saved_node_id,
             const TrackableObjectGraph::TrackableObject& trackable_object)
-            -> absl::Status {
+            -> Status {
           for (const auto& attr : trackable_object.attributes()) {
             if (attr.name() == "VARIABLE_VALUE") {
               restored_vars.emplace_back(saved_node_id, attr.full_name(),
                                          attr.checkpoint_key());
             }
           }
-          return absl::OkStatus();
+          return OkStatus();
         }));
 
     // Should be one of each var name restored.
@@ -85,7 +83,7 @@ class BundleV2Test : public ::testing::Test {
 };
 
 TEST_F(BundleV2Test, LoadsVarsAndArithmeticObjectGraph) {
-  const std::string export_dir = io::JoinPath(
+  const string export_dir = io::JoinPath(
       testing::TensorFlowSrcRoot(), kTestData, "VarsAndArithmeticObjectGraph");
 
   SavedModelV2Bundle bundle;
@@ -98,7 +96,7 @@ TEST_F(BundleV2Test, LoadsVarsAndArithmeticObjectGraph) {
 }
 
 TEST_F(BundleV2Test, LoadsCyclicModule) {
-  const std::string export_dir =
+  const string export_dir =
       io::JoinPath(testing::TensorFlowSrcRoot(), kTestData, "CyclicModule");
 
   SavedModelV2Bundle bundle;
@@ -111,11 +109,11 @@ TEST_F(BundleV2Test, LoadsCyclicModule) {
 }
 
 TEST_F(BundleV2Test, UpdatesMetrics) {
-  const std::string kCCLoadBundleV2Label = "cc_load_bundle_v2";
+  const string kCCLoadBundleV2Label = "cc_load_bundle_v2";
   const int read_count = metrics::SavedModelReadCount("2").value();
   const int api_count =
       metrics::SavedModelReadApi(kCCLoadBundleV2Label).value();
-  const std::string export_dir = io::JoinPath(
+  const string export_dir = io::JoinPath(
       testing::TensorFlowSrcRoot(), kTestData, "VarsAndArithmeticObjectGraph");
 
   SavedModelV2Bundle bundle;
@@ -140,11 +138,10 @@ TEST_F(BundleV2Test, UpdatesMetrics) {
             12074714563970609759ULL);
   EXPECT_EQ(fingerprint["checkpoint_hash"].asUInt64(), 10788359570789890102ULL);
 
-  TF_ASSERT_OK_AND_ASSIGN(
-      auto path_and_singleprint,
-      metrics::ParseSavedModelPathAndSingleprint(
-          metrics::SavedModelReadPathAndSingleprint().value()));
-  auto [path, singleprint] = path_and_singleprint;
+  // TODO(adamcogdell): add ASSERT_OK_AND_ASSIGN here after migrating
+  // cc/saved_model code from the tsl version of StatusOr to absl::StatusOr
+  auto [path, singleprint] = metrics::ParseSavedModelPathAndSingleprint(
+      metrics::SavedModelReadPathAndSingleprint().value());
   EXPECT_TRUE(absl::StrContains(
       path, absl::StrCat(kTestData, "/VarsAndArithmeticObjectGraph")));
   EXPECT_EQ(singleprint,

@@ -43,7 +43,7 @@ _TENSORFLOW_DOC_SOURCES = {
     'compat':
         DocSource(docstring_module_name='util.compat'),
     'distribute':
-        DocSource(docstring_module_name='distribute'),
+        DocSource(docstring_module_name='distribute.distribute_lib'),
     'distributions': DocSource(
         docstring='Core module for TensorFlow distribution objects and helpers.'
     ),
@@ -61,12 +61,8 @@ _TENSORFLOW_DOC_SOURCES = {
         DocSource(docstring_module_name='ops.linalg_ops'),
     'logging':
         DocSource(docstring_module_name='ops.logging_ops'),
-    'losses': DocSource(
-        docstring=(
-            'Loss operations for use in neural networks. Note: All the losses'
-            ' are added to the `GraphKeys.LOSSES` collection by default.'
-        )
-    ),
+    'losses':
+        DocSource(docstring_module_name='ops.losses.losses'),
     'manip':
         DocSource(docstring_module_name='ops.manip_ops'),
     'math':
@@ -93,14 +89,8 @@ _TENSORFLOW_DOC_SOURCES = {
         DocSource(docstring_module_name='ops.sparse_ops'),
     'strings':
         DocSource(docstring_module_name='ops.string_ops'),
-    'summary': DocSource(
-        docstring=(
-            'Operations for writing summary data, for use in analysis and'
-            ' visualization. See the [Summaries and'
-            ' TensorBoard](https://www.tensorflow.org/guide/summaries_and_tensorboard)'
-            ' guide.'
-        )
-    ),
+    'summary':
+        DocSource(docstring_module_name='summary.summary'),
     'sysconfig':
         DocSource(docstring='System configuration library.'),
     'test':

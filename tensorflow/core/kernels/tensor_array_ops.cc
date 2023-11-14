@@ -28,7 +28,7 @@ limitations under the License.
 // TODO(b/31496047): Fix non-standard include order.
 #include <numeric>  // clang-format off
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
@@ -231,8 +231,7 @@ class TensorArrayOp : public TensorArrayCreationOp {
   bool clear_after_read_;
   string tensor_array_name_;  // The name used to create the TensorArray.
 
-  TensorArrayOp(const TensorArrayOp&) = delete;
-  void operator=(const TensorArrayOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorArrayOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TensorArray").Device(DEVICE_CPU), TensorArrayOp);
@@ -408,8 +407,7 @@ class TensorArrayGradOp : public TensorArrayCreationOp {
   // call.  Typical values look like "gradients", "gradients_1", ...
   string source_;
 
-  TensorArrayGradOp(const TensorArrayGradOp&) = delete;
-  void operator=(const TensorArrayGradOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorArrayGradOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TensorArrayGrad").Device(DEVICE_CPU),

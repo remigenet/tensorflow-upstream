@@ -27,11 +27,11 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/constants.h"
-#include "xla/client/lib/math.h"
-#include "xla/client/lib/prng.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/lib/constants.h"
+#include "tensorflow/compiler/xla/client/lib/math.h"
+#include "tensorflow/compiler/xla/client/lib/prng.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/rng_alg.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -262,8 +262,7 @@ class StatefulUniformOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StatefulUniformOp(const StatefulUniformOp&) = delete;
-  void operator=(const StatefulUniformOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatefulUniformOp);
 };
 
 // TODO(wangpeng): Support plain float16 to get rid of the `TypeConstraint`.
@@ -302,8 +301,7 @@ class StatefulStandardNormalOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StatefulStandardNormalOp(const StatefulStandardNormalOp&) = delete;
-  void operator=(const StatefulStandardNormalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatefulStandardNormalOp);
 };
 
 // TODO(wangpeng): Support plain float16 to get rid of the `TypeConstraint`.
@@ -350,8 +348,7 @@ class StatefulTruncatedNormalOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StatefulTruncatedNormalOp(const StatefulTruncatedNormalOp&) = delete;
-  void operator=(const StatefulTruncatedNormalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatefulTruncatedNormalOp);
 };
 
 // TODO(wangpeng): Support plain float16 to get rid of the `TypeConstraint`.
@@ -387,8 +384,7 @@ class StatefulUniformIntOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StatefulUniformIntOp(const StatefulUniformIntOp&) = delete;
-  void operator=(const StatefulUniformIntOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatefulUniformIntOp);
 };
 
 REGISTER_XLA_OP(Name("StatefulUniformInt")
@@ -421,8 +417,7 @@ class StatefulUniformFullIntOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StatefulUniformFullIntOp(const StatefulUniformFullIntOp&) = delete;
-  void operator=(const StatefulUniformFullIntOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatefulUniformFullIntOp);
 };
 
 REGISTER_XLA_OP(Name("StatefulUniformFullInt")
@@ -496,8 +491,7 @@ class RngSkipOp : public XlaOpKernel {
   }
 
  private:
-  RngSkipOp(const RngSkipOp&) = delete;
-  void operator=(const RngSkipOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RngSkipOp);
 };
 
 REGISTER_XLA_OP(Name("RngSkip").CompileTimeConstantInput("algorithm"),

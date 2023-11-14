@@ -55,8 +55,7 @@ def _test_combinations():
   def reduce_fn(x, y):
     name, functions = y
     return x + combinations.combine(
-        functions=combinations.NamedObject(name, functions)
-    )
+        functions=combinations.NamedObject(name, functions))
 
   return functools.reduce(reduce_fn, cases, [])
 
@@ -64,36 +63,13 @@ def _test_combinations():
 class MapFusionTest(test_base.DatasetTestBase, parameterized.TestCase):
 
   @combinations.generate(
-      combinations.times(
-          test_base.default_test_combinations(),
-          _test_combinations(),
-          combinations.combine(
-              num_parallel_calls=[None, 2, dataset_ops.AUTOTUNE]
-          ),
-          combinations.combine(deterministic=[None, True, False]),
-      )
-  )
-  def testMapFusion(self, functions, num_parallel_calls, deterministic):
-    dataset = dataset_ops.Dataset.range(5)
-    if num_parallel_calls is None:
-      dataset = dataset.apply(testing.assert_next(["Map", "MemoryCacheImpl"]))
-    elif num_parallel_calls in [dataset_ops.AUTOTUNE]:
-      # TODO(b/148614504): Support fusion of parallel maps with
-      # non-AUTOTUNE value.
-      dataset = dataset.apply(
-          testing.assert_next(["ParallelMap", "MemoryCacheImpl"])
-      )
-    else:
-      dataset = dataset.apply(
-          testing.assert_next(["ParallelMap", "ParallelMap"])
-      )
-
+      combinations.times(test_base.default_test_combinations(),
+                         _test_combinations()))
+  def testMapFusion(self, functions):
+    dataset = dataset_ops.Dataset.range(5).apply(
+        testing.assert_next(["Map", "MemoryCacheImpl"]))
     for function in functions:
-      dataset = dataset.map(
-          function,
-          num_parallel_calls=num_parallel_calls,
-          deterministic=deterministic,
-      )
+      dataset = dataset.map(function)
 
     dataset = dataset.cache()
     options = options_lib.Options()
@@ -109,36 +85,18 @@ class MapFusionTest(test_base.DatasetTestBase, parameterized.TestCase):
         else:
           r = function(r)
       expected_output.append(r)
+    self.assertDatasetProduces(dataset, expected_output=expected_output)
 
-    if num_parallel_calls is None or deterministic in [None, True]:
-      self.assertDatasetProduces(dataset, expected_output=expected_output)
-
-  @combinations.generate(
-      combinations.times(
-          test_base.default_test_combinations(),
-          combinations.combine(
-              num_parallel_calls=[None, 2, dataset_ops.AUTOTUNE]
-          ),
-      )
-  )
-  def testCapturedInputs(self, num_parallel_calls):
+  @combinations.generate(test_base.default_test_combinations())
+  def testCapturedInputs(self):
     a = constant_op.constant(3, dtype=dtypes.int64)
     b = constant_op.constant(4, dtype=dtypes.int64)
     some_tensor = math_ops.mul(a, b)
 
-    dataset = dataset_ops.Dataset.range(1)
     # We currently do not support functions with captured inputs.
-    if num_parallel_calls in [2, dataset_ops.AUTOTUNE]:
-      dataset = dataset.apply(
-          testing.assert_next(["ParallelMap", "ParallelMap"])
-      )
-    else:
-      dataset = dataset.apply(testing.assert_next(["Map", "Map"]))
-
-    dataset = dataset.map(
-        lambda x: some_tensor, num_parallel_calls=num_parallel_calls
-    ).map(lambda x: x, num_parallel_calls=num_parallel_calls)
-
+    dataset = dataset_ops.Dataset.range(1).apply(
+        testing.assert_next(["Map", "Map"
+                            ])).map(lambda x: some_tensor).map(lambda x: x)
     options = options_lib.Options()
     options.experimental_optimization.apply_default_optimizations = False
     options.experimental_optimization.map_fusion = True

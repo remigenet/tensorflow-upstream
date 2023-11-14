@@ -15,13 +15,9 @@ limitations under the License.
 
 #include "tensorflow/c/tf_buffer.h"
 
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-
 #include "tensorflow/core/platform/errors.h"
 #include "tensorflow/core/platform/mem.h"
-#include "tensorflow/core/platform/protobuf.h"  // IWYU pragma: keep
+#include "tensorflow/core/platform/protobuf.h"
 #include "tensorflow/core/platform/status.h"
 
 extern "C" {
@@ -30,7 +26,7 @@ TF_Buffer* TF_NewBuffer() { return new TF_Buffer{nullptr, 0, nullptr}; }
 
 TF_Buffer* TF_NewBufferFromString(const void* proto, size_t proto_len) {
   void* copy = tensorflow::port::Malloc(proto_len);
-  std::memcpy(copy, proto, proto_len);
+  memcpy(copy, proto, proto_len);
 
   TF_Buffer* buf = new TF_Buffer;
   buf->data = copy;
@@ -68,7 +64,7 @@ Status MessageToBuffer(const tensorflow::protobuf::MessageLite& in,
         "Failed to allocate memory to serialize message of type '",
         in.GetTypeName(), "' and size ", proto_size);
   }
-  if (!in.SerializeWithCachedSizesToArray(static_cast<uint8_t*>(buf))) {
+  if (!in.SerializeWithCachedSizesToArray(static_cast<uint8*>(buf))) {
     port::Free(buf);
     return errors::InvalidArgument(
         "Unable to serialize ", in.GetTypeName(),

@@ -194,7 +194,6 @@ cc_test_with_tflite(
     name = "delegate_provider_lib_test",
     size = "small",
     srcs = ["delegate_provider_test.cc"],
-    copts = tflite_copts(),
     # See details in https://github.com/bazelbuild/bazel/issues/11552 to avoid
     # lazy symbol binding failure on macOS.
     linkstatic = select({

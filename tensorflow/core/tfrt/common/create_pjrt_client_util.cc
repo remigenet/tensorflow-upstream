@@ -17,7 +17,7 @@ limitations under the License.
 #include <optional>
 #include <set>
 
-#include "xla/pjrt/pjrt_client.h"
+#include "tensorflow/compiler/xla/pjrt/pjrt_client.h"
 #include "tensorflow/core/tfrt/common/global_state.h"
 #include "tensorflow/core/tfrt/common/pjrt_state.h"
 

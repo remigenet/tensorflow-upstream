@@ -17,9 +17,9 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_compiler.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/quantize.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/lib/quantize.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/op_kernel.h"
 
 namespace tensorflow {
@@ -51,8 +51,7 @@ class XlaDequantizeOp : public XlaOpKernel {
   float max_range_;
   bool transpose_output_;
   string mode_;
-  XlaDequantizeOp(const XlaDequantizeOp&) = delete;
-  void operator=(const XlaDequantizeOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaDequantizeOp);
 };
 
 REGISTER_XLA_OP(Name("XlaDequantize"), XlaDequantizeOp);

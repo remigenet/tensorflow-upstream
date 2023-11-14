@@ -19,7 +19,6 @@ import numbers
 import numpy as np
 
 from tensorflow.core.config import flags
-from tensorflow.dtensor.python import api as d_api
 from tensorflow.python.eager import context
 from tensorflow.python.eager import record
 from tensorflow.python.framework import common_shapes
@@ -50,8 +49,18 @@ from tensorflow.python.util import deprecation
 from tensorflow.python.util import dispatch
 from tensorflow.python.util import nest
 from tensorflow.python.util import tf_decorator
+from tensorflow.python.util.lazy_loader import LazyLoader
 from tensorflow.python.util.tf_export import tf_export
 # pylint: enable=wildcard-import
+
+# TODO(b/282205877): Eliminate this LazyLoader.
+# DTensor doesn't depend on array_ops.py, but it imports tensorflow.python,
+# which imports array_ops.py, creating a cyclic import without a cyclic BUILD
+# dependency. The import cycle creates errors in some unit tests, but not
+# always.
+d_api = LazyLoader(
+    "api", globals(), "tensorflow.dtensor.python.api"
+)
 
 # Used for slicing to specify a new 1 size dimension
 newaxis = None
@@ -3749,7 +3758,7 @@ def _compute_size_of_strided_dim(shrink, spec, size):
     return unknown  # unknown because stride is unknown
 
 
-def _TileGradShape(op: ops.Operation):
+def _TileGradShape(op):
   """Shape function for the TileGrad op."""
   multiples_shape = op.inputs[1].get_shape().with_rank(1)
   input_shape = op.inputs[0].get_shape().with_rank(multiples_shape[0])
@@ -3873,7 +3882,7 @@ def edit_distance(hypothesis, truth, normalize=True, name="edit_distance"):
 
 
 @ops.RegisterGradient("FakeQuantWithMinMaxArgs")
-def _FakeQuantWithMinMaxArgsGradient(op: ops.Operation, grad):
+def _FakeQuantWithMinMaxArgsGradient(op, grad):
   """Gradient for FakeQuantWithMinMaxArgs op."""
   return fake_quant_with_min_max_args_gradient(
       grad,
@@ -3885,7 +3894,7 @@ def _FakeQuantWithMinMaxArgsGradient(op: ops.Operation, grad):
 
 
 @ops.RegisterGradient("FakeQuantWithMinMaxVars")
-def _FakeQuantWithMinMaxVarsGradient(op: ops.Operation, grad):
+def _FakeQuantWithMinMaxVarsGradient(op, grad):
   """Gradient for FakeQuantWithMinMaxVars op."""
   return fake_quant_with_min_max_vars_gradient(
       grad,
@@ -3897,7 +3906,7 @@ def _FakeQuantWithMinMaxVarsGradient(op: ops.Operation, grad):
 
 
 @ops.RegisterGradient("FakeQuantWithMinMaxVarsPerChannel")
-def _FakeQuantWithMinMaxVarsPerChannelGradient(op: ops.Operation, grad):
+def _FakeQuantWithMinMaxVarsPerChannelGradient(op, grad):
   """Gradient for FakeQuantWithMinMaxVarsPerChannel op."""
   return fake_quant_with_min_max_vars_per_channel_gradient(
       grad,
@@ -3909,7 +3918,7 @@ def _FakeQuantWithMinMaxVarsPerChannelGradient(op: ops.Operation, grad):
 
 
 @ops.RegisterGradient("QuantizeAndDequantizeV4")
-def _QuantizeAndDequantizeV4Grad(op: ops.Operation, grad):
+def _QuantizeAndDequantizeV4Grad(op, grad):
   """Gradient for QuantizeAndDequantizeV4 op."""
   return quantize_and_dequantize_v4_grad(
       grad,
@@ -3920,7 +3929,7 @@ def _QuantizeAndDequantizeV4Grad(op: ops.Operation, grad):
 
 
 @ops.RegisterGradient("QuantizeAndDequantizeV4Grad")
-def _QuantizeAndDequantizeV4GradGrad(op: ops.Operation, grad):
+def _QuantizeAndDequantizeV4GradGrad(op, grad):
   """Gradient for QuantizeAndDequantizeV4Grad op."""
   return _QuantizeAndDequantizeV4Grad(op, grad)
 

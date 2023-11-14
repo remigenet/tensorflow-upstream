@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 #include "mlir/IR/BuiltinAttributes.h"  // from @llvm-project
 #include "mlir/IR/BuiltinTypes.h"  // from @llvm-project
-#include "mlir/IR/Operation.h"  // from @llvm-project
 #include "mlir/Pass/Pass.h"  // from @llvm-project
 #include "tensorflow/compiler/mlir/lite/ir/tfl_ops.h"
 #include "tensorflow/compiler/mlir/lite/transforms/passes.h"
@@ -49,14 +48,8 @@ bool IsSupportedTFLiteControlFlow(Operation* op) {
 // Returns true if the 'op' is one of the supported TF control flow ops or
 // dataset ops. Those ops just forward the operands to other subgraphs.
 bool IsSupportedTFDataForwardingOp(Operation* op) {
-  return llvm::isa<TF::MapDatasetOp, TF::ReduceDatasetOp, TF::CacheDatasetV2Op,
+  return llvm::isa<TF::MapDatasetOp, TF::ReduceDatasetOp,
                    TF::TakeWhileDatasetOp, TF::IfOp, TF::WhileOp>(op);
-}
-
-// Returns true if the 'op' is one of the supported custom op that takes
-// resource type.
-bool IsSupportedTFCustomOp(Operation* op) {
-  return op->getName().getStringRef().str() == "tf.SentencepieceTokenizeOp";
 }
 
 class AnalyzeVariablesPass
@@ -75,8 +68,6 @@ void AnalyzeVariablesPass::runOnOperation() {
     // Skip ops that are supported natively by TFLite.
     if (IsSupportedTFLiteResourceOp(op)) return WalkResult::advance();
     if (IsSupportedTFLiteControlFlow(op)) return WalkResult::advance();
-
-    if (IsSupportedTFCustomOp(op)) return WalkResult::advance();
 
     // Check for ops that are legalized to TFLite.
     if (op->getDialect()->getNamespace() == "tfl") {

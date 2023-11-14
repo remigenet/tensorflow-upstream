@@ -15,8 +15,7 @@ limitations under the License.
 
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/shape_inference.h"
-#include "tensorflow/core/platform/status.h"
-#include "tsl/platform/errors.h"
+#include "tensorflow/core/lib/core/status.h"
 
 namespace tensorflow {
 

@@ -63,7 +63,7 @@ class CallOptions:
 RUNTIME_FUNCTION_REFS = {}
 
 
-class AtomicFunction(core.AtomicFunction):
+class AtomicFunction:
   """A Python callable for functions in the TF Runtime.
 
   Provides core functionality for tf.function including:
@@ -72,6 +72,7 @@ class AtomicFunction(core.AtomicFunction):
     - calls from both eager and graph mode
     - dependency tracking of children functions
     - runtime error interpolation to identify user code stack traces
+    - compatibility with gradient infrastructure
     - control dependencies (including automatic)
   """
 
@@ -202,21 +203,21 @@ class AtomicFunction(core.AtomicFunction):
 
     return self._generated_graph
 
-  def call_with_captures(
+  def structured_call(
       self, args: Sequence[Any], kwargs: Dict[str, Any], captures: Sequence[Any]
   ) -> Any:
-    """Calls with args, kwargs, captures and returns structured output."""
+    """Calls with structured tensor inputs and returns structured output."""
     bound_parameters = self.function_type.bind(*args, **kwargs)
     tensor_inputs = self.function_type.unpack_inputs(bound_parameters)
     capture_inputs = self.function_type.unpack_captures(captures)
-    return self.call_preflattened(tensor_inputs + capture_inputs)
+    return self.flat_call(tensor_inputs + capture_inputs)
 
-  def call_preflattened(self, args: Sequence[core.Tensor]) -> Any:
-    """Calls with flattened tensor inputs and returns the structured output."""
-    flat_outputs = self.call_flat(*args)
+  def flat_call(self, args: Sequence[core.Tensor]) -> Any:
+    """Calls with tensor inputs and returns the structured output."""
+    flat_outputs = self(*args)
     return self.function_type.pack_output(flat_outputs)
 
-  def call_flat(self, *args: core.Tensor) -> Sequence[core.Tensor]:
+  def __call__(self, *args: core.Tensor) -> Sequence[core.Tensor]:
     """Calls with flat tensor inputs and returns flat tensor outputs.
 
     Args:
@@ -261,7 +262,7 @@ class AtomicFunction(core.AtomicFunction):
             )
 
     for i, output_type in enumerate(self.function_type.flat_outputs):
-      handle_data = output_type.dtype._handle_data  # pylint: disable=protected-access
+      handle_data = output_type.dtype._handle_data
       if handle_data:
         handle_data_util.set_handle_data(
             outputs[i], handle_data.shape_inference
@@ -273,15 +274,6 @@ class AtomicFunction(core.AtomicFunction):
         outputs[i].set_shape(output_type.shape)
 
     return outputs
-
-  def __call__(self, *args, **kwargs) -> Any:
-    if self.function_type.captures:
-      raise ValueError(
-          "The FunctionType defines captured inputs. Use call_with_captures"
-          " instead."
-      )
-
-    return self.call_with_captures(args, kwargs, [])
 
   def __del__(self):
     if self._generated_graph:

@@ -21,7 +21,7 @@ limitations under the License.
 #include <string>
 
 #include "tensorflow/compiler/jit/device_compiler_client.h"
-#include "xla/client/local_client.h"
+#include "tensorflow/compiler/xla/client/local_client.h"
 
 namespace tensorflow {
 
@@ -60,8 +60,7 @@ class XlaDeviceCompilerClient
  private:
   xla::LocalClient* const client_;
 
-  XlaDeviceCompilerClient(const XlaDeviceCompilerClient&) = delete;
-  void operator=(const XlaDeviceCompilerClient&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaDeviceCompilerClient);
 };
 
 }  // namespace tensorflow

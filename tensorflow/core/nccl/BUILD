@@ -15,6 +15,7 @@ load(
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
     default_visibility = ["//tensorflow:__subpackages__"],
+    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
@@ -30,10 +31,6 @@ cc_library(
     copts = tf_copts(),
     deps = if_cuda([
         "@local_config_nccl//:nccl",
-        "//tensorflow/core/platform:blocking_counter",
-        "//tensorflow/core/platform:unbounded_work_queue",
-        "@local_xla//xla/stream_executor/cuda:cuda_activation",
-        "//tensorflow/core/framework:tensor_proto_cc",
     ]) + if_rocm([
         "@local_config_rocm//rocm:rccl",
         "//tensorflow/core:gpu_runtime",
@@ -96,8 +93,6 @@ cc_library(
             ":nccl_lib",
             "@com_google_absl//absl/memory",
             "//tensorflow/core/profiler/lib:traceme",
-        ]) + if_cuda([
-            "//tensorflow/core/platform:tracing",
         ]),
 )
 

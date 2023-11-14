@@ -23,7 +23,7 @@ limitations under the License.
 #include <utility>
 
 #include "absl/strings/string_view.h"
-#include "tsl/profiler/lib/scoped_annotation_stack.h"
+#include "tensorflow/tsl/profiler/lib/scoped_annotation_stack.h"
 
 #if !defined(IS_MOBILE_PLATFORM)
 #include "tensorflow/core/profiler/backends/cpu/annotation_stack.h"

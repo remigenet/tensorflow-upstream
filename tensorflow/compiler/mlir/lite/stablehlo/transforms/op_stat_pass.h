@@ -26,8 +26,8 @@ namespace odml {
 
 // Creates a pass which prints out a detailed report of conversion stats with:
 // success or not, % of Ops non-converted, list of non-converted Ops, etc.
-std::unique_ptr<Pass> createPrintOpStatsPass(
-    std::vector<std::string> accepted_dialects);
+// It get the stats based on the list in `TFL::mhlo::GetAcceptedDialects()`.
+std::unique_ptr<Pass> createPrintOpStatsPass();
 
 }  // namespace odml
 }  // namespace mlir

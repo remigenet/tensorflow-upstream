@@ -18,13 +18,15 @@ limitations under the License.
 
 #include "mlir/Support/LogicalResult.h"  // from @llvm-project
 
-namespace mlir::quant::stablehlo {
+namespace mlir {
+namespace stablehlo {
 
 // Decomposes a given floating point value num into a normalized and quantized
 // fraction and an integral power of two.
 LogicalResult QuantizeMultiplier(double double_multiplier,
                                  int32_t& quantized_fraction, int32_t& shift);
 
-}  // namespace mlir::quant::stablehlo
+}  // namespace stablehlo
+}  // namespace mlir
 
 #endif  // TENSORFLOW_COMPILER_MLIR_QUANTIZATION_STABLEHLO_UTILS_MATH_UTILS_H_

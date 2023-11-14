@@ -872,8 +872,7 @@ class FusedResizeConv2DUsingGemmOp : public OpKernel {
   bool align_corners_;
   int offset_;
 
-  FusedResizeConv2DUsingGemmOp(const FusedResizeConv2DUsingGemmOp&) = delete;
-  void operator=(const FusedResizeConv2DUsingGemmOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FusedResizeConv2DUsingGemmOp);
 };
 
 #define REGISTER_FUSED(T)                                                 \

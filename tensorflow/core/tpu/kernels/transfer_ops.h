@@ -20,16 +20,11 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "xla/literal.h"
-#include "xla/stream_executor/stream_executor.h"
-#include "xla/stream_executor/tpu/noncopyable_buffer.h"
-#include "xla/stream_executor/tpu/tpu_platform_interface.h"
-#include "xla/stream_executor/tpu/tpu_transfer_manager_interface.h"
+#include "tensorflow/compiler/jit/xla_device.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/tpu_platform_interface.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/tpu_transfer_manager_interface.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/platform/mutex.h"
-#include "tensorflow/core/platform/status.h"
-#include "tensorflow/core/platform/statusor.h"
-#include "tensorflow/core/platform/threadpool.h"
+#include "tensorflow/core/util/stream_executor_util.h"
 
 namespace tensorflow {
 
@@ -53,7 +48,7 @@ class TpuTransferOpInterface {
 class TpuTransferAsyncOpKernelBase : public AsyncOpKernel {
  public:
   explicit TpuTransferAsyncOpKernelBase(
-      OpKernelConstruction* ctx, const std::string& transfer_type,
+      OpKernelConstruction* ctx, const string& transfer_type,
       int number_of_threads,
       std::unique_ptr<TpuTransferOpInterface> transfer_op);
 
@@ -81,7 +76,7 @@ class TpuTransferAsyncOpKernelBase : public AsyncOpKernel {
 class TpuTransferAsyncOpKernel : public TpuTransferAsyncOpKernelBase {
  public:
   explicit TpuTransferAsyncOpKernel(
-      OpKernelConstruction* ctx, const std::string& transfer_type,
+      OpKernelConstruction* ctx, const string& transfer_type,
       int number_of_threads,
       std::unique_ptr<TpuTransferOpInterface> transfer_op);
 
@@ -98,7 +93,7 @@ class TpuTransferAsyncDynamicOrdinalOpKernel
     : public TpuTransferAsyncOpKernelBase {
  public:
   explicit TpuTransferAsyncDynamicOrdinalOpKernel(
-      OpKernelConstruction* ctx, const std::string& transfer_type,
+      OpKernelConstruction* ctx, const string& transfer_type,
       int number_of_threads,
       std::unique_ptr<TpuTransferOpInterface> transfer_op);
 

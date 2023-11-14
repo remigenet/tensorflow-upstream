@@ -48,8 +48,7 @@ class TestAsyncIdentityKernel : public AsyncOpKernel {
   }
 
  private:
-  TestAsyncIdentityKernel(const TestAsyncIdentityKernel&) = delete;
-  void operator=(const TestAsyncIdentityKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TestAsyncIdentityKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TestAsyncIdentity").Device(DEVICE_CPU),
@@ -90,9 +89,7 @@ class TestAsyncTfrtAsyncThreadKernel : public AsyncOpKernel {
  private:
   mutex mu_;
   std::unique_ptr<Thread> thread_ TF_GUARDED_BY(mu_);
-  TestAsyncTfrtAsyncThreadKernel(const TestAsyncTfrtAsyncThreadKernel&) =
-      delete;
-  void operator=(const TestAsyncTfrtAsyncThreadKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TestAsyncTfrtAsyncThreadKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TestAsyncTfrtAsyncThread").Device(DEVICE_CPU),
@@ -115,8 +112,7 @@ class TestPrintThreadNameKernel : public OpKernel {
   }
 
  private:
-  TestPrintThreadNameKernel(const TestPrintThreadNameKernel&) = delete;
-  void operator=(const TestPrintThreadNameKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TestPrintThreadNameKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TestPrintThreadName").Device(DEVICE_CPU),

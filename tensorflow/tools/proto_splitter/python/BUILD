@@ -54,7 +54,6 @@ py_strict_test(
     deps = [
         "//tensorflow/python/framework:dtypes",
         "//tensorflow/python/platform:client_testlib",
-        "//tensorflow/tools/proto_splitter/python:test_util",
         "@absl_py//absl/testing:parameterized",
     ],
 )

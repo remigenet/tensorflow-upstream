@@ -28,6 +28,9 @@ limitations under the License.
 #include "tfrt/core_runtime/core_runtime.h"  // from @tf_runtime
 #include "tfrt/host_context/resource_context.h"  // from @tf_runtime
 
+namespace tfrt {
+}  // namespace tfrt
+
 namespace tensorflow {
 namespace tfrt_stub {
 
@@ -59,19 +62,6 @@ class ModelRuntimeContext {
     meta_graph_def_ = meta_graph_def;
   }
 
-  FunctionLibraryDefinition* function_library_definition() const {
-    return flib_def_;
-  }
-  void set_function_library_definition(FunctionLibraryDefinition* flib_def) {
-    flib_def_ = flib_def;
-  }
-
-  bool is_local_session() const { return is_local_session_; }
-
-  void set_is_local_session(bool is_local_session) {
-    is_local_session_ = is_local_session;
-  }
-
   tfrt::ResourceContext& resource_context() { return *resource_context_; }
 
   const GraphExecutionOptions& graph_execution_options() const {
@@ -85,10 +75,6 @@ class ModelRuntimeContext {
   const MetaGraphDef* meta_graph_def_ = nullptr;
 
   tfrt::ResourceContext* resource_context_ = nullptr;
-
-  FunctionLibraryDefinition* flib_def_ = nullptr;
-
-  bool is_local_session_ = false;
 };
 
 // This defines the runtime abstraction in tensorflow for TFRT. It is supposed

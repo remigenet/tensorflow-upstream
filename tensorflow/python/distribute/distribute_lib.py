@@ -27,13 +27,11 @@ the same way with eager and graph execution.
 *Guides*
 
 * [TensorFlow v2.x](https://www.tensorflow.org/guide/distributed_training)
-* [TensorFlow
-v1.x](https://github.com/tensorflow/docs/blob/master/site/en/r1/guide/distribute_strategy.ipynb)
+* [TensorFlow v1.x](https://github.com/tensorflow/docs/blob/master/site/en/r1/guide/distribute_strategy.ipynb)
 
 *Tutorials*
 
-* [Distributed Training
-Tutorials](https://www.tensorflow.org/tutorials/distribute/)
+* [Distributed Training Tutorials](https://www.tensorflow.org/tutorials/distribute/)
 
   The tutorials cover how to use `tf.distribute.Strategy` to do distributed
   training with native Keras APIs, custom training loops,
@@ -541,7 +539,7 @@ def in_cross_replica_context():
 
 
 @tf_export("distribute.get_strategy")
-def get_strategy() -> "StrategyBase":
+def get_strategy():
   """Returns the current `tf.distribute.Strategy` object.
 
   Typically only used in a cross-replica context:

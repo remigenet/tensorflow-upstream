@@ -15,7 +15,7 @@ py_strict_library(
     deps = [
         "//tensorflow/python/autograph/pyct:templates",
         "//third_party/py/numpy",
-        "@pypi_gast//:pkg",
+        "@gast_archive//:gast",
     ],
 )
 

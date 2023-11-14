@@ -17,24 +17,21 @@ limitations under the License.
 
 #include <string>
 
-#include <gtest/gtest.h>
-#include "absl/status/status.h"
-#include "absl/status/statusor.h"
-#include "absl/strings/string_view.h"
+#include "tensorflow/cc/framework/scope.h"
 #include "tensorflow/core/framework/graph.pb.h"
 #include "tensorflow/core/framework/versions.pb.h"
-#include "tensorflow/core/platform/env.h"
+#include "tensorflow/core/lib/core/status_test_util.h"
+#include "tensorflow/core/platform/errors.h"
 #include "tensorflow/core/platform/path.h"
 #include "tensorflow/core/platform/test.h"
 #include "tensorflow/core/protobuf/fingerprint.pb.h"
 #include "tensorflow/core/protobuf/saved_model.pb.h"
-#include "tsl/platform/statusor.h"
 
 namespace tensorflow::saved_model::fingerprinting {
 
 namespace {
 
-absl::StatusOr<SavedModel> ReadSavedModel(absl::string_view file_dir) {
+StatusOr<SavedModel> ReadSavedModel(absl::string_view file_dir) {
   std::string file_path = io::JoinPath(file_dir, "saved_model.pb");
   std::string serialized_saved_model;
   auto status =
@@ -46,6 +43,7 @@ absl::StatusOr<SavedModel> ReadSavedModel(absl::string_view file_dir) {
   saved_model_pb.ParseFromString(serialized_saved_model);
   return saved_model_pb;
 }
+
 
 TEST(FingerprintingTest, TestCreateFingerprint) {
   const std::string export_dir =
@@ -153,8 +151,7 @@ TEST(FingerprintingTest, TestSingleprint) {
   const std::string const_singleprint =
       "706963557435316516/5693392539583495303/12074714563970609759/"
       "10788359570789890102";
-  TF_ASSERT_OK_AND_ASSIGN(std::string singleprint, Singleprint(export_dir));
-  EXPECT_EQ(singleprint, const_singleprint);
+  EXPECT_EQ(Singleprint(export_dir), const_singleprint);
   TF_ASSERT_OK_AND_ASSIGN(FingerprintDef fingerprint_pb,
                           ReadSavedModelFingerprint(export_dir));
   EXPECT_EQ(Singleprint(fingerprint_pb), const_singleprint);

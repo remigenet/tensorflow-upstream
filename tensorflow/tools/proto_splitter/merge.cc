@@ -32,9 +32,9 @@ limitations under the License.
 #include "tensorflow/core/platform/file_system_helper.h"
 #include "tensorflow/tools/proto_splitter/cc/util.h"
 #include "tensorflow/tools/proto_splitter/chunk.pb.h"
-#include "tsl/platform/errors.h"
-#include "tsl/platform/protobuf.h"
-#include "tsl/platform/statusor.h"
+#include "tensorflow/tsl/platform/errors.h"
+#include "tensorflow/tsl/platform/protobuf.h"
+#include "tensorflow/tsl/platform/statusor.h"
 
 namespace tensorflow::tools::proto_splitter {
 
@@ -195,7 +195,7 @@ absl::Status Merger::ReadFields(
             uint64_t index2 = tag2.index();
             if (index1 != index2) return index1 < index2;
           } else if (tag1.has_map_key() && tag2.has_map_key()) {
-            return false;
+            return true;
           } else {
             sort_status = absl::FailedPreconditionError("Field tag mismatch");
             return false;

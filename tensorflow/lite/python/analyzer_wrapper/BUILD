@@ -11,10 +11,6 @@ pybind_extension(
     srcs = [
         "analyzer_wrapper.cc",
     ],
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "_pywrap_analyzer_wrapper.pyi",
-    ],
     deps = [
         ":model_analyzer",
         "@pybind11",

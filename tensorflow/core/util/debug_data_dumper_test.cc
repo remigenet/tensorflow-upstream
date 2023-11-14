@@ -61,15 +61,13 @@ TEST(DebugDataDumper, ShouldDumpTest) {
 
   setenv("TF_DUMP_GRAPH_NAME_FILTER", "*", 1);
   DEBUG_DATA_DUMPER()->LoadEnvvars();
-  EXPECT_EQ(false,
-            DEBUG_DATA_DUMPER()->ShouldDump("DumpGraphToFileTest",
-                                            kDebugGroupBridgePhase1Clustering));
+  EXPECT_EQ(false, DEBUG_DATA_DUMPER()->ShouldDump("DumpGraphToFileTest",
+                                                   kDebugGroupBridgePhase1));
 
-  setenv("TF_DUMP_GRAPH_GROUPS", "main,bridge_phase1_clustering", 1);
+  setenv("TF_DUMP_GRAPH_GROUPS", "main,bridge_phase1", 1);
   DEBUG_DATA_DUMPER()->LoadEnvvars();
-  EXPECT_EQ(true,
-            DEBUG_DATA_DUMPER()->ShouldDump("DumpGraphToFileTest",
-                                            kDebugGroupBridgePhase1Clustering));
+  EXPECT_EQ(true, DEBUG_DATA_DUMPER()->ShouldDump("DumpGraphToFileTest",
+                                                  kDebugGroupBridgePhase1));
 
   DEBUG_DATA_DUMPER()->LoadEnvvars();
   EXPECT_EQ(false, DEBUG_DATA_DUMPER()->ShouldDump(

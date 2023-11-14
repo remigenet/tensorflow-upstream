@@ -25,8 +25,8 @@ limitations under the License.
 #include "llvm/TableGen/Main.h"
 #include "llvm/TableGen/Record.h"
 #include "mlir/TableGen/Operator.h"  // from @llvm-project
-#include "tsl/platform/logging.h"
-#include "tsl/platform/regexp.h"
+#include "tensorflow/tsl/platform/logging.h"
+#include "tensorflow/tsl/platform/regexp.h"
 
 using llvm::LessRecord;
 using llvm::raw_ostream;

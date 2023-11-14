@@ -181,9 +181,6 @@ class DataServiceDispatcherImpl {
                           GetSnapshotSplitResponse* response);
   Status GetSnapshotStreams(const GetSnapshotStreamsRequest* request,
                             GetSnapshotStreamsResponse* response);
-  Status DisableCompressionAtRuntime(
-      const DisableCompressionAtRuntimeRequest* request,
-      DisableCompressionAtRuntimeResponse* response);
 
   // Exports the dispatcher state for debugging.
   DispatcherStateExport ExportState() const;
@@ -388,8 +385,7 @@ class DataServiceDispatcherImpl {
   std::unique_ptr<Thread> maintenance_thread_;
   MultipleIterationsAutoScaler auto_scaler_;
 
-  DataServiceDispatcherImpl(const DataServiceDispatcherImpl&) = delete;
-  void operator=(const DataServiceDispatcherImpl&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DataServiceDispatcherImpl);
 };
 
 }  // namespace data

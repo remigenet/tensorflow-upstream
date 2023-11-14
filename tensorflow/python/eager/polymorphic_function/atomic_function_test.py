@@ -50,9 +50,7 @@ class AtomicFunctionTest(test.TestCase):
     )
 
     self.assertEqual(
-        atomic.call_flat(constant_op.constant(3), constant_op.constant(4))[
-            0
-        ].numpy(),
+        atomic(constant_op.constant(3), constant_op.constant(4))[0].numpy(),
         7,
     )
 
@@ -65,7 +63,7 @@ class AtomicFunctionTest(test.TestCase):
 
     @polymorphic_function.function
     def foo(a, b):
-      return atomic.call_flat(a, b)[0]
+      return atomic(a, b)[0]
 
     self.assertEqual(
         foo(constant_op.constant(3), constant_op.constant(4)).numpy(),
@@ -81,7 +79,7 @@ class AtomicFunctionTest(test.TestCase):
     atomic = atomic_function.from_function_def(definition, func_type)
 
     self.assertEqual(
-        atomic.call_flat(
+        atomic(
             resource_variable_ops.ResourceVariable(3)._handle,
             constant_op.constant(4),
         )[0].numpy(),
@@ -98,7 +96,7 @@ class AtomicFunctionTest(test.TestCase):
 
     @polymorphic_function.function
     def foo(a, b):
-      return atomic.call_flat(a, b)[0]
+      return atomic(a, b)[0]
 
     self.assertEqual(
         foo(
@@ -108,7 +106,8 @@ class AtomicFunctionTest(test.TestCase):
         7,
     )
 
-  def test_call_with_captures(self):
+  def test_structured_call(self):
+
     my_capture = constant_op.constant(2)
 
     @polymorphic_function.function
@@ -132,45 +131,12 @@ class AtomicFunctionTest(test.TestCase):
 
     atomic = atomic_function.from_function_def(function_def, function_type)
 
-    with self.assertRaisesRegex(ValueError, "Use call_with_captures instead."):
-      atomic(structured_inputs)
-
-    result = atomic.call_with_captures((structured_inputs,), {}, [my_capture])
+    result = atomic.structured_call((structured_inputs,), {}, [my_capture])
     self.assertEqual(
         result["my_tensor"].numpy(), structured_inputs["my_tensor"].numpy()
     )
     self.assertEqual(result["my_resource"].dtype, dtypes.resource)
     self.assertEqual(result["my_capture"].numpy(), my_capture.numpy())
-    self.assertEqual(result["my_ints"][0].numpy(), 1)
-    self.assertEqual(result["my_ints"][1].numpy(), 2)
-    self.assertEqual(result["my_ints"][2].numpy(), 3)
-
-  def test_call(self):
-    @polymorphic_function.function
-    def foo(x):
-      my_dict = {}
-      my_dict["my_tensor"] = x["my_tensor"]
-      my_dict["my_resource"] = x["my_variable"].handle
-      my_dict["my_ints"] = x["my_ints"]
-      return my_dict
-
-    structured_inputs = {
-        "my_tensor": constant_op.constant(1),
-        "my_variable": resource_variable_ops.ResourceVariable(1),
-        "my_ints": [1, 2, 3],
-    }
-
-    function_def, function_type = get_function_def_and_type(
-        foo, (structured_inputs,)
-    )
-
-    atomic = atomic_function.from_function_def(function_def, function_type)
-
-    result = atomic(structured_inputs)
-    self.assertEqual(
-        result["my_tensor"].numpy(), structured_inputs["my_tensor"].numpy()
-    )
-    self.assertEqual(result["my_resource"].dtype, dtypes.resource)
     self.assertEqual(result["my_ints"][0].numpy(), 1)
     self.assertEqual(result["my_ints"][1].numpy(), 2)
     self.assertEqual(result["my_ints"][2].numpy(), 3)

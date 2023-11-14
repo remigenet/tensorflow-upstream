@@ -17,7 +17,6 @@ limitations under the License.
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
@@ -64,7 +63,6 @@ limitations under the License.
 #include "tensorflow/core/profiler/lib/traceme.h"
 #include "tensorflow/core/protobuf/error_codes.pb.h"
 #include "tensorflow/core/public/version.h"
-#include "tsl/c/tsl_status_internal.h"
 
 #if !defined(IS_MOBILE_PLATFORM)
 #include "tensorflow/core/common_runtime/eager/context_distributed_manager.h"
@@ -168,29 +166,17 @@ TF_CAPI_EXPORT extern void TFE_ContextSetServerDef(TFE_Context* ctx,
                                                    const void* proto,
                                                    size_t proto_len,
                                                    TF_Status* status) {
-  TFE_ContextSetServerDefWithTimeoutAndRetries(
-      ctx, keep_alive_secs, proto, proto_len, /*init_timeout_in_ms=*/0,
-      /*retries=*/0, status);
-}
-
-// Set server def with timeout.
-TF_CAPI_EXPORT extern void TFE_ContextSetServerDefWithTimeout(
-    TFE_Context* ctx, int keep_alive_secs, const void* proto, size_t proto_len,
-    int64_t init_timeout_in_ms, TF_Status* status) {
-  TFE_ContextSetServerDefWithTimeoutAndRetries(ctx, keep_alive_secs, proto,
-                                               proto_len, init_timeout_in_ms,
-                                               /*retries=*/0, status);
+  TFE_ContextSetServerDefWithTimeout(ctx, keep_alive_secs, proto, proto_len,
+                                     /*init_timeout_in_ms=*/0, status);
 }
 
 // Set server_def on the context, possibly updating it.
-// TODO(b/291142876) Simplify TFE_ContextSetServerDefWithTimeoutAndRetries and
+// TODO(b/291142876) Simplify TFE_ContextSetServerDefWithTimeout and
 // TFE_ContextUpdateServerDefWithTimeout to be simple wrappers around the same
 // C++ function.
-// Retries are used for CreateContext calls, which is used in
-// ParameterServerStrategy initialization to be robust to worker preemption.
-TF_CAPI_EXPORT extern void TFE_ContextSetServerDefWithTimeoutAndRetries(
+TF_CAPI_EXPORT extern void TFE_ContextSetServerDefWithTimeout(
     TFE_Context* ctx, int keep_alive_secs, const void* proto, size_t proto_len,
-    int64_t init_timeout_in_ms, int retries, TF_Status* status) {
+    int64_t init_timeout_in_ms, TF_Status* status) {
 #if defined(IS_MOBILE_PLATFORM)
   status->status = tensorflow::errors::Unimplemented(
       "TFE_ContextSetServerDef not supported on mobile");
@@ -204,7 +190,7 @@ TF_CAPI_EXPORT extern void TFE_ContextSetServerDefWithTimeoutAndRetries(
   status->status =
       tensorflow::unwrap(ctx)->GetDistributedManager()->SetOrUpdateServerDef(
           server_def, /*reset_context=*/true, keep_alive_secs,
-          init_timeout_in_ms, retries);
+          init_timeout_in_ms);
 #endif  // !IS_MOBILE_PLATFORM
 }
 
@@ -239,7 +225,7 @@ TF_CAPI_EXPORT extern void TFE_ContextUpdateServerDefWithTimeout(
   status->status =
       tensorflow::unwrap(ctx)->GetDistributedManager()->SetOrUpdateServerDef(
           server_def, /*reset_context=*/false, keep_alive_secs,
-          init_timeout_in_ms, /*retries=*/0);
+          init_timeout_in_ms);
 #endif  // !IS_MOBILE_PLATFORM
 }
 

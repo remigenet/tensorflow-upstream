@@ -40,8 +40,7 @@ class AssertOp : public XlaOpKernel {
   }
 
  private:
-  AssertOp(const AssertOp&) = delete;
-  void operator=(const AssertOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(AssertOp);
 };
 
 REGISTER_XLA_OP(Name("Assert").CompilationOnly(), AssertOp);

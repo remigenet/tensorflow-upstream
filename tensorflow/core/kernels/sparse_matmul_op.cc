@@ -23,7 +23,7 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/common_runtime/device.h"
 #include "tensorflow/core/framework/bfloat16.h"
 #include "tensorflow/core/framework/op.h"
@@ -40,7 +40,7 @@ limitations under the License.
 #include "tensorflow/core/platform/types.h"
 
 #if defined(TENSORFLOW_USE_CUSTOM_CONTRACTION_KERNEL)
-#include "tsl/framework/contraction/eigen_contraction_kernel.h"
+#include "tensorflow/tsl/framework/contraction/eigen_contraction_kernel.h"
 #endif
 
 #define ALWAYS_INLINE EIGEN_ALWAYS_INLINE
@@ -839,8 +839,7 @@ class SparseMatMul {
                                        int* KR, int* NR, int* KL, int* JB,
                                        int* IB);
 
-  SparseMatMul(const SparseMatMul&) = delete;
-  void operator=(const SparseMatMul&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SparseMatMul);
 };
 
 template <typename TL, typename TR,
@@ -980,8 +979,7 @@ class SparseMatMulOp : public OpKernel {
   bool a_is_sparse_;
   bool b_is_sparse_;
 
-  SparseMatMulOp(const SparseMatMulOp&) = delete;
-  void operator=(const SparseMatMulOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SparseMatMulOp);
 };
 
 template <typename TL, typename TR>

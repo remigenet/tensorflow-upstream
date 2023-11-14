@@ -179,12 +179,15 @@ TEST_PARAMS = [
     ("Conv_NCHW_float_gpu", "NCHW", dtypes.float32, True, "Conv"),
     ("Conv_NCHW_half_gpu", "NCHW", dtypes.float16, True, "Conv"),
     ("Conv_NCHW_bfloat16_gpu", "NCHW", dtypes.bfloat16, True, "Conv"),
-    #("Conv_NHWC_double_gpu", "NHWC", dtypes.float64, True, "Conv"),
-    #("Conv_NCHW_double_gpu", "NCHW", dtypes.float64, True, "Conv"),
     #("Conv2D_NHWC_double_gpu", "NHWC", dtypes.float64, True, "Conv2D"),
-    #("Conv2D_NHWC_double_cpu", "NHWC", dtypes.float64, False, "Conv2D"),
-    #("Conv2D_NCHW_double_gpu", "NCHW", dtypes.float64, True, "Conv2D"),
-    #("Conv_NHWC_double_cpu", "NHWC", dtypes.float64, False, "Conv"),
+    # ("Conv_NHWC_float_gpu", "NHWC", dtypes.float32, True, "Conv"),
+    # ("Conv_NHWC_half_gpu", "NHWC", dtypes.float16, True, "Conv"),
+    # ("Conv_NHWC_double_gpu", "NHWC", dtypes.float64, True, "Conv"),
+    # ("Conv_NHWC_bfloat16_gpu", "NHWC", dtypes.bfloat16, True, "Conv"),
+    # ("Conv_NCHW_float_gpu", "NCHW", dtypes.float32, True, "Conv"),
+    # ("Conv_NCHW_half_gpu", "NCHW", dtypes.float16, True, "Conv"),
+    # ("Conv_NCHW_double_gpu", "NCHW", dtypes.float64, True, "Conv"),
+    # ("Conv_NCHW_bfloat16_gpu", "NCHW", dtypes.bfloat16, True, "Conv")
 ]
 
 DILATED_PARAMS = [
@@ -1331,7 +1334,6 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
 
   @test_util.run_in_graph_and_eager_modes
   def testConv2DGroupConvFwd(self):
-    self.skipTest("Need to Check why MIOpen complains")
     if test.is_gpu_available(cuda_only=True) or test_util.IsMklEnabled():
       data_formats = ["NHWC", "NCHW"]
     else:
@@ -2545,8 +2547,7 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           test_input=True,
           data_format=data_format,
           use_gpu=use_gpu,
-          max_err=0.005,
-      )
+          max_err=0.005)
 
   @test_util.deprecated_graph_mode_only
   def testFilterGradientValidPaddingStrideThree(self):
@@ -2601,8 +2602,7 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           test_input=False,
           data_format=data_format,
           use_gpu=use_gpu,
-          max_err=0.005,
-      )
+          max_err=0.005)
 
   @test_util.deprecated_graph_mode_only
   def testInputGradientSamePaddingStrideTwo(self):
@@ -2657,8 +2657,7 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           test_input=True,
           data_format=data_format,
           use_gpu=use_gpu,
-          max_err=0.005,
-      )
+          max_err=0.005)
 
   @test_util.deprecated_graph_mode_only
   def testFilterGradientSamePaddingStrideThree(self):
@@ -2712,7 +2711,8 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           padding="VALID",
           test_input=True,
           data_format=data_format,
-          use_gpu=use_gpu)
+          use_gpu=use_gpu,
+          max_err=0.005 if test.is_built_with_rocm() else 0.003)
 
   @test_util.deprecated_graph_mode_only
   def testFilterGradientKernelSizeMatchesInputSize(self):
@@ -2914,8 +2914,7 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           test_input=False,
           data_format=data_format,
           use_gpu=use_gpu,
-          max_err=0.005,
-      )
+          max_err=0.005)
 
   @test_util.deprecated_graph_mode_only
   def testInputGradient0_0_0_5PaddingStride1x2(self):
@@ -2934,8 +2933,7 @@ class Conv2DTest(parameterized.TestCase, test.TestCase):
           test_input=True,
           data_format=data_format,
           use_gpu=use_gpu,
-          max_err=0.005,
-      )
+          max_err=0.005)
 
   @test_util.deprecated_graph_mode_only
   def testFilterGradient0_0_0_5PaddingStride1x2(self):

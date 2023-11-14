@@ -22,28 +22,19 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "absl/algorithm/container.h"
-#include "absl/status/status.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/string_view.h"
 #include "tensorflow/compiler/jit/device_executable_persistor.h"
 #include "tensorflow/compiler/jit/flags.h"
 #include "tensorflow/compiler/jit/pjrt_device_compiler_client.h"
 #include "tensorflow/compiler/jit/xla_compile_util.h"
 #include "tensorflow/compiler/jit/xla_device_compiler_client.h"
-#include "xla/client/client_library.h"
-#include "xla/client/local_client.h"
-#include "xla/pjrt/pjrt_client.h"
-#include "tensorflow/core/framework/function.h"
-#include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/framework/resource_mgr.h"
-#include "tensorflow/core/framework/types.h"
+#include "tensorflow/compiler/xla/client/client_library.h"
+#include "tensorflow/compiler/xla/client/local_client.h"
+#include "tensorflow/compiler/xla/pjrt/pjrt_client.h"
 #include "tensorflow/core/platform/status.h"
 #include "tensorflow/core/tfrt/common/create_pjrt_client_util.h"
 #include "tensorflow/core/tfrt/common/global_state.h"
 #include "tensorflow/core/tfrt/common/pjrt_util.h"
 #include "tensorflow/core/tpu/tpu_defs.h"
-#include "tsl/framework/device_type.h"
 
 namespace tensorflow {
 namespace {
@@ -67,14 +58,10 @@ XlaDeviceCompiler* CreateXlaDeviceCompiler(
 
 PjRtDeviceCompiler* CreatePjRtDeviceCompiler(DeviceType compilation_device_type,
                                              xla::PjRtClient* pjrt_client) {
-  std::string persistent_cache_directory =
-      GetPersistentCacheDirectory(compilation_device_type);
-
   PjRtDeviceExecutablePersistor::Config persistor_config(
-      persistent_cache_directory,
+      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_directory,
       GetMarkForCompilationPassFlags()->tf_xla_disable_strict_signature_checks,
-      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_prefix,
-      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_read_only);
+      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_prefix);
 
   return new PjRtDeviceCompiler(
       std::make_unique<PjRtDeviceExecutablePersistor>(
@@ -150,23 +137,6 @@ Status GetCompilationDeviceTypeAndPjRtClient(
 }
 }  // namespace
 
-std::string GetPersistentCacheDirectory(
-    const DeviceType& compilation_device_type) {
-  // If a persistent cache device type is specified, ensure it matches
-  // compilation device type.
-  if (!GetMarkForCompilationPassFlags()
-           ->tf_xla_persistent_cache_device_types.empty() &&
-      !absl::c_any_of(absl::StrSplit(GetMarkForCompilationPassFlags()
-                                         ->tf_xla_persistent_cache_device_types,
-                                     ','),
-                      [&](absl::string_view device) {
-                        return compilation_device_type == DeviceType(device);
-                      })) {
-    return "";
-  }
-  return GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_directory;
-}
-
 xla::StatusOr<std::optional<std::set<int>>> ParseVisibleDeviceList(
     absl::string_view visible_device_list) {
   std::set<int> gpu_ids;
@@ -191,14 +161,10 @@ xla::StatusOr<std::optional<std::set<int>>> ParseVisibleDeviceList(
 Status BuildXlaDeviceCompiler(DeviceBase* device, FunctionLibraryRuntime* flr,
                               const XlaPlatformInfo& platform_info,
                               XlaDeviceCompiler** xla_device_compiler) {
-  std::string persistent_cache_directory =
-      GetPersistentCacheDirectory(platform_info.device_type());
-
   XlaDeviceExecutablePersistor::Config persistor_config(
-      persistent_cache_directory,
+      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_directory,
       GetMarkForCompilationPassFlags()->tf_xla_disable_strict_signature_checks,
-      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_prefix,
-      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_read_only);
+      GetMarkForCompilationPassFlags()->tf_xla_persistent_cache_prefix);
 
   if (platform_info.xla_device_metadata()) {
     *xla_device_compiler = CreateXlaDeviceCompiler(
@@ -272,9 +238,13 @@ Status BuildXlaDeviceCompiler(DeviceBase* device, FunctionLibraryRuntime* flr,
 }
 
 Status GetOrCreatePjRtDeviceCompilerAndProfiler(
-    const XlaPlatformInfo& platform_info, ResourceMgr* rm,
-    FunctionLibraryRuntime* flr, PjRtDeviceCompiler** pjrt_device_compiler,
+    const XlaPlatformInfo& platform_info, FunctionLibraryRuntime* flr,
+    PjRtDeviceCompiler** pjrt_device_compiler,
     DeviceCompilationProfiler** profiler) {
+  // We store information about the JIT-compiled XLA computation
+  // in the ResourceMgr.
+  ResourceMgr* rm = tfrt_global::GetTFGlobalResourceMgr();
+
   const auto& device_type = platform_info.device_type();
   const std::string& compiler_name =
       GetPjRtDeviceCompilerResourceName(device_type);
@@ -309,34 +279,21 @@ Status GetOrCreatePjRtDeviceCompilerAndProfiler(
   return OkStatus();
 }
 
-Status GetOrCreatePjRtDeviceCompilerAndProfiler(
-    const OpKernelContext& ctx, const XlaPlatformInfo& platform_info,
-    FunctionLibraryRuntime* flr,
-    DeviceCompiler<xla::PjRtLoadedExecutable, xla::PjRtClient>**
-        pjrt_device_compiler,
-    DeviceCompilationProfiler** profiler) {
-  TF_ASSIGN_OR_RETURN(ResourceMgr * rm, GetResourceMgrForDeviceCompiler(
-                                            ctx, platform_info.device_type()));
-  return GetOrCreatePjRtDeviceCompilerAndProfiler(
-      platform_info, rm, flr, pjrt_device_compiler, profiler);
-}
-
 XlaPlatformInfo XlaPlatformInfoFromDevice(DeviceBase* device_base) {
+  auto device = static_cast<Device*>(device_base);
   se::Platform::Id platform_id = nullptr;
   const XlaDevice::Metadata* xla_device_metadata = nullptr;
   const PjRtBaseDevice::Metadata* pjrt_device_metadata = nullptr;
   std::shared_ptr<se::DeviceMemoryAllocator> custom_allocator;
 
-  const std::string& device_type = device_base->device_type();
-  if (device_type == DEVICE_CPU) {
+  if (device->device_type() == DEVICE_CPU) {
     platform_id = se::host::kHostPlatformId;
-  } else if (device_type == DEVICE_GPU) {
-    auto device = static_cast<Device*>(device_base);
+  } else if (device->device_type() == DEVICE_GPU) {
     platform_id = device->tensorflow_accelerator_device_info()
                       ->stream->parent()
                       ->platform()
                       ->id();
-  } else if (XlaDevice::GetMetadataFromDevice(device_base, &xla_device_metadata)
+  } else if (XlaDevice::GetMetadataFromDevice(device, &xla_device_metadata)
                  .ok()) {
     // If we are on an XlaDevice, use the underlying XLA platform's allocator
     // directly. We could use the StreamExecutor's allocator which may
@@ -350,12 +307,12 @@ XlaPlatformInfo XlaPlatformInfoFromDevice(DeviceBase* device_base) {
     platform_id = xla_device_metadata->platform()->id();
     custom_allocator =
         xla_device_metadata->client()->backend().shared_memory_allocator();
-  } else if (auto metadata = PjRtBaseDevice::GetMetadataFromDevice(device_base);
+  } else if (auto metadata = PjRtBaseDevice::GetMetadataFromDevice(device);
              metadata.ok()) {
     pjrt_device_metadata = *metadata;
   }
 
-  return XlaPlatformInfo(DeviceType(device_type), platform_id,
+  return XlaPlatformInfo(DeviceType(device->device_type()), platform_id,
                          xla_device_metadata, pjrt_device_metadata,
                          custom_allocator);
 }

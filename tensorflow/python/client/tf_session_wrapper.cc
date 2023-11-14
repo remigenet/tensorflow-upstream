@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "Python.h"
 #include "absl/types/optional.h"
-#include "Eigen/Core"  // from @eigen_archive
+#include "third_party/eigen3/Eigen/Core"
 #include "pybind11/attr.h"  // from @pybind11
 #include "pybind11/cast.h"  // from @pybind11
 #include "pybind11/chrono.h"  // from @pybind11
@@ -38,7 +38,6 @@ limitations under the License.
 #include "tensorflow/c/c_api_internal.h"
 #include "tensorflow/c/python_api.h"
 #include "tensorflow/c/safe_ptr.h"
-#include "tensorflow/c/tf_buffer.h"
 #include "tensorflow/c/tf_datatype.h"
 #include "tensorflow/core/distributed_runtime/server_lib.h"
 #include "tensorflow/core/framework/full_type.pb.h"
@@ -49,8 +48,8 @@ limitations under the License.
 #include "tensorflow/python/lib/core/pybind11_lib.h"
 #include "tensorflow/python/lib/core/pybind11_status.h"
 #include "tensorflow/python/lib/core/safe_pyobject_ptr.h"
-#include "tsl/platform/mutex.h"
-#include "tsl/python/lib/core/numpy.h"
+#include "tensorflow/tsl/platform/mutex.h"
+#include "tensorflow/tsl/python/lib/core/numpy.h"
 
 namespace pybind11 {
 namespace detail {
@@ -1710,25 +1709,6 @@ PYBIND11_MODULE(_pywrap_tf_session, m) {
       py::return_value_policy::reference);
 
   m.def(
-      "TF_GraphImportGraphDefWithResultsNoSerialization",
-      [](PyGraph* graph, const tensorflow::GraphDef* graph_def,
-         const TF_ImportGraphDefOptions* options) {
-        tensorflow::Safe_TF_StatusPtr status =
-            tensorflow::make_safe(TF_NewStatus());
-        TF_ImportGraphDefResults* output;
-        {
-          TF_Buffer graph_def_buffer;
-          graph_def_buffer.data = reinterpret_cast<const void*>(graph_def);
-          graph_def_buffer.length = sizeof(tensorflow::GraphDef*);
-          output = TF_GraphImportGraphDefWithResultsNoSerialization(
-              graph->tf_graph(), &graph_def_buffer, options, status.get());
-        }
-        tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
-        return output;
-      },
-      py::return_value_policy::reference);
-
-  m.def(
       "TF_GraphNextOperation",
       [](PyGraph* graph, size_t pos) {
         tensorflow::Safe_TF_StatusPtr status =
@@ -1865,25 +1845,6 @@ PYBIND11_MODULE(_pywrap_tf_session, m) {
         pybind11::gil_scoped_acquire acquire;
         tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
         return output;
-      },
-      py::return_value_policy::reference);
-
-  m.def(
-      "TF_FunctionImportFunctionDefNoSerialization",
-      [](tensorflow::FunctionDef fdef) {
-        tensorflow::Safe_TF_StatusPtr status =
-            tensorflow::make_safe(TF_NewStatus());
-
-        // Release GIL.
-        py::gil_scoped_release release;
-        TF_Function* func = new TF_Function();
-        func->record =
-            new tensorflow::FunctionRecord(std::move(fdef), {}, false);
-        status.get()->status = ::tensorflow::OkStatus();
-        // Acquire GIL for returning output returning.
-        pybind11::gil_scoped_acquire acquire;
-        tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
-        return func;
       },
       py::return_value_policy::reference);
 

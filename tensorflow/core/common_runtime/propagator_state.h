@@ -546,8 +546,7 @@ class PropagatorState {
   absl::flat_hash_map<uint64, FrameState*> outstanding_frames_
       TF_GUARDED_BY(mu_);
 
-  PropagatorState(const PropagatorState&) = delete;
-  void operator=(const PropagatorState&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(PropagatorState);
 };
 
 inline int64_t PropagatorState::TaggedNode::get_iter_num() const {

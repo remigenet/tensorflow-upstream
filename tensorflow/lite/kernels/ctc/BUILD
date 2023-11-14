@@ -21,7 +21,7 @@ cc_library(
     deps = [
         ":top_n",
         "//tensorflow/lite/kernels/internal:compatibility",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 

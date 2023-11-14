@@ -85,8 +85,7 @@ class RandomShuffleQueue : public TypedQueue<std::vector<Tensor> > {
   random::SingleSampleAdapter<random::PhiloxRandom> generator_
       TF_GUARDED_BY(mu_);
 
-  RandomShuffleQueue(const RandomShuffleQueue&) = delete;
-  void operator=(const RandomShuffleQueue&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RandomShuffleQueue);
 };
 
 RandomShuffleQueue::RandomShuffleQueue(
@@ -509,8 +508,7 @@ class RandomShuffleQueueOp : public TypedQueueOp {
   int64_t seed2_;
   std::vector<TensorShape> component_shapes_;
 
-  RandomShuffleQueueOp(const RandomShuffleQueueOp&) = delete;
-  void operator=(const RandomShuffleQueueOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RandomShuffleQueueOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("RandomShuffleQueue").Device(DEVICE_CPU),

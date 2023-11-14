@@ -330,12 +330,7 @@ class FunctionSpec(object):
     """
     summary = f"{self._function_type!r}"
     if default_values:
-      summary += "\nDefaults:"
-      if self.default_values:
-        for name, value in self.default_values.items():
-          summary += f"\n  {name}: {value!r}"
-      else:
-        summary += "\n  None"
+      summary += f", defaults: {self.default_values!r}"
     return summary
 
 

@@ -671,7 +671,7 @@ class TFGraphNode {
       if (complete_shape) {
         return params;
       } else {
-        LOG(INFO) << "Incomplete shape.\n";
+        absl::FPrintF(stderr, "Incomplete shape.\n");
       }
     }
     return 0;

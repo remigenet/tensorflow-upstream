@@ -1,4 +1,3 @@
-# Placeholder: load py_proto_library
 # copybara:uncomment(oss-unused) load("//net/grpc/go/build_defs:go_grpc_library.bzl", "go_grpc_library")
 load("//tensorflow:tensorflow.default.bzl", "filegroup")
 load("//tensorflow:tensorflow.bzl", "tf_cc_binary")
@@ -32,11 +31,11 @@ tf_proto_library(
     cc_api_version = 2,
     make_default_target_header_only = True,
     protodeps = [
-        "@local_tsl//tsl/profiler/protobuf:profiler_service_monitor_result_proto",
+        "//tensorflow/tsl/profiler/protobuf:profiler_service_monitor_result_proto",
     ],
     visibility = ["//visibility:public"],
     exports = [
-        "@local_tsl//tsl/profiler/protobuf:profiler_service_monitor_result_proto",
+        "//tensorflow/tsl/profiler/protobuf:profiler_service_monitor_result_proto",
     ],
 )
 
@@ -45,9 +44,9 @@ tf_proto_library(
     srcs = ["profiler_options.proto"],
     cc_api_version = 2,
     make_default_target_header_only = True,
-    protodeps = ["@local_tsl//tsl/profiler/protobuf:profiler_options_proto"],
+    protodeps = ["//tensorflow/tsl/profiler/protobuf:profiler_options_proto"],
     visibility = ["//visibility:public"],
-    exports = ["@local_tsl//tsl/profiler/protobuf:profiler_options_proto"],
+    exports = ["//tensorflow/tsl/profiler/protobuf:profiler_options_proto"],
 )
 
 # This is needed because of how tf_android_core_proto_sources parses proto paths.
@@ -62,11 +61,11 @@ tf_proto_library(
     cc_api_version = 2,
     make_default_target_header_only = True,
     protodeps = [
-        "@local_tsl//tsl/profiler/protobuf:profiler_service_proto",
+        "//tensorflow/tsl/profiler/protobuf:profiler_service_proto",
     ],
     use_grpc_namespace = True,
     visibility = ["//visibility:public"],
-    exports = ["@local_tsl//tsl/profiler/protobuf:profiler_service_proto"],
+    exports = ["//tensorflow/tsl/profiler/protobuf:profiler_service_proto"],
 )
 
 tf_proto_library(
@@ -75,11 +74,11 @@ tf_proto_library(
     cc_api_version = 2,
     make_default_target_header_only = True,
     protodeps = [
-        "@local_tsl//tsl/profiler/protobuf:profiler_analysis_proto",
+        "//tensorflow/tsl/profiler/protobuf:profiler_analysis_proto",
     ],
     use_grpc_namespace = True,
     visibility = ["//visibility:public"],
-    exports = ["@local_tsl//tsl/profiler/protobuf:profiler_analysis_proto"],
+    exports = ["//tensorflow/tsl/profiler/protobuf:profiler_analysis_proto"],
 )
 
 tf_proto_library(
@@ -92,11 +91,11 @@ tf_proto_library(
     ],
     cc_api_version = 2,
     protodeps = [
-        "@local_tsl//tsl/profiler/protobuf:profile_proto",
+        "//tensorflow/tsl/profiler/protobuf:profile_proto",
     ] + tf_additional_all_protos(),
     visibility = [":friends"],
     exports = [
-        "@local_tsl//tsl/profiler/protobuf:profile_proto",
+        "//tensorflow/tsl/profiler/protobuf:profile_proto",
     ],
 )
 
@@ -112,7 +111,7 @@ cc_library(
         "//tensorflow/core/profiler/backends/cpu:traceme_recorder_impl",
         "//tensorflow/core/profiler/lib:profiler_factory_impl",
         "//tensorflow/core/profiler/lib:profiler_session_impl",
-        "@local_tsl//tsl/profiler/utils:time_utils_impl",
+        "//tensorflow/tsl/profiler/utils:time_utils_impl",
     ],
     alwayslink = True,
 )
@@ -157,7 +156,7 @@ filegroup(
     name = "mobile_srcs_no_runtime",
     srcs = [
         "//tensorflow/core/profiler/lib:mobile_srcs_no_runtime",
-        "@local_tsl//tsl/profiler/lib:mobile_srcs_no_runtime",
+        "//tensorflow/tsl/profiler/lib:mobile_srcs_no_runtime",
     ],
     visibility = ["//tensorflow/core:__pkg__"],
 )
@@ -166,7 +165,7 @@ filegroup(
     name = "mobile_srcs_only_runtime",
     srcs = [
         "//tensorflow/core/profiler/lib:mobile_srcs_only_runtime",
-        "@local_tsl//tsl/profiler/lib:mobile_srcs_only_runtime",
+        "//tensorflow/tsl/profiler/lib:mobile_srcs_only_runtime",
     ],
     visibility = ["//tensorflow/core:__pkg__"],
 )

@@ -14,10 +14,10 @@ limitations under the License.
 ==============================================================================*/
 
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
-#include "xla/client/lib/matrix.h"
-#include "xla/client/lib/qr.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/lib/matrix.h"
+#include "tensorflow/compiler/xla/client/lib/qr.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 
 namespace tensorflow {
 namespace {
@@ -65,8 +65,7 @@ class MatrixSolveOp : public XlaOpKernel {
  private:
   bool adjoint_;
 
-  MatrixSolveOp(const MatrixSolveOp&) = delete;
-  void operator=(const MatrixSolveOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixSolveOp);
 };
 
 // TODO(b/111271662): Support integer and complex types.

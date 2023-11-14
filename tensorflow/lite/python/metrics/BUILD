@@ -1,4 +1,3 @@
-# Placeholder: load py_proto_library
 load("//tensorflow:strict.default.bzl", "py_strict_test")
 load("//tensorflow:tensorflow.default.bzl", "get_compatible_with_portable", "if_portable", "pybind_extension")
 load("//tensorflow:pytype.default.bzl", "pytype_strict_library")
@@ -37,10 +36,6 @@ pybind_extension(
     srcs = ["wrapper/metrics_wrapper_pybind11.cc"],
     hdrs = ["wrapper/metrics_wrapper.h"],
     compatible_with = get_compatible_with_portable(),
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "_pywrap_tensorflow_lite_metrics_wrapper.pyi",
-    ],
     visibility = ["//visibility:private"],
     deps = [
         ":metrics_wrapper_lib",

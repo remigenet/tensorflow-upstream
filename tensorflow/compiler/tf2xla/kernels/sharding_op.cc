@@ -20,8 +20,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/sharding_op_util.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/sharding_op_util.h"
 #include "tensorflow/core/framework/op_kernel.h"
 
 namespace tensorflow {
@@ -60,8 +60,7 @@ class ShardingOp : public XlaOpKernel {
   }
 
  private:
-  ShardingOp(const ShardingOp&) = delete;
-  void operator=(const ShardingOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ShardingOp);
   std::vector<int64_t> unspecified_dims_;
 };
 

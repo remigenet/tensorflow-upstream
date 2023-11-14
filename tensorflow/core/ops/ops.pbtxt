@@ -4204,6 +4204,20 @@ op {
       b: false
     }
   }
+  attr {
+    name: "grad_x"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_y"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
 }
 op {
   name: "BatchMatMulV2"
@@ -4249,6 +4263,20 @@ op {
   }
   attr {
     name: "adj_y"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_x"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_y"
     type: "bool"
     default_value {
       b: false
@@ -4333,6 +4361,20 @@ op {
   }
   attr {
     name: "adj_y"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_x"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_y"
     type: "bool"
     default_value {
       b: false
@@ -8222,13 +8264,6 @@ op {
     }
   }
   attr {
-    name: "is_stateless"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
-  attr {
     name: "Nordering_token"
     type: "int"
     default_value {
@@ -8646,13 +8681,6 @@ op {
     }
   }
   attr {
-    name: "is_stateless"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
-  attr {
     name: "Nordering_token"
     type: "int"
     default_value {
@@ -8906,13 +8934,6 @@ op {
     }
   }
   attr {
-    name: "is_stateless"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
-  attr {
     name: "Nordering_token"
     type: "int"
     default_value {
@@ -9005,13 +9026,6 @@ op {
     type: "float"
     default_value {
       f: 0
-    }
-  }
-  attr {
-    name: "is_stateless"
-    type: "bool"
-    default_value {
-      b: false
     }
   }
   attr {
@@ -9329,18 +9343,6 @@ op {
     name: "batch_size"
     type: DT_INT64
   }
-}
-op {
-  name: "ComputeDedupDataSize"
-  output_arg {
-    name: "num_elements"
-    type: DT_INT32
-  }
-  attr {
-    name: "config"
-    type: "string"
-  }
-  is_stateful: true
 }
 op {
   name: "ComputeDedupDataTupleMask"
@@ -15661,106 +15663,6 @@ op {
   is_stateful: true
 }
 op {
-  name: "DynamicEnqueueTPUEmbeddingRaggedTensorBatch"
-  input_arg {
-    name: "sample_splits"
-    type_attr: "T1"
-    number_attr: "N"
-  }
-  input_arg {
-    name: "embedding_indices"
-    type_attr: "T2"
-    number_attr: "N"
-  }
-  input_arg {
-    name: "aggregation_weights"
-    type_attr: "T3"
-    number_attr: "N"
-  }
-  input_arg {
-    name: "mode_override"
-    type: DT_STRING
-  }
-  input_arg {
-    name: "device_ordinal"
-    type: DT_INT32
-  }
-  attr {
-    name: "T1"
-    type: "type"
-    default_value {
-      type: DT_INT32
-    }
-    allowed_values {
-      list {
-        type: DT_INT32
-        type: DT_INT64
-      }
-    }
-  }
-  attr {
-    name: "T2"
-    type: "type"
-    default_value {
-      type: DT_INT32
-    }
-    allowed_values {
-      list {
-        type: DT_INT32
-        type: DT_INT64
-      }
-    }
-  }
-  attr {
-    name: "T3"
-    type: "type"
-    default_value {
-      type: DT_FLOAT
-    }
-    allowed_values {
-      list {
-        type: DT_FLOAT
-        type: DT_DOUBLE
-      }
-    }
-  }
-  attr {
-    name: "N"
-    type: "int"
-    has_minimum: true
-    minimum: 1
-  }
-  attr {
-    name: "combiners"
-    type: "list(string)"
-    default_value {
-      list {
-      }
-    }
-  }
-  attr {
-    name: "table_ids"
-    type: "list(int)"
-  }
-  attr {
-    name: "max_sequence_lengths"
-    type: "list(int)"
-    default_value {
-      list {
-      }
-    }
-  }
-  attr {
-    name: "num_features"
-    type: "list(int)"
-    default_value {
-      list {
-      }
-    }
-  }
-  is_stateful: true
-}
-op {
   name: "DynamicPartition"
   input_arg {
     name: "data"
@@ -19235,38 +19137,6 @@ op {
   }
 }
 op {
-  name: "FFTND"
-  input_arg {
-    name: "input"
-    type_attr: "Tcomplex"
-  }
-  input_arg {
-    name: "fft_length"
-    type: DT_INT32
-  }
-  input_arg {
-    name: "axes"
-    type: DT_INT32
-  }
-  output_arg {
-    name: "output"
-    type_attr: "Tcomplex"
-  }
-  attr {
-    name: "Tcomplex"
-    type: "type"
-    default_value {
-      type: DT_COMPLEX64
-    }
-    allowed_values {
-      list {
-        type: DT_COMPLEX64
-        type: DT_COMPLEX128
-      }
-    }
-  }
-}
-op {
   name: "FIFOQueue"
   output_arg {
     name: "handle"
@@ -22346,38 +22216,6 @@ op {
   }
 }
 op {
-  name: "IFFTND"
-  input_arg {
-    name: "input"
-    type_attr: "Tcomplex"
-  }
-  input_arg {
-    name: "fft_length"
-    type: DT_INT32
-  }
-  input_arg {
-    name: "axes"
-    type: DT_INT32
-  }
-  output_arg {
-    name: "output"
-    type_attr: "Tcomplex"
-  }
-  attr {
-    name: "Tcomplex"
-    type: "type"
-    default_value {
-      type: DT_COMPLEX64
-    }
-    allowed_values {
-      list {
-        type: DT_COMPLEX64
-        type: DT_COMPLEX128
-      }
-    }
-  }
-}
-op {
   name: "IRFFT"
   input_arg {
     name: "input"
@@ -22467,51 +22305,6 @@ op {
   }
   input_arg {
     name: "fft_length"
-    type: DT_INT32
-  }
-  output_arg {
-    name: "output"
-    type_attr: "Treal"
-  }
-  attr {
-    name: "Treal"
-    type: "type"
-    default_value {
-      type: DT_FLOAT
-    }
-    allowed_values {
-      list {
-        type: DT_FLOAT
-        type: DT_DOUBLE
-      }
-    }
-  }
-  attr {
-    name: "Tcomplex"
-    type: "type"
-    default_value {
-      type: DT_COMPLEX64
-    }
-    allowed_values {
-      list {
-        type: DT_COMPLEX64
-        type: DT_COMPLEX128
-      }
-    }
-  }
-}
-op {
-  name: "IRFFTND"
-  input_arg {
-    name: "input"
-    type_attr: "Tcomplex"
-  }
-  input_arg {
-    name: "fft_length"
-    type: DT_INT32
-  }
-  input_arg {
-    name: "axes"
     type: DT_INT32
   }
   output_arg {
@@ -26860,6 +26653,20 @@ op {
         type: DT_COMPLEX64
         type: DT_COMPLEX128
       }
+    }
+  }
+  attr {
+    name: "grad_a"
+    type: "bool"
+    default_value {
+      b: false
+    }
+  }
+  attr {
+    name: "grad_b"
+    type: "bool"
+    default_value {
+      b: false
     }
   }
 }
@@ -38603,51 +38410,6 @@ op {
   }
   input_arg {
     name: "fft_length"
-    type: DT_INT32
-  }
-  output_arg {
-    name: "output"
-    type_attr: "Tcomplex"
-  }
-  attr {
-    name: "Treal"
-    type: "type"
-    default_value {
-      type: DT_FLOAT
-    }
-    allowed_values {
-      list {
-        type: DT_FLOAT
-        type: DT_DOUBLE
-      }
-    }
-  }
-  attr {
-    name: "Tcomplex"
-    type: "type"
-    default_value {
-      type: DT_COMPLEX64
-    }
-    allowed_values {
-      list {
-        type: DT_COMPLEX64
-        type: DT_COMPLEX128
-      }
-    }
-  }
-}
-op {
-  name: "RFFTND"
-  input_arg {
-    name: "input"
-    type_attr: "Treal"
-  }
-  input_arg {
-    name: "fft_length"
-    type: DT_INT32
-  }
-  input_arg {
-    name: "axes"
     type: DT_INT32
   }
   output_arg {
@@ -54774,13 +54536,6 @@ op {
       }
     }
   }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
 }
 op {
   name: "SparseSegmentMeanGrad"
@@ -54981,13 +54736,6 @@ op {
       }
     }
   }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
 }
 op {
   name: "SparseSegmentSqrtN"
@@ -55043,13 +54791,6 @@ op {
         type: DT_INT32
         type: DT_INT64
       }
-    }
-  }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
     }
   }
 }
@@ -55252,13 +54993,6 @@ op {
       }
     }
   }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
-    }
-  }
 }
 op {
   name: "SparseSegmentSum"
@@ -55322,13 +55056,6 @@ op {
         type: DT_INT32
         type: DT_INT64
       }
-    }
-  }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
     }
   }
 }
@@ -55537,13 +55264,6 @@ op {
         type: DT_INT32
         type: DT_INT64
       }
-    }
-  }
-  attr {
-    name: "sparse_gradient"
-    type: "bool"
-    default_value {
-      b: false
     }
   }
 }
@@ -64977,13 +64697,6 @@ op {
   }
   attr {
     name: "shared_name"
-    type: "string"
-    default_value {
-      s: ""
-    }
-  }
-  attr {
-    name: "debug_name"
     type: "string"
     default_value {
       s: ""

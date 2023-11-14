@@ -1,5 +1,3 @@
-load("//tensorflow:py.default.bzl", "py_library")
-
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
     default_visibility = ["//tensorflow:internal"],
@@ -384,5 +382,5 @@ py_library(
 
 alias(
     name = "expect_tensorflow_estimator_installed",
-    actual = "@pypi_tf_estimator_nightly//:pkg",
+    actual = "@pypi_tensorflow_estimator//:pkg",
 )

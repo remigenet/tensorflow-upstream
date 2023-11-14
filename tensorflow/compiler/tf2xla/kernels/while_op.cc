@@ -15,42 +15,29 @@ limitations under the License.
 
 #include "tensorflow/compiler/tf2xla/kernels/while_op.h"
 
-#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "absl/container/inlined_vector.h"
-#include "absl/log/log.h"
-#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
+#include "tensorflow/compiler/tf2xla/const_analysis.h"
 #include "tensorflow/compiler/tf2xla/kernels/if_while_utils.h"
 #include "tensorflow/compiler/tf2xla/kernels/tensor_list_utils.h"
+#include "tensorflow/compiler/tf2xla/shape_util.h"
 #include "tensorflow/compiler/tf2xla/side_effect_util.h"
 #include "tensorflow/compiler/tf2xla/tf2xla_util.h"
+#include "tensorflow/compiler/tf2xla/type_util.h"
 #include "tensorflow/compiler/tf2xla/xla_compiler.h"
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "tensorflow/compiler/tf2xla/xla_resource.h"
-#include "xla/client/client.h"
-#include "xla/client/lib/tuple.h"
-#include "xla/client/xla_builder.h"
-#include "xla/client/xla_computation.h"
-#include "xla/shape.h"
-#include "xla/shape_tree.h"
-#include "xla/shape_util.h"
-#include "xla/status_macros.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/client/xla_computation.h"
+#include "tensorflow/compiler/xla/literal.h"
+#include "tensorflow/compiler/xla/status_macros.h"
 #include "tensorflow/core/framework/attr_value.pb.h"
 #include "tensorflow/core/framework/function.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/framework/op_requires.h"
-#include "tensorflow/core/framework/types.h"
-#include "tensorflow/core/framework/types.pb.h"
-#include "tensorflow/core/platform/errors.h"
-#include "tensorflow/core/platform/status.h"
-#include "tensorflow/core/platform/statusor.h"
-#include "tensorflow/core/platform/types.h"
-#include "tsl/platform/errors.h"
 
 namespace tensorflow {
 
@@ -231,8 +218,7 @@ StatusOr<xla::XlaComputation> BuildWrappedBody(
     XlaOpKernelContext* ctx, const XlaCompiler::CompilationResult& body,
     const std::vector<bool>& compile_time_const_arg_indices,
     int num_compile_time_const_args, bool has_token_input_output) {
-  if (num_compile_time_const_args <= 0 &&
-      body.xla_input_shapes[0] == body.xla_output_shape) {
+  if (num_compile_time_const_args <= 0) {
     return xla::XlaComputation(body.computation->proto());
   }
   xla::XlaComputation body_wrapper;
@@ -245,41 +231,10 @@ StatusOr<xla::XlaComputation> BuildWrappedBody(
   // the inputs and outputs of its body function to match.
   auto outputs = xla::Call(cb.get(), *body.computation, {inputs});
   std::vector<xla::XlaOp> non_compile_time_const_outputs;
-  int input_num = 0;
   for (int i = 0; i < compile_time_const_arg_indices.size(); i++) {
     if (!compile_time_const_arg_indices[i]) {
-      xla::XlaOp output = xla::GetTupleElement(outputs, i);
-      const xla::Shape& input_shape = body_input_shape.tuple_shapes(input_num);
-      const xla::Shape& output_shape = body.xla_output_shape.tuple_shapes(i);
-      TF_RET_CHECK(xla::ShapeUtil::Compatible(input_shape, output_shape));
-      if (input_shape != output_shape) {
-        TF_ASSIGN_OR_RETURN(xla::ShapeTree<xla::XlaOp> disassembled_tuple,
-                            xla::DisassembleTuple(output));
-        disassembled_tuple.ForEachMutableElement(
-            [&](const xla::ShapeIndex& index, xla::XlaOp* element) {
-              const xla::Shape& output_subshape =
-                  xla::ShapeUtil::GetSubshape(output_shape, index);
-              if (output_subshape.IsArray()) {
-                const xla::Shape& input_subshape =
-                    xla::ShapeUtil::GetSubshape(input_shape, index);
-                for (int d = 0; d < output_subshape.rank(); ++d) {
-                  if (input_subshape.is_dynamic_dimension(d) &&
-                      !output_subshape.is_dynamic_dimension(d)) {
-                    *element = xla::SetDimensionSize(
-                        *element,
-                        xla::ConstantR0(
-                            cb.get(),
-                            static_cast<int32_t>(output_shape.dimensions()[d])),
-                        d);
-                  }
-                }
-              }
-            });
-        output =
-            xla::AssembleTuple(output.builder(), std::move(disassembled_tuple));
-      }
-      non_compile_time_const_outputs.push_back(output);
-      ++input_num;
+      non_compile_time_const_outputs.push_back(
+          xla::GetTupleElement(outputs, i));
     }
   }
   // If `body` has a token output, append it to

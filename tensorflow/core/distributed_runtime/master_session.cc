@@ -64,7 +64,7 @@ limitations under the License.
 #include "tensorflow/core/protobuf/config.pb.h"
 #include "tensorflow/core/public/session_options.h"
 #include "tensorflow/core/util/device_name_utils.h"
-#include "tsl/protobuf/coordination_config.pb.h"
+#include "tensorflow/tsl/protobuf/coordination_config.pb.h"
 
 namespace tensorflow {
 
@@ -336,8 +336,7 @@ class MasterSession::ReffedClientGraph : public core::RefCounted {
   // destructor and does not wait for the rpc completion.
   void DeregisterPartitions();
 
-  ReffedClientGraph(const ReffedClientGraph&) = delete;
-  void operator=(const ReffedClientGraph&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ReffedClientGraph);
 };
 
 Status MasterSession::ReffedClientGraph::RegisterPartitions(
@@ -611,8 +610,7 @@ class RunManyGraphs {
     status_group_.Update(s);
   }
 
-  RunManyGraphs(const RunManyGraphs&) = delete;
-  void operator=(const RunManyGraphs&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RunManyGraphs);
 };
 
 Status AddSendFromClientRequest(const RunStepRequestWrapper& client_req,
@@ -921,8 +919,7 @@ class CleanupBroadcastHelper {
   // Callback to be called when all operations complete.
   StatusCallback done_;
 
-  CleanupBroadcastHelper(const CleanupBroadcastHelper&) = delete;
-  void operator=(const CleanupBroadcastHelper&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CleanupBroadcastHelper);
 };
 
 }  // namespace

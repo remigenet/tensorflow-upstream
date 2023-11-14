@@ -29,6 +29,8 @@ and library files in a hard-coded set of subdirectories from these base paths.
 If TF_CUDA_PATHS is not specified, a OS specific default is used:
 
   Linux:   /usr/local/cuda, /usr, and paths from 'ldconfig -p'.
+  Windows: CUDA_PATH environment variable, or
+           C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\*
 
 For backwards compatibility, some libraries also use alternative base
 directories from other environment variables if they are specified. List of
@@ -54,6 +56,7 @@ tf_<library>_library_dir: ...
 import io
 import os
 import glob
+import platform
 import re
 import subprocess
 import sys
@@ -68,6 +71,18 @@ except ImportError:
 
 class ConfigError(Exception):
   pass
+
+
+def _is_linux():
+  return platform.system() == "Linux"
+
+
+def _is_windows():
+  return platform.system() == "Windows"
+
+
+def _is_macos():
+  return platform.system() == "Darwin"
 
 
 def _matches_version(actual_version, required_version):
@@ -106,7 +121,7 @@ def _at_least_version(actual_version, required_version):
 def _get_header_version(path, name):
   """Returns preprocessor defines in C header file."""
   for line in io.open(path, "r", encoding="utf-8").readlines():
-    match = re.match(r"\s*#\s*define %s\s+(\d+)" % name, line)
+    match = re.match("\s*#\s*define %s\s+(\d+)" % name, line)
     if match:
       return match.group(1)
   return ""
@@ -119,6 +134,8 @@ def _cartesian_product(first, second):
 
 def _get_ld_config_paths():
   """Returns all directories from 'ldconfig -p'."""
+  if not _is_linux():
+    return []
   ldconfig_path = which("ldconfig") or "/sbin/ldconfig"
   output = subprocess.check_output([ldconfig_path, "-p"])
   pattern = re.compile(".* => (.*)")
@@ -139,6 +156,13 @@ def _get_default_cuda_paths(cuda_version):
   elif not "." in cuda_version:
     cuda_version = cuda_version + ".*"
 
+  if _is_windows():
+    return [
+        os.environ.get(
+            "CUDA_PATH",
+            "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v%s\\" %
+            cuda_version)
+    ]
   return ["/usr/local/cuda-%s" % cuda_version, "/usr/local/cuda", "/usr",
          "/usr/local/cudnn"] + _get_ld_config_paths()
 
@@ -153,7 +177,6 @@ def _header_paths():
       "extras/CUPTI/include",
       "include/cuda/CUPTI",
       "local/cuda/extras/CUPTI/include",
-      "targets/x86_64-linux/include",
   ]
 
 
@@ -188,8 +211,14 @@ def _find_file(base_paths, relative_paths, filepattern):
 
 def _find_library(base_paths, library_name, required_version):
   """Returns first valid path to the requested library."""
-  filepattern = ".".join(["lib" + library_name, "so"] +
-                         required_version.split(".")[:1]) + "*"
+  if _is_windows():
+    filepattern = library_name + ".lib"
+  elif _is_macos():
+    filepattern = "%s*.dylib" % (".".join(["lib" + library_name] +
+                                          required_version.split(".")[:1]))
+  else:
+    filepattern = ".".join(["lib" + library_name, "so"] +
+                           required_version.split(".")[:1]) + "*"
   return _find_file(base_paths, _library_paths(), filepattern)
 
 
@@ -231,14 +260,14 @@ def _find_cuda_config(base_paths, required_version):
   cuda_library_path = _find_library(base_paths, "cudart", cuda_version)
 
   def get_nvcc_version(path):
-    pattern = r"Cuda compilation tools, release \d+\.\d+, V(\d+\.\d+\.\d+)"
+    pattern = "Cuda compilation tools, release \d+\.\d+, V(\d+\.\d+\.\d+)"
     for line in subprocess.check_output([path, "--version"]).splitlines():
       match = re.match(pattern, line.decode("ascii"))
       if match:
         return match.group(1)
     return None
 
-  nvcc_name = "nvcc"
+  nvcc_name = "nvcc.exe" if _is_windows() else "nvcc"
   nvcc_path, nvcc_version = _find_versioned_file(base_paths, [
       "",
       "bin",
@@ -253,7 +282,6 @@ def _find_cuda_config(base_paths, required_version):
   ], "libdevice*.10.bc")
 
   cupti_header_path = _find_file(base_paths, _header_paths(), "cupti.h")
-  nvml_header_dir = _find_file(base_paths, _header_paths(), "nvml.h")
   cupti_library_path = _find_library(base_paths, "cupti", required_version)
 
   cuda_binary_dir = os.path.dirname(nvcc_path)
@@ -278,7 +306,6 @@ def _find_cuda_config(base_paths, required_version):
       "cupti_include_dir": os.path.dirname(cupti_header_path),
       "cupti_library_dir": os.path.dirname(cupti_library_path),
       "cuda_toolkit_path": cuda_toolkit_paths[0],
-      "nvml_header_dir": os.path.dirname(nvml_header_dir),
   }
 
 
@@ -501,7 +528,7 @@ def _find_tensorrt_config(base_paths, required_version):
   library_path = _find_library(base_paths, "nvinfer", tensorrt_version)
 
   return {
-      "tensorrt_version": header_version,
+      "tensorrt_version": tensorrt_version,
       "tensorrt_include_dir": os.path.dirname(header_path),
       "tensorrt_library_dir": os.path.dirname(library_path),
   }
@@ -522,10 +549,18 @@ def _get_legacy_path(env_name, default=[]):
   paths. Detect those and return '/usr', otherwise forward to _list_from_env().
   """
   if env_name in os.environ:
-    match = re.match(r"^(/[^/ ]*)+/lib/\w+-linux-gnu/?$", os.environ[env_name])
+    match = re.match("^(/[^/ ]*)+/lib/\w+-linux-gnu/?$", os.environ[env_name])
     if match:
       return [match.group(1)]
   return _list_from_env(env_name, default)
+
+
+def _normalize_path(path):
+  """Returns normalized path, with forward slashes on Windows."""
+  path = os.path.realpath(path)
+  if _is_windows():
+    path = path.replace("\\", "/")
+  return path
 
 
 def find_cuda_config():
@@ -539,9 +574,7 @@ def find_cuda_config():
   result = {}
   if "cuda" in libraries:
     cuda_paths = _list_from_env("CUDA_TOOLKIT_PATH", base_paths)
-    res = _find_cuda_config(cuda_paths, cuda_version)
-
-    result.update(res)
+    result.update(_find_cuda_config(cuda_paths, cuda_version))
 
     cuda_version = result["cuda_version"]
     cublas_paths = base_paths
@@ -596,7 +629,7 @@ def find_cuda_config():
 
   for k, v in result.items():
     if k.endswith("_dir") or k.endswith("_path"):
-      result[k] = os.path.realpath(v)
+      result[k] = _normalize_path(v)
 
   return result
 

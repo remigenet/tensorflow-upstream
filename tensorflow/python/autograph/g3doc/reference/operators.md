@@ -91,10 +91,11 @@ corresponding thunk is `lambda: foo`.
 
 The Python conditional statement: `foo if bar else baz`.
 
-Args: cond: expression condition; same as `cond` in `_ if cond else _`. if_true:
-true value (as thunk); same as `lambda: x` in `x if _ else _`. if_false: false
-value (as thunk); same as `lambda: x` in `_ if _ else x`. expr_repr:
-human-readable string representing `cond`. Used for error messages.
+Args:
+  cond: expression condition; same as `cond` in `_ if cond else _`.
+  if_true: true value (as thunk); same as `lambda: x` in `x if _ else _`.
+  if_false: false value (as thunk); same as `lambda: x` in `_ if _ else x`.
+  expr_repr: human readable string representing `cond`. Used for error messages.
 
 Example:
 
@@ -146,7 +147,7 @@ Args:
     <b>`.
 *   get_state: returns the current value of the loop variables
 *   set_state: sets new values into the loop variables
-*   symbol_names: human-readable string representing each loop variable. Used
+*   symbol_names: human readable string representing each loop variable. Used
     for error messages.
 *   opts: additional, implementation-specific, keyword arguments.
 
@@ -231,7 +232,7 @@ Args:
     <b>`.
 *   get_state: returns the current value of the conditional variables
 *   set_state: sets new values into the conditional variables
-*   symbol_names: human-readable string representing each conditional variable.
+*   symbol_names: human readable string representing each conditional variable.
     Used for error messages.
 *   nouts: number of output conditional variables. Not all conditional variables
     are outputs - some are just inputs. The first nouts values in get_state and
@@ -279,7 +280,7 @@ Args:
 *   body: loop body (as thunk); same as `def body(): <b>` in `while _: <b>`.
 *   get_state: returns the current value of the loop variables
 *   set_state: sets new values into the loop variables
-*   symbol_names: human-readable string representing each loop variable. Used
+*   symbol_names: human readable string representing each loop variable. Used
     for error messages.
 *   opts: additional, implementation-specific, keyword arguments.
 

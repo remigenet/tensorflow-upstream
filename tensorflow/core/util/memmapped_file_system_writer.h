@@ -45,8 +45,7 @@ class MemmappedFileSystemWriter {
   // The current offset in the file, to support alignment.
   uint64 output_file_offset_ = 0;
   std::unique_ptr<WritableFile> output_file_;
-  MemmappedFileSystemWriter(const MemmappedFileSystemWriter&) = delete;
-  void operator=(const MemmappedFileSystemWriter&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MemmappedFileSystemWriter);
 };
 
 }  // namespace tensorflow

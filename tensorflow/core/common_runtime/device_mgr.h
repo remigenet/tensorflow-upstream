@@ -75,8 +75,7 @@ class DeviceMgr {
   // nullptr.
   virtual Device* HostCPU() const = 0;
 
-  DeviceMgr(const DeviceMgr&) = delete;
-  void operator=(const DeviceMgr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DeviceMgr);
 };
 
 
@@ -166,8 +165,7 @@ class DynamicDeviceMgr : public DeviceMgr {
   // buffer only for that purpose.
   DeviceCircularBuffer stale_devices_ TF_GUARDED_BY(devices_mu_);
 
-  DynamicDeviceMgr(const DynamicDeviceMgr&) = delete;
-  void operator=(const DynamicDeviceMgr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DynamicDeviceMgr);
 };
 
 // TODO(b/183966398): Remove StaticDeviceMgr since there's no usage.

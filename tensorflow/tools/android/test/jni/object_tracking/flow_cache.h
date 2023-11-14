@@ -297,8 +297,7 @@ class FlowCache {
   // The cached displacement values.
   Image<Point2f>* displacements_[kNumCacheLevels];
 
-  FlowCache(const FlowCache&) = delete;
-  void operator=(const FlowCache&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FlowCache);
 };
 
 }  // namespace tf_tracking

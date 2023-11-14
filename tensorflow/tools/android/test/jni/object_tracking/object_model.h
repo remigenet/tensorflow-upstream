@@ -80,8 +80,7 @@ class ObjectModelBase {
   const std::string name_;
 
  private:
-  ObjectModelBase(const ObjectModelBase&) = delete;
-  void operator=(const ObjectModelBase&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ObjectModelBase);
 };
 
 template <typename DetectorType>
@@ -94,8 +93,7 @@ class ObjectModel : public ObjectModelBase {
  protected:
   const DetectorType* const detector_;
 
-  ObjectModel<DetectorType>(const ObjectModel<DetectorType>&) = delete;
-  void operator=(const ObjectModel<DetectorType>&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ObjectModel<DetectorType>);
 };
 
 }  // namespace tf_tracking

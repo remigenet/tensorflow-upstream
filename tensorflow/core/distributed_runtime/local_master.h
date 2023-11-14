@@ -103,8 +103,7 @@ class LocalMaster : public MasterInterface {
   // objects of this type.
   LocalMaster(Master* master_impl, const int64_t default_timeout_in_ms);
 
-  LocalMaster(const LocalMaster&) = delete;
-  void operator=(const LocalMaster&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(LocalMaster);
 };
 
 }  // namespace tensorflow

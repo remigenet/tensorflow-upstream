@@ -49,7 +49,7 @@ limitations under the License.
 #include "tensorflow/core/platform/stack_frame.h"
 #include "tensorflow/core/platform/threadpool_interface.h"
 #include "tensorflow/core/protobuf/config.pb.h"
-#include "tsl/protobuf/error_codes.pb.h"
+#include "tensorflow/tsl/protobuf/error_codes.pb.h"
 #if !defined(IS_MOBILE_PLATFORM)
 #include "tensorflow/core/protobuf/remote_tensor_handle.pb.h"
 #endif  // IS_MOBILE_PLATFORM
@@ -351,8 +351,7 @@ class FunctionCallFrame : public CallFrameInterface {
   };
   gtl::InlinedVector<Retval, 4> rets_;
 
-  FunctionCallFrame(const FunctionCallFrame&) = delete;
-  void operator=(const FunctionCallFrame&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FunctionCallFrame);
 };
 
 // Map of function names to StackTracesMaps.
@@ -412,12 +411,8 @@ class FunctionLibraryDefinition : public OpRegistryInterface {
 
   // Note: This constructor grabs `lib_def`'s lock in shared mode.
   FunctionLibraryDefinition(const FunctionLibraryDefinition& lib_def);
-  explicit FunctionLibraryDefinition(
-      const OpRegistryInterface* default_registry,
-      const FunctionDefLibrary& lib_def = {},
-      const FunctionDefLibraryStackTraces& library_traces = {});
   FunctionLibraryDefinition(const OpRegistryInterface* default_registry,
-                            const GraphDef& graph_def);
+                            const FunctionDefLibrary& lib_def = {});
   ~FunctionLibraryDefinition() override;
 
   FunctionLibraryDefinition& operator=(const FunctionLibraryDefinition&) =
@@ -450,8 +445,6 @@ class FunctionLibraryDefinition : public OpRegistryInterface {
   // `graph` has to outlive all instantiated graphs.
   Status AddFunctionDef(const FunctionDef& fdef,
                         const StackTracesMap& stack_traces = {})
-      TF_LOCKS_EXCLUDED(mu_);
-  Status AddFunctionDef(FunctionDef&& fdef, StackTracesMap&& stack_traces = {})
       TF_LOCKS_EXCLUDED(mu_);
 
   // Adds gradient definition 'grad' to this function library.
@@ -606,14 +599,7 @@ class FunctionLibraryDefinition : public OpRegistryInterface {
     return nullptr;
   }
 
-  // Creates a map of function names to stack traces for a FunctionDefLibrary.
-  static FunctionDefLibraryStackTraces CreateStackTracesForFunctionDefLibrary(
-      const FunctionDefLibrary& library, const GraphDebugInfo& debug_info);
-
  private:
-  void Initialize(const FunctionDefLibrary& library,
-                  const FunctionDefLibraryStackTraces& library_traces);
-
   core::RefCountPtr<FunctionRecord> FindHelper(const string& func) const
       TF_SHARED_LOCKS_REQUIRED(mu_);
   std::string FindGradientHelper(const std::string& func) const

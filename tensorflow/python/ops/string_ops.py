@@ -14,10 +14,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Operations for working with string Tensors.
-
-API docstring: tensorflow.strings
-"""
+"""Operations for working with string Tensors."""
 
 import numpy as np
 

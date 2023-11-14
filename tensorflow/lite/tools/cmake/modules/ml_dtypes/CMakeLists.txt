@@ -23,13 +23,8 @@ if(NOT ML_DTYPES_SOURCE_DIR)
 endif()
 
 add_library(ml_dtypes INTERFACE)
-target_include_directories(ml_dtypes INTERFACE
-  "${ML_DTYPES_SOURCE_DIR}"
-  "${ML_DTYPES_SOURCE_DIR}/ml_dtypes")
-file(GLOB ML_DTYPES_PUBLIC_HEADERS
-  ${ML_DTYPES_SOURCE_DIR}/ml_dtypes/include/*.h)
-set_target_properties(ml_dtypes PROPERTIES
-  PUBLIC_HEADER "${ML_DTYPES_PUBLIC_HEADERS}")
+target_include_directories(ml_dtypes INTERFACE "${ML_DTYPES_SOURCE_DIR}/ml_dtypes")
+set_target_properties(ml_dtypes PROPERTIES PUBLIC_HEADER "${ML_DTYPES_SOURCE_DIR}/ml_dtypes/include/float8.h")
 
 if(TFLITE_ENABLE_INSTALL)
   install(

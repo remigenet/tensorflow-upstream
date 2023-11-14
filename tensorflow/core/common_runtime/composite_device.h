@@ -63,8 +63,7 @@ class CompositeDevice : public Device {
 
   const std::vector<string> underlying_devices_;
 
-  CompositeDevice(const CompositeDevice&) = delete;
-  void operator=(const CompositeDevice&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CompositeDevice);
 };
 
 }  // namespace tensorflow

@@ -1,4 +1,3 @@
-# Placeholder: load py_proto_library
 load("//tensorflow:strict.default.bzl", "py_strict_binary")
 load(
     "//tensorflow/core/platform:build_config.bzl",
@@ -64,7 +63,7 @@ tf_proto_library(
 #     srcs = ["split_gen.py"],
 #     deps = [
 #         ":test_message_proto_py_pb2",
-#         "//tensorflow/python/lib/io:file_io",
+#         "//tensorflow/python/lib/io:lib",
 #         "//tensorflow/tools/proto_splitter:chunk_proto_py_pb2",
 #         "//tensorflow/tools/proto_splitter:split",
 #         "//tensorflow/tools/proto_splitter:util",
@@ -79,7 +78,7 @@ tf_proto_library(
 #     srcs = ["split_graph_def_gen.py"],
 #     deps = [
 #         "//tensorflow/core:protos_all_py",
-#         "//tensorflow/python/lib/io:file_io",
+#         "//tensorflow/python/lib/io:lib",
 #         "//tensorflow/tools/proto_splitter:constants",
 #         "//tensorflow/tools/proto_splitter:split_graph_def",
 #         "//tensorflow/tools/proto_splitter/python:test_util",
@@ -94,7 +93,7 @@ tf_proto_library(
 #     srcs = ["split_saved_model_gen.py"],
 #     deps = [
 #         "//tensorflow/core:protos_all_py",
-#         "//tensorflow/python/lib/io:file_io",
+#         "//tensorflow/python/lib/io:lib",
 #         "//tensorflow/tools/proto_splitter:constants",
 #         "//tensorflow/tools/proto_splitter/python:saved_model",
 #         "//tensorflow/tools/proto_splitter/python:test_util",
@@ -109,7 +108,7 @@ tf_proto_library(
 #     srcs = ["many_field_gen.py"],
 #     deps = [
 #         ":test_message_proto_py_pb2",
-#         "//tensorflow/python/lib/io:file_io",
+#         "//tensorflow/python/lib/io:lib",
 #         "//tensorflow/tools/proto_splitter:split",
 #         "@absl_py//absl:app",
 #         "@absl_py//absl/flags",

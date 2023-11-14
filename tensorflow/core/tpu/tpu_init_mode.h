@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_CORE_TPU_TPU_INIT_MODE_H_
 #define TENSORFLOW_CORE_TPU_TPU_INIT_MODE_H_
 
-#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/lib/core/status.h"
 
 namespace tensorflow {
 

@@ -23,11 +23,11 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/arithmetic.h"
-#include "xla/client/lib/constants.h"
-#include "xla/client/lib/prng.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/lib/arithmetic.h"
+#include "tensorflow/compiler/xla/client/lib/constants.h"
+#include "tensorflow/compiler/xla/client/lib/prng.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/tensor_shape.h"
@@ -139,8 +139,7 @@ class CategoricalOp : public XlaOpKernel {
   }
 
  private:
-  CategoricalOp(const CategoricalOp&) = delete;
-  void operator=(const CategoricalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CategoricalOp);
 };
 
 // TODO(b/68769717): Rename this sampler to Categorical.
@@ -185,8 +184,7 @@ class StatelessCategoricalOp : public CategoricalOp {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessCategoricalOp(const StatelessCategoricalOp&) = delete;
-  void operator=(const StatelessCategoricalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessCategoricalOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessMultinomial")

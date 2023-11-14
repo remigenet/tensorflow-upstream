@@ -18,19 +18,17 @@
 
 import os
 import sys
-
 from absl import app
+
 import tensorflow as tf
 
 from tensorflow.compiler.mlir.tfr.python import composite
 from tensorflow.compiler.mlir.tfr.python.op_reg_gen import gen_register_op
 from tensorflow.compiler.mlir.tfr.python.tfr_gen import tfr_gen_from_module
-from tensorflow.python.framework import ops
 from tensorflow.python.ops import gen_math_ops
 from tensorflow.python.ops import gen_nn_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.platform import flags
-
 
 Composite = composite.Composite
 FLAGS = flags.FLAGS
@@ -72,7 +70,7 @@ def _composite_conv_add_relu(input_, filter_, bias, stride_w, stride_h,
 
 
 @tf.RegisterGradient('NewConv2D')
-def _conv_add_relu_grad(op: ops.Operation, grad):
+def _conv_add_relu_grad(op, grad):
   act = op.get_attr('act')
   y = op.outputs[0]
   if act == 'RELU':
@@ -136,7 +134,7 @@ def _composite_fully_connected(input_, filter_, bias, act):
 
 
 @tf.RegisterGradient('NewFullyConnected')
-def _fully_connected_grad(op: ops.Operation, grad):
+def _fully_connected_grad(op, grad):
   act = op.get_attr('act')
   y = op.outputs[0]
   if act == 'RELU':
@@ -180,7 +178,7 @@ def _composite_max_pool(input_, stride_w, stride_h, filter_width, filter_height,
 
 
 @tf.RegisterGradient('NewMaxPool')
-def _max_pool_grad(op: ops.Operation, grad):
+def _max_pool_grad(op, grad):
   filter_width = op.get_attr('filter_width')
   filter_height = op.get_attr('filter_height')
   stride_w = op.get_attr('stride_w')

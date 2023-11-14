@@ -22,7 +22,7 @@ limitations under the License.
 #include "tensorflow/compiler/jit/xla_device.h"
 #include "tensorflow/compiler/jit/xla_launch_util.h"
 #include "tensorflow/compiler/jit/xla_platform_info.h"
-#include "xla/stream_executor/integrations/tf_allocator_adapter.h"
+#include "tensorflow/compiler/xla/stream_executor/tf_allocator_adapter.h"
 #include "tensorflow/core/framework/allocator.h"
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
@@ -83,8 +83,7 @@ class XlaLocalLaunchOp : public XlaLocalLaunchBase {
   ~XlaLocalLaunchOp() override;
 
  private:
-  XlaLocalLaunchOp(const XlaLocalLaunchOp&) = delete;
-  void operator=(const XlaLocalLaunchOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaLocalLaunchOp);
 };
 
 class XlaCompileOp : public OpKernel {

@@ -39,11 +39,11 @@ limitations under the License.
 #include "rocm/include/rocblas.h"
 #endif
 #include "rocm/rocm_config.h"
-#include "xla/stream_executor/blas.h"
+#include "tensorflow/compiler/xla/stream_executor/blas.h"
 #if TF_ROCM_VERSION >= 40500
-#include "xla/stream_executor/rocm/hipsolver_wrapper.h"
+#include "tensorflow/compiler/xla/stream_executor/rocm/hipsolver_wrapper.h"
 #endif
-#include "xla/stream_executor/rocm/rocsolver_wrapper.h"
+#include "tensorflow/compiler/xla/stream_executor/rocm/rocsolver_wrapper.h"
 #endif
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -594,8 +594,7 @@ class GpuSolver {
 
   std::vector<TensorReference> scratch_tensor_refs_;
 
-  GpuSolver(const GpuSolver&) = delete;
-  void operator=(const GpuSolver&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSolver);
 };
 
 // Helper class to allocate scratch memory and keep track of debug info.

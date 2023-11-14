@@ -15,16 +15,14 @@
 # ==============================================================================
 
 VERSION="$1"
-NO_RC_VERSION="${VERSION%rc*}"
-
 shift
 
 mkdir /build
 cd /build
-wget "https://www.python.org/ftp/python/${NO_RC_VERSION}/Python-${VERSION}.tgz"
+wget "https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz"
 tar xvzf "Python-${VERSION}.tgz"
 cd "Python-${VERSION}"
-./configure "$@"
-make -j$(nproc) altinstall
+./configure --enable-optimizations "$@"
+make altinstall
 
 rm -rf /build

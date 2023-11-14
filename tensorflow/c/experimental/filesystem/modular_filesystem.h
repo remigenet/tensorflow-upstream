@@ -117,8 +117,7 @@ class ModularFileSystem final : public FileSystem {
       read_only_memory_region_ops_;
   std::function<void*(size_t)> plugin_memory_allocate_;
   std::function<void(void*)> plugin_memory_free_;
-  ModularFileSystem(const ModularFileSystem&) = delete;
-  void operator=(const ModularFileSystem&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ModularFileSystem);
 };
 
 class ModularRandomAccessFile final : public RandomAccessFile {
@@ -138,8 +137,7 @@ class ModularRandomAccessFile final : public RandomAccessFile {
   std::string filename_;
   std::unique_ptr<TF_RandomAccessFile> file_;
   const TF_RandomAccessFileOps* ops_;  // not owned
-  ModularRandomAccessFile(const ModularRandomAccessFile&) = delete;
-  void operator=(const ModularRandomAccessFile&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ModularRandomAccessFile);
 };
 
 class ModularWritableFile final : public WritableFile {
@@ -162,8 +160,7 @@ class ModularWritableFile final : public WritableFile {
   std::string filename_;
   std::unique_ptr<TF_WritableFile> file_;
   const TF_WritableFileOps* ops_;  // not owned
-  ModularWritableFile(const ModularWritableFile&) = delete;
-  void operator=(const ModularWritableFile&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ModularWritableFile);
 };
 
 class ModularReadOnlyMemoryRegion final : public ReadOnlyMemoryRegion {
@@ -180,8 +177,7 @@ class ModularReadOnlyMemoryRegion final : public ReadOnlyMemoryRegion {
  private:
   std::unique_ptr<TF_ReadOnlyMemoryRegion> region_;
   const TF_ReadOnlyMemoryRegionOps* ops_;  // not owned
-  ModularReadOnlyMemoryRegion(const ModularReadOnlyMemoryRegion&) = delete;
-  void operator=(const ModularReadOnlyMemoryRegion&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ModularReadOnlyMemoryRegion);
 };
 
 // Registers a filesystem plugin so that core TensorFlow can use it.

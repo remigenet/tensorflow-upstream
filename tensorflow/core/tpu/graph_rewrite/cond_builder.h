@@ -18,9 +18,8 @@ limitations under the License.
 
 #include <string>
 
-#include "tensorflow/core/framework/types.pb.h"
 #include "tensorflow/core/graph/graph.h"
-#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/lib/core/status.h"
 
 namespace tensorflow {
 
@@ -39,7 +38,7 @@ class CondBuilder {
  public:
   enum Branch { kElseBranch = 0, kThenBranch = 1 };
 
-  CondBuilder(std::string name, std::string device, const NodeDebugInfo& debug,
+  CondBuilder(string name, string device, const NodeDebugInfo& debug,
               Graph* graph);
 
   // Returns node corresponding to the predicate input.
@@ -56,8 +55,8 @@ class CondBuilder {
 
   // Returns the Switch node to feed a value of the given type into the
   // conditional.
-  Status AddInput(const std::string& input_name, const DataType& type,
-                  const std::string& device, const NodeDebugInfo& debug,
+  Status AddInput(const string& input_name, const DataType& type,
+                  const string& device, const NodeDebugInfo& debug,
                   Node** input);
 
  private:
@@ -66,8 +65,8 @@ class CondBuilder {
   Node* switch_t_;
   Node* pred_;
   Graph* const graph_;
-  const std::string name_;
-  const std::string device_;
+  const string name_;
+  const string device_;
 };
 
 }  // namespace tensorflow

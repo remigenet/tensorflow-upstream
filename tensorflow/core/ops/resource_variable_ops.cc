@@ -93,7 +93,6 @@ Status ReadVariablesShapeFn(InferenceContext* c) {
 REGISTER_OP("VarHandleOp")
     .Attr("container: string = ''")
     .Attr("shared_name: string = ''")
-    .Attr("debug_name: string = ''")
     .Attr("dtype: type")
     .Attr("shape: shape")
     .Attr("allowed_devices: list(string) = []")

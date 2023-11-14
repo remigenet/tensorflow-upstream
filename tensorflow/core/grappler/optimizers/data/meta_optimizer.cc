@@ -15,8 +15,6 @@ limitations under the License.
 
 #include "tensorflow/core/grappler/optimizers/data/meta_optimizer.h"
 
-#include <array>
-
 #include "absl/status/status.h"
 #include "absl/strings/str_split.h"
 #include "tensorflow/core/framework/dataset.h"
@@ -38,7 +36,7 @@ using ConfigMap =
     std::map<string, tensorflow::RewriterConfig_CustomGraphOptimizer>;
 
 // tf.data optimizations, in the order we want to perform them.
-constexpr std::array<const char*, 21> kTFDataOptimizations = {
+constexpr std::array<const char*, 19> kTFDataOptimizations = {
     "noop_elimination",
     "disable_intra_op_parallelism",
     "use_private_thread_pool",
@@ -55,8 +53,6 @@ constexpr std::array<const char*, 21> kTFDataOptimizations = {
     "slack",
     "autotune_buffer_sizes",
     "inject_prefetch",
-    "inject_io_prefetch_eligible",
-    "inject_io_prefetch",
     "disable_prefetch_legacy_autotune",
     "enable_gradient_descent",
     "make_deterministic"};

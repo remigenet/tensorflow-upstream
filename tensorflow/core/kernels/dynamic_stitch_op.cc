@@ -21,7 +21,6 @@ limitations under the License.
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
 #include "tensorflow/core/framework/tensor.h"
-#include "tensorflow/core/kernels/fill_functor.h"
 #include "tensorflow/core/lib/core/threadpool.h"
 
 #if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
@@ -196,6 +195,8 @@ class DynamicStitchOpGPU : public DynamicStitchOpImplBase<T> {
       return;
     }
 
+    // TODO(jeff): Currently we leave uninitialized any portions of
+    // merged that aren't covered by an index in indices.  What should we do?
     if (first_dim_size > 0) {
       // because the collision requirements, we have to deal with
       // collision first before send data to gpu kernel.
@@ -235,10 +236,7 @@ class DynamicStitchOpGPU : public DynamicStitchOpImplBase<T> {
       OP_REQUIRES_OK(c, indices_flat.Finalize());
       OP_REQUIRES_OK(c, data_flat.Finalize());
 
-      auto merged_flat = merged->template flat<T>();
-      functor::SetZeroFunctor<GPUDevice, T> f;
-      f(c->eigen_device<GPUDevice>(), merged_flat);
-      auto output = merged_flat.data();
+      auto output = merged->template flat<T>().data();
       DynamicStitchGPUImpl<T>(c->eigen_gpu_device(), slice_size, first_dim_size,
                               indices_flat.data(), data_flat.data(), output);
     }
@@ -267,9 +265,9 @@ class DynamicStitchOpImplCPU : public DynamicStitchOpImplBase<T> {
       return;
     }
 
+    // TODO(jeff): Currently we leave uninitialized any portions of
+    // merged that aren't covered by an index in indices.  What should we do?
     if (first_dim_size > 0) {
-      functor::SetZeroFunctor<CPUDevice, T> f;
-      f(c->eigen_device<CPUDevice>(), merged->template flat<T>());
       auto merged_flat = merged->flat_outer_dims<T>();
       // slice_size must not be stored as int for cases of tensors over 2GB.
       const auto slice_size = merged_flat.dimension(1);

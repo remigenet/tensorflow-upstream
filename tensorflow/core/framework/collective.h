@@ -158,7 +158,6 @@ struct CollectiveParams : public core::RefCounted {
   OpKernel* final_op = nullptr;  // reduction only
   string ToString() const;
   bool run_group_initialization = true;
-  bool is_stateless = false;
 };
 
 class CollectiveExecutor;
@@ -389,8 +388,7 @@ class CollectiveExecutor : public core::RefCounted {
   static OpKernelContext::Params* CtxParams(OpKernelContext* ctx);
   CollectiveExecutorMgrInterface* cem_;
 
-  CollectiveExecutor(const CollectiveExecutor&) = delete;
-  void operator=(const CollectiveExecutor&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CollectiveExecutor);
 };
 
 struct CollectiveContext {

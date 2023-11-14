@@ -21,10 +21,6 @@ package(
 tf_python_pybind_extension(
     name = "_pywrap_file_io",
     srcs = ["file_io_wrapper.cc"],
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "_pywrap_file_io.pyi",
-    ],
     deps = [
         "//tensorflow/core:framework_headers_lib",
         "//tensorflow/core:protos_all_cc",
@@ -34,32 +30,15 @@ tf_python_pybind_extension(
     ],
 )
 
-tf_python_pybind_extension(
-    name = "_pywrap_record_io",
-    srcs = ["record_io_wrapper.cc"],
-    enable_stub_generation = True,
-    pytype_srcs = [
-        "_pywrap_record_io.pyi",
-    ],
-    deps = [
-        "//tensorflow/core:core_stringpiece",
-        "//tensorflow/core:lib",
-        "//tensorflow/core:lib_headers_for_pybind",
-        "//tensorflow/core:lib_proto_parsing",
-        "//tensorflow/core/platform:errors",
-        "//tensorflow/core/platform:types",
-        "//tensorflow/python/lib/core:pybind11_absl",
-        "//tensorflow/python/lib/core:pybind11_status",
-        "@com_google_absl//absl/memory",
-        "@pybind11",
-    ],
-)
-
 py_strict_library(
-    name = "file_io",
-    srcs = ["file_io.py"],
-    visibility = [
-        "//tensorflow:__subpackages__",
+    name = "lib",
+    srcs = [
+        "file_io.py",
+        "python_io.py",
+        "tf_record.py",
+    ],
+    srcs_version = "PY3",
+    visibility = visibility + [
         "//tensorflow:internal",
         "//third_party/cloud_tpu/convergence_tools:__subpackages__",
         "//third_party/py/tf_agents:__subpackages__",
@@ -67,6 +46,7 @@ py_strict_library(
     ],
     deps = [
         ":_pywrap_file_io",
+        ":_pywrap_record_io",
         "//tensorflow/python/framework:errors",
         "//tensorflow/python/util:compat",
         "//tensorflow/python/util:deprecation",
@@ -75,35 +55,18 @@ py_strict_library(
     ],
 )
 
-py_strict_library(
-    name = "tf_record",
-    srcs = ["tf_record.py"],
-    visibility = [
-        "//tensorflow:__subpackages__",
-        "//tensorflow:internal",
-        "//third_party/cloud_tpu/convergence_tools:__subpackages__",
-        "//third_party/py/tf_agents:__subpackages__",
-        "//third_party/py/tf_slim:__subpackages__",
-    ],
+tf_python_pybind_extension(
+    name = "_pywrap_record_io",
+    srcs = ["record_io_wrapper.cc"],
     deps = [
-        ":_pywrap_record_io",
-        "//tensorflow/python/util:compat",
-        "//tensorflow/python/util:deprecation",
-        "//tensorflow/python/util:tf_export",
+        "//tensorflow/core:framework_headers_lib",
+        "//tensorflow/core:lib_headers_for_pybind",
+        "//tensorflow/core/platform:types",
+        "//tensorflow/python/lib/core:pybind11_absl",
+        "//tensorflow/python/lib/core:pybind11_status",
+        "@com_google_absl//absl/memory",
+        "@pybind11",
     ],
-)
-
-py_strict_library(
-    name = "python_io",
-    srcs = ["python_io.py"],
-    visibility = [
-        "//tensorflow:__subpackages__",
-        "//tensorflow:internal",
-        "//third_party/cloud_tpu/convergence_tools:__subpackages__",
-        "//third_party/py/tf_agents:__subpackages__",
-        "//third_party/py/tf_slim:__subpackages__",
-    ],
-    deps = [":tf_record"],
 )
 
 tf_py_strict_test(
@@ -115,7 +78,7 @@ tf_py_strict_test(
         "no_windows",
     ],
     deps = [
-        ":file_io",
+        ":lib",
         "//tensorflow/python/framework:errors",
         "//tensorflow/python/platform:client_testlib",
         "//tensorflow/python/platform:gfile",
@@ -136,7 +99,7 @@ tf_py_strict_test(
         # copybara:uncomment_end
     ],
     deps = [
-        ":tf_record",
+        ":lib",
         "//tensorflow/python/framework:errors",
         "//tensorflow/python/platform:client_testlib",
         "//tensorflow/python/util:compat",

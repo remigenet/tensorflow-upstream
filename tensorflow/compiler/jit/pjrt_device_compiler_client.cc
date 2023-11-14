@@ -21,6 +21,7 @@ limitations under the License.
 
 namespace tensorflow {
 
+namespace {
 xla::CompileOptions GetPjRtCompileOptions(
     const XlaCompiler::Options& options,
     const XlaCompiler::CompilationResult& result) {
@@ -38,6 +39,7 @@ xla::CompileOptions GetPjRtCompileOptions(
   }
   return pjrt_compile_options;
 }
+}  // namespace
 
 StatusOr<std::unique_ptr<xla::PjRtLoadedExecutable>>
 PjRtDeviceCompilerClient::BuildExecutable(

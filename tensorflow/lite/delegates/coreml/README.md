@@ -46,9 +46,6 @@ TfLiteCoreMlDelegateOptions options = {};
 delegate = TfLiteCoreMlDelegateCreate(&options);
 interpreter->ModifyGraphWithDelegate(delegate);
 
-// Any calls to AllocateTensors must happen strictly AFTER all
-// ModifyGraphWithDelegate calls.
-
 // ...
 ```
 

@@ -15,8 +15,6 @@ limitations under the License.
 
 // See docs in ../ops/io_ops.cc.
 
-#include <cstddef>
-#include <limits>
 #include <string>
 #include <vector>
 
@@ -31,10 +29,9 @@ limitations under the License.
 #include "tensorflow/core/lib/core/status.h"
 #include "tensorflow/core/lib/io/path.h"
 #include "tensorflow/core/platform/env.h"
-#include "tensorflow/core/platform/logging.h"  // IWYU pragma: keep
+#include "tensorflow/core/platform/logging.h"
 #include "tensorflow/core/platform/types.h"
 #include "tensorflow/core/util/saved_tensor_slice_util.h"
-#include "tensorflow/core/util/tensor_bundle/naming.h"
 #include "tensorflow/core/util/tensor_bundle/tensor_bundle.h"
 #include "tensorflow/core/util/tensor_slice_reader.h"
 

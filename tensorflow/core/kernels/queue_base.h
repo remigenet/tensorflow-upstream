@@ -178,8 +178,7 @@ class QueueBase : public QueueInterface {
   std::deque<Attempt> enqueue_attempts_ TF_GUARDED_BY(mu_);
   std::deque<Attempt> dequeue_attempts_ TF_GUARDED_BY(mu_);
 
-  QueueBase(const QueueBase&) = delete;
-  void operator=(const QueueBase&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(QueueBase);
 };
 
 }  // namespace tensorflow

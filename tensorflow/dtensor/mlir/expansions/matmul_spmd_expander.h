@@ -16,7 +16,6 @@ limitations under the License.
 #ifndef TENSORFLOW_DTENSOR_MLIR_EXPANSIONS_MATMUL_SPMD_EXPANDER_H_
 #define TENSORFLOW_DTENSOR_MLIR_EXPANSIONS_MATMUL_SPMD_EXPANDER_H_
 
-#include <optional>
 #include <string>
 
 #include "mlir/IR/Builders.h"  // from @llvm-project
@@ -42,7 +41,7 @@ class MatMulSPMDExpander : public SPMDExpanderBase {
   StatusOr<Layout> OutputLayoutAndReducedDims(
       bool allow_unknown_layouts, mlir::Operation* op,
       absl::flat_hash_set<std::string>* reduced_dims,
-      std::optional<Layout>* left, std::optional<Layout>* right);
+      absl::optional<Layout>* left, absl::optional<Layout>* right);
 
   // This function prepares the inputs (x, y or a, b) to (Batch)MatMul by
   // possibly computing a new layout for each input that allows us to simply

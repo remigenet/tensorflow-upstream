@@ -5,54 +5,15 @@ licenses(["notice"])
 
 exports_files(["LICENSE.txt"])
 
-load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load(
     "@local_config_cuda//cuda:build_defs.bzl",
     "cuda_library",
+    "if_cuda_clang",
 )
 load(
     "@local_config_nccl//:build_defs.bzl",
     "cuda_rdc_library",
     "gen_device_srcs",
-)
-
-NCCL_MAJOR = 2
-
-NCCL_MINOR = 18
-
-NCCL_PATCH = 5
-
-NCCL_VERSION = NCCL_MAJOR * 10000 + NCCL_MINOR * 100 + NCCL_PATCH  # e.g., 21605
-
-expand_template(
-    name = "nccl_header_version",
-    out = "src/nccl.h",
-    substitutions = {
-        "${nccl:Major}": str(NCCL_MAJOR),
-        "${nccl:Minor}": str(NCCL_MINOR),
-        "${nccl:Patch}": str(NCCL_PATCH),
-        "${nccl:Suffix}": "\"\"",
-        "${nccl:Version}": str(NCCL_VERSION),
-    },
-    template = "src/nccl.h.in",
-)
-
-# This additional header allows us to determine the configured NCCL version
-# without including the rest of NCCL.
-write_file(
-    name = "nccl_config_header",
-    out = "nccl_config.h",
-    content = [
-        "#define TF_NCCL_VERSION \"{}\"".format(NCCL_MAJOR),
-    ],
-)
-
-cc_library(
-    name = "nccl_config",
-    hdrs = ["nccl_config.h"],
-    include_prefix = "third_party/nccl",
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -127,29 +88,6 @@ cc_library(
 )
 
 cc_library(
-    name = "nccl_via_stub",
-    hdrs = ["src/nccl.h"],
-    include_prefix = "third_party/nccl",
-    strip_include_prefix = "src",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_tsl//tsl/cuda:nccl_stub",
-    ],
-)
-
-cc_library(
-    name = "nccl_headers",
-    hdrs = ["src/nccl.h"],
-    include_prefix = "third_party/nccl",
-    strip_include_prefix = "src",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-    ],
-)
-
-cc_library(
     name = "nccl",
     srcs = glob(
         include = [
@@ -186,60 +124,19 @@ cc_library(
     ],
 )
 
-alias(
-    name = "enqueue",
-    actual = select({
-        "@local_config_cuda//cuda:using_clang": ":enqueue_clang",
-        "@local_config_cuda//cuda:using_nvcc": ":enqueue_nvcc",
-    }),
-)
-
-# Kernels and their names have special treatment in CUDA compilation.
-# Specifically, the host-side kernel launch stub (host-side representation of
-# the kernel) ends up having the name which does not match the actual kernel
-# name. In order to correctly refer to the kernel the referring code must be
-# compiled as CUDA.
-cuda_library(
-    name = "enqueue_clang",
-    srcs = [
-        "src/enqueue.cc",
-    ],
-    hdrs = ["src/nccl.h"],
-    copts = [
-        "--cuda-host-only",
-    ],
-    include_prefix = "third_party/nccl",
-    linkopts = ["-lrt"],
-    # The following definition is needed to enable placeholder literals such as
-    # PRIx64 defined at the inttypes.h since Tensorflow docker image uses
-    # an old version of glibc.
-    local_defines = ["__STDC_FORMAT_MACROS"],
-    strip_include_prefix = "src",
-    target_compatible_with = select({
-        "@local_config_cuda//cuda:using_clang": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":device",
-        ":include_hdrs",
-        ":src_hdrs",
-    ],
-)
-
 cc_library(
-    name = "enqueue_nvcc",
+    name = "enqueue",
     srcs = [
         "src/enqueue.cc",
     ],
     hdrs = ["src/nccl.h"],
+    copts = if_cuda_clang([
+        "-x",
+        "cuda",
+    ]),
     include_prefix = "third_party/nccl",
     linkopts = ["-lrt"],
     strip_include_prefix = "src",
-    target_compatible_with = select({
-        "@local_config_cuda//cuda:using_nvcc": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
     visibility = ["//visibility:public"],
     deps = [
         ":device",

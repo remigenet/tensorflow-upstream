@@ -35,15 +35,8 @@ from tensorflow.python.ops import resource_variable_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 
-_TEST_TYPES = (
-    dtypes.int64,
-    dtypes.bfloat16,
-    dtypes.float32,
-    dtypes.complex64,
-    dtypes.complex128,
-    dtypes.float8_e5m2,
-    dtypes.float8_e4m3fn,
-)
+_TEST_TYPES = (dtypes.int64, dtypes.bfloat16, dtypes.float32, dtypes.complex64,
+               dtypes.complex128)
 _INDEX_TYPES = (dtypes.int16, dtypes.int32, dtypes.int64)
 
 # TODO(virimia): Add a benchmark for gather_v2, with batch_dims and axis set.
@@ -167,10 +160,7 @@ class GatherTest(test.TestCase, parameterized.TestCase):
               )
               self.assertIsNone(indices_grad)
               self.assertIsNone(axis_grad)
-              if dtype.is_integer or dtype in [
-                  dtypes.float8_e5m2,
-                  dtypes.float8_e4m3fn,
-              ]:
+              if dtype.is_integer:
                 self.assertIsNone(params_grad)
                 continue
               # For axis 0, we are able to create an efficient IndexedSlices
@@ -255,10 +245,7 @@ class GatherTest(test.TestCase, parameterized.TestCase):
             )
             self.assertIsNone(indices_grad)
             self.assertIsNone(axis_grad)
-            if dtype.is_integer or dtype in [
-                dtypes.float8_e5m2,
-                dtypes.float8_e4m3fn,
-            ]:
+            if dtype.is_integer:
               self.assertIsNone(params_grad)
               continue
             # For axis 0, we are able to create an efficient IndexedSlices for

@@ -12,8 +12,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include <cstdint>
-#include <cstdlib>
+
+#include <algorithm>
+#include <cstddef>
 #include <random>
 #include <vector>
 
@@ -34,14 +35,14 @@ struct TestPack {
         src_rows(src_rows),
         src_cols(src_cols),
         width(width),
-        depth(depth),
-        rows((src_rows + (width - 1)) & ~(width - 1)),
-        cols((src_cols + (depth - 1)) & ~(depth - 1)),
-        packed_data_buffer(rows * cols + padding) {}
+        depth(depth) {
+    rows = (src_rows + (width - 1)) & ~(width - 1);
+    cols = (src_cols + (depth - 1)) & ~(depth - 1);
+  }
 
+  ~TestPack() { free(packed_data); }
   void Prepack() {
-    packed_data = packed_data_buffer.data();
-    optimized_4bit::Prepack(packed_data, src_data.data(), rows, cols, src_rows,
+    optimized_4bit::Prepack(&packed_data, src_data.data(), rows, cols, src_rows,
                             src_cols, width, depth);
   }
 
@@ -51,7 +52,6 @@ struct TestPack {
     for (int i = 0; i < size; i++) {
       values[i] = packed_data[i];
     }
-    packed_data = nullptr;
     return values;
   }
 
@@ -59,12 +59,10 @@ struct TestPack {
   uint8_t* packed_data;
   int src_rows;
   int src_cols;
-  int width;
-  int depth;
   int rows;
   int cols;
-  int padding = optimized_4bit::kDefaultAlignmentPadding;
-  std::vector<uint8_t> packed_data_buffer;
+  int width;
+  int depth;
 };
 
 class RunPackTests
@@ -133,11 +131,8 @@ INSTANTIATE_TEST_SUITE_P(RunPackTests, RunPackTests,
                          ::testing::ValuesIn({
                              std::make_tuple(4, 32),
                              std::make_tuple(4, 46),
-                             std::make_tuple(4, 56),
                              std::make_tuple(5, 64),
                              std::make_tuple(5, 72),
-                             std::make_tuple(5, 80),
-                             std::make_tuple(5, 84),
                          }));
 
 struct TestQuantize {
@@ -460,8 +455,11 @@ TEST_P(RunKernelTests, RunKernelTests) {
   int outer_cols = rhs_outer_cols;
   for (int i = 0; i < lhs_outer_rows; ++i) {
     for (int j = 0; j < rhs_outer_rows; ++j) {
+      int32_t accum[1][optimized_4bit::FilterWidth];
       for (int k = 0; k < rhs_width; ++k) {
         for (int l = 0; l < optimized_4bit::FilterWidth; ++l) {
+          memset(accum, 0,
+                 sizeof(int32_t) * rhs_width * optimized_4bit::FilterWidth);
           for (int m = 0; m < outer_cols; ++m) {
             for (int n = 0; n < optimized_4bit::FilterDepth; ++n) {
               int right_index = ((j * outer_cols + m) * rhs_width + k) *

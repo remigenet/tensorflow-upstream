@@ -167,8 +167,7 @@ class TrackedObject {
   friend std::ostream& operator<<(std::ostream& stream,
                                   const TrackedObject& tracked_object);
 
-  TrackedObject(const TrackedObject&) = delete;
-  void operator=(const TrackedObject&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TrackedObject);
 };
 
 inline std::ostream& operator<<(std::ostream& stream,

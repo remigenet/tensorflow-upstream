@@ -17,8 +17,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_context.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/status_macros.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/status_macros.h"
 #include "tensorflow/core/framework/kernel_def_builder.h"
 #include "tensorflow/core/framework/op_kernel.h"
 
@@ -62,8 +62,7 @@ class RetvalOp : public XlaOpKernel {
   int index_;
   DataType dtype_;
 
-  RetvalOp(const RetvalOp&) = delete;
-  void operator=(const RetvalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RetvalOp);
 };
 
 REGISTER_XLA_OP(

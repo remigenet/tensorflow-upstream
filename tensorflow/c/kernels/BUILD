@@ -33,7 +33,7 @@ tf_kernel_library(
         "//tensorflow/core:framework",
         "//tensorflow/core:lib",
         "//tensorflow/core:protos_all_cc",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 
@@ -47,7 +47,7 @@ tf_kernel_library(
         "//tensorflow/core:framework",
         "//tensorflow/core:lib",
         "//tensorflow/core:protos_all_cc",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 

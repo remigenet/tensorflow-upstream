@@ -14,29 +14,27 @@ limitations under the License.
 ==============================================================================*/
 
 #include <array>
-#include <cstdint>
 #include <memory>
 #include <vector>
 
-#include "absl/strings/string_view.h"
+#include "tensorflow/compiler/tf2xla/literal_util.h"
+#include "tensorflow/compiler/tf2xla/type_util.h"
+#include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/arithmetic.h"
-#include "xla/client/lib/comparators.h"
-#include "xla/client/lib/constants.h"
-#include "xla/client/lib/dynamic_shaped_ops.h"
-#include "xla/client/xla_builder.h"
-#include "xla/client/xla_computation.h"
-#include "xla/shape.h"
-#include "xla/shape_util.h"
-#include "xla/status_macros.h"
-#include "xla/util.h"
+#include "tensorflow/compiler/xla/client/lib/arithmetic.h"
+#include "tensorflow/compiler/xla/client/lib/comparators.h"
+#include "tensorflow/compiler/xla/client/lib/constants.h"
+#include "tensorflow/compiler/xla/client/lib/dynamic_shaped_ops.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/framework/op_requires.h"
-#include "tensorflow/core/framework/types.h"
+#include "tensorflow/core/framework/ops_util.h"
+#include "tensorflow/core/framework/register_types.h"
+#include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/lib/core/bits.h"
+#include "tensorflow/core/lib/core/status.h"
 #include "tensorflow/core/platform/statusor.h"
-#include "tsl/platform/errors.h"
+#include "tensorflow/core/tpu/tpu_defs.h"
 
 namespace tensorflow {
 namespace {
@@ -159,8 +157,8 @@ StatusOr<XlaOp> CompileWhereWithSort(XlaOpKernelContext* ctx) {
   XlaOp condition = ctx->Input(0);
   TF_ASSIGN_OR_RETURN(xla::Shape input_shape,
                       ctx->builder()->GetShape(condition));
-  auto iota_shape =
-      xla::ShapeUtil::MakeShape(xla::S32, input_shape.dimensions());
+  auto iota_shape = input_shape;
+  iota_shape.set_element_type(xla::S32);
 
   int64_t flattened_size = xla::Product(iota_shape.dimensions());
   XlaOp reshaped_condition = xla::Reshape(condition, {flattened_size});
@@ -274,7 +272,8 @@ StatusOr<XlaOp> CompileWhereWithPrefixSum(XlaOpKernelContext* ctx) {
   //
   // and then scatter iotas[out_idxs] into the output.
   std::vector<XlaOp> iotas_to_concat;
-  auto iota_shape = xla::ShapeUtil::MakeShape(S32, input_shape.dimensions());
+  auto iota_shape = input_shape;
+  iota_shape.set_element_type(S32);
   for (int64_t axis = 0; axis < iota_shape.rank(); ++axis) {
     iotas_to_concat.push_back(
         xla::Reshape(xla::Iota(b, iota_shape, axis), {flattened_size, 1}));

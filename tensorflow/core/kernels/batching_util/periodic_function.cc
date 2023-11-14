@@ -16,19 +16,17 @@ limitations under the License.
 #include "tensorflow/core/kernels/batching_util/periodic_function.h"
 
 #include <algorithm>
-#include <utility>
 
-#include "absl/functional/any_invocable.h"
 #include "tensorflow/core/lib/strings/strcat.h"
 #include "tensorflow/core/platform/logging.h"
 
 namespace tensorflow {
 namespace serving {
 
-PeriodicFunction::PeriodicFunction(absl::AnyInvocable<void()> function,
+PeriodicFunction::PeriodicFunction(const std::function<void()>& function,
                                    const int64_t interval_micros,
                                    const Options& options)
-    : function_(std::move(function)),
+    : function_(function),
       interval_micros_([interval_micros]() -> int64 {
         if (interval_micros < 0) {
           const string error = strings::StrCat(

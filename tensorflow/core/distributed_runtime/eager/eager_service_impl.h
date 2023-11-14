@@ -232,8 +232,7 @@ class EagerServiceImpl {
   condition_variable gc_thread_cv_;
   bool shutting_down_ TF_GUARDED_BY(gc_thread_shutdown_mu_) = false;
 
-  EagerServiceImpl(const EagerServiceImpl&) = delete;
-  void operator=(const EagerServiceImpl&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(EagerServiceImpl);
 };
 
 }  // namespace eager

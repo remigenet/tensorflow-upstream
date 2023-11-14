@@ -34,7 +34,7 @@ namespace testing {
 
 class Test : public ::testing::Test {
  public:
-  static void SetUpTestSuite() { ASSERT_EQ(TfLiteInitializeShimsForTest(), 0); }
+  void SetUp() override { ASSERT_EQ(TfLiteInitializeShimsForTest(), 0); }
 };
 
 }  // namespace testing

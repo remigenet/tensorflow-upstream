@@ -217,8 +217,7 @@ class CapturedFunction {
   const std::shared_ptr<const FunctionMetadata> metadata_;
   const std::vector<Tensor> captured_inputs_;
 
-  CapturedFunction(const CapturedFunction&) = delete;
-  void operator=(const CapturedFunction&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CapturedFunction);
 };
 
 // `InstantiatedCapturedFunction` encapsulates all the runtime support needed
@@ -312,8 +311,7 @@ class InstantiatedCapturedFunction {
   CapturedFunction* const captured_func_;  // Not owned.
   const bool is_multi_device_;
 
-  InstantiatedCapturedFunction(const InstantiatedCapturedFunction&) = delete;
-  void operator=(const InstantiatedCapturedFunction&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InstantiatedCapturedFunction);
 };
 
 }  // namespace data

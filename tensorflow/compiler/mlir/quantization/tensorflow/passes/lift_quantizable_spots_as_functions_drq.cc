@@ -37,7 +37,8 @@ namespace mlir {
 namespace quant {
 namespace {
 
-using QuantMethod = tensorflow::quantization::QuantizationMethod::PresetMethod;
+using QuantMethod =
+    tensorflow::quantization::QuantizationMethod::ExperimentalMethod;
 
 class LiftQuantizableSpotsAsFunctionsDRQPass
     : public PassWrapper<LiftQuantizableSpotsAsFunctionsDRQPass,
@@ -101,15 +102,14 @@ class LiftQuantizableSpotsAsFunctionsDRQPass
 
   Option<QuantMethod> quantization_method_{
       *this, "quantization-method",
-      llvm::cl::init(tensorflow::quantization::QuantizationMethod::
-                         METHOD_DYNAMIC_RANGE_INT8),
+      llvm::cl::init(
+          tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE),
       llvm::cl::desc("Choose quantization method."),
       llvm::cl::values(
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_DYNAMIC_RANGE_INT8,
-                     "drq", "Post-training dynamic-range quantizaiton"),
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_WEIGHT_ONLY_INT8,
+          clEnumValN(
+              tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE,
+              "drq", "Post-training dynamic-range quantizaiton"),
+          clEnumValN(tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY,
                      "weight_only", "Post-training weight_only quantizaiton"))};
 };
 
@@ -148,8 +148,8 @@ class CheckQuantizableOps
 
     StringRef function_name =
         call_op.getFAttr().cast<FlatSymbolRefAttr>().getValue();
-    if ((quantization_method_ == tensorflow::quantization::QuantizationMethod::
-                                     METHOD_DYNAMIC_RANGE_INT8) &&
+    if ((quantization_method_ ==
+         tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE) &&
         (function_name.contains("batch_matmul") ||
          function_name.contains("conv3d"))) {
       call_op->removeAttr(kQuantTraitAttrName);

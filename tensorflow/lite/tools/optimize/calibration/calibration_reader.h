@@ -15,17 +15,13 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_TOOLS_OPTIMIZE_CALIBRATION_CALIBRATION_READER_H_
 #define TENSORFLOW_LITE_TOOLS_OPTIMIZE_CALIBRATION_CALIBRATION_READER_H_
 
-#include <tuple>
-
-#include "absl/container/flat_hash_map.h"
-#include "tensorflow/lite/core/c/c_api_types.h"
+#include "tensorflow/lite/context.h"
 #include "tensorflow/lite/core/model.h"
 #include "tensorflow/lite/tools/optimize/calibration/calibration_logger.h"
 
 namespace tflite {
 namespace optimize {
 namespace calibration {
-
 // Warning: This is not a public API and subject to change.
 //
 // Reads calibrator data collected by running the interpreter through
@@ -54,7 +50,6 @@ class CalibrationReader {
  private:
   const Logger* logger_;
 };
-
 }  // namespace calibration
 }  // namespace optimize
 }  // namespace tflite

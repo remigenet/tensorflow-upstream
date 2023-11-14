@@ -10,35 +10,22 @@ exports_files(["LICENSE"])
 cc_library(
     name = "float8",
     hdrs = ["include/float8.h"],
-    include_prefix = "ml_dtypes",
-    # Internal headers are all relative to . but other packages
-    # include these headers with the prefix.
-    includes = [
-        ".",
-        "ml_dtypes",
-    ],
-    deps = ["@eigen_archive//:eigen3"],
-)
-
-cc_library(
-    name = "int4",
-    hdrs = ["include/int4.h"],
-    include_prefix = "ml_dtypes",
-    # Internal headers are all relative to . but other packages
+    # Internal headers are all relative to , but other packages
     # include these headers with the  prefix.
     includes = [
         ".",
         "ml_dtypes",
     ],
+    deps = ["@org_tensorflow//third_party/eigen3"],
 )
 
 pybind_extension(
-    name = "_ml_dtypes_ext",
+    name = "_custom_floats",
     srcs = [
         "_src/common.h",
         "_src/custom_float.h",
         "_src/dtypes.cc",
-        "_src/int4_numpy.h",
+        "_src/int4.h",
         "_src/numpy.cc",
         "_src/numpy.h",
         "_src/ufuncs.h",
@@ -47,8 +34,7 @@ pybind_extension(
     visibility = [":__subpackages__"],
     deps = [
         ":float8",
-        ":int4",
-        "@eigen_archive//:eigen3",
+        "@org_tensorflow//third_party/eigen3",
         "@org_tensorflow//third_party/py/numpy:headers",
     ],
 )
@@ -60,5 +46,5 @@ py_library(
         "_finfo.py",
         "_iinfo.py",
     ],
-    deps = [":_ml_dtypes_ext"],
+    deps = [":_custom_floats"],
 )

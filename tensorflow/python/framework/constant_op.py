@@ -19,7 +19,6 @@ See the [constants guide](https://tensorflow.org/api_guides/python/constant_op).
 
 # Must be separate from array_ops to avoid a cyclic dependency.
 
-from typing import Union
 import numpy as np
 from tensorflow.core.framework import types_pb2
 from tensorflow.core.protobuf import struct_pb2
@@ -67,7 +66,7 @@ def _eager_identity(tensor, ctx):
   return result
 
 
-def convert_to_eager_tensor(value, ctx, dtype=None) -> ops._EagerTensorBase:
+def convert_to_eager_tensor(value, ctx, dtype=None):
   """Converts the given `value` to an `EagerTensor`.
 
   Note that this function could return cached copies of created constants for
@@ -105,8 +104,7 @@ def convert_to_eager_tensor(value, ctx, dtype=None) -> ops._EagerTensorBase:
 
 @tf_export(v1=["constant"])
 def constant_v1(
-    value, dtype=None, shape=None, name="Const", verify_shape=False
-) -> Union[ops.Operation, ops._EagerTensorBase]:
+    value, dtype=None, shape=None, name="Const", verify_shape=False):
   """Creates a constant tensor.
 
   The resulting tensor is populated with values of type `dtype`, as
@@ -170,9 +168,7 @@ def constant_v1(
 
 
 @tf_export("constant", v1=[])
-def constant(
-    value, dtype=None, shape=None, name="Const"
-) -> Union[ops.Operation, ops._EagerTensorBase]:
+def constant(value, dtype=None, shape=None, name="Const"):
   """Creates a constant tensor from a tensor-like object.
 
   Note: All eager `tf.Tensor` values are immutable (in contrast to
@@ -273,8 +269,7 @@ def constant(
 
 
 def _constant_impl(
-    value, dtype, shape, name, verify_shape, allow_broadcast
-) -> Union[ops.Operation, ops._EagerTensorBase]:
+    value, dtype, shape, name, verify_shape, allow_broadcast):
   """Implementation of constant."""
   ctx = context.context()
   if ctx.executing_eagerly():
@@ -289,9 +284,7 @@ def _constant_impl(
   return const_tensor
 
 
-def _constant_eager_impl(
-    ctx, value, dtype, shape, verify_shape
-) -> ops._EagerTensorBase:
+def _constant_eager_impl(ctx, value, dtype, shape, verify_shape):
   """Creates a constant on the current device."""
   t = convert_to_eager_tensor(value, ctx, dtype)
   if shape is None:

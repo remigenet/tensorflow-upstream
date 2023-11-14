@@ -16,6 +16,7 @@ package(
         # copybara:uncomment(<g3 only>) "//learning/brain/tfrt/aot:__pkg__",
         "//tensorflow/c:__subpackages__",
         "//tensorflow/c/experimental/saved_model/internal:__pkg__",
+        "//tensorflow/core:__subpackages__",
     ],
     licenses = ["notice"],
 )

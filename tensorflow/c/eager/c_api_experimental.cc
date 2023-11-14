@@ -15,8 +15,6 @@ limitations under the License.
 
 #include "tensorflow/c/eager/c_api_experimental.h"
 
-#include <cstdint>
-#include <memory>
 #include <utility>
 #include <vector>
 
@@ -28,7 +26,6 @@ limitations under the License.
 #include "tensorflow/c/eager/tfe_context_internal.h"
 #include "tensorflow/c/eager/tfe_op_internal.h"
 #include "tensorflow/c/eager/tfe_tensorhandle_internal.h"
-#include "tensorflow/c/tf_status.h"
 #include "tensorflow/c/tf_status_helper.h"
 #include "tensorflow/core/common_runtime/composite_device.h"
 #include "tensorflow/core/common_runtime/device.h"
@@ -43,9 +40,7 @@ limitations under the License.
 #include "tensorflow/core/platform/errors.h"
 #include "tensorflow/core/platform/mutex.h"
 #include "tensorflow/core/platform/strcat.h"
-#include "tsl/c/tsl_status_internal.h"
-#include "tsl/distributed_runtime/coordination/coordination_service_agent.h"
-#include "tsl/framework/cancellation.h"
+#include "tensorflow/tsl/distributed_runtime/coordination/coordination_service_agent.h"
 
 using tensorflow::string;
 
@@ -561,39 +556,6 @@ void TFE_CancellationManagerStartCancel(
 bool TFE_CancellationManagerIsCancelled(
     TFE_CancellationManager* cancellation_manager) {
   return tensorflow::unwrap(cancellation_manager)->IsCancelled();
-}
-
-bool TFE_CancellationManagerIsCancelling(
-    TFE_CancellationManager* cancellation_manager) {
-  return tensorflow::unwrap(cancellation_manager)->IsCancelling();
-}
-
-TFE_CancellationToken TFE_CancellationManagerGetToken(
-    TFE_CancellationManager* cancellation_manager) {
-  return tensorflow::unwrap(cancellation_manager)->get_cancellation_token();
-}
-
-bool TFE_CancellationManagerRegisterCallback(
-    TFE_CancellationManager* cancellation_manager, TFE_CancellationToken token,
-    const TFE_CancelCallback* c_callback, const char* callback_name) {
-  tensorflow::CancelCallback callback = [callback = c_callback->callback,
-                                         context = c_callback->context]() {
-    callback(context);
-  };
-  return tensorflow::unwrap(cancellation_manager)
-      ->RegisterCallbackWithErrorLogging(token, callback, callback_name);
-}
-
-bool TFE_CancellationManagerDeregisterCallback(
-    TFE_CancellationManager* cancellation_manager,
-    TFE_CancellationToken token) {
-  return tensorflow::unwrap(cancellation_manager)->DeregisterCallback(token);
-}
-
-bool TFE_CancellationManagerTryDeregisterCallback(
-    TFE_CancellationManager* cancellation_manager,
-    TFE_CancellationToken token) {
-  return tensorflow::unwrap(cancellation_manager)->TryDeregisterCallback(token);
 }
 
 void TFE_DeleteCancellationManager(

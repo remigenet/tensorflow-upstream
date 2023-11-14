@@ -16,10 +16,10 @@ limitations under the License.
 #include <utility>
 
 #include "tensorflow/core/framework/types.h"
-#include "tsl/platform/refcount.h"
+#include "tensorflow/tsl/platform/refcount.h"
 #define EIGEN_USE_THREADS
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/common_runtime/device.h"
 #include "tensorflow/core/framework/device_base.h"
 #include "tensorflow/core/framework/function.h"
@@ -594,8 +594,7 @@ class WhileOp : public AsyncOpKernel {
     std::vector<Tensor>* const retvals_;  // Not owned.
     DataTypeSlice ret_types_;
 
-    BodyFuncCallFrame(const BodyFuncCallFrame&) = delete;
-    void operator=(const BodyFuncCallFrame&) = delete;
+    TF_DISALLOW_COPY_AND_ASSIGN(BodyFuncCallFrame);
   };
 
   class State {

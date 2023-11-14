@@ -39,7 +39,7 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/core/util/env_var.h"
 #include "tensorflow/core/util/tensor_format.h"
-#include "tsl/platform/status.h"
+#include "tensorflow/tsl/platform/status.h"
 
 #include "tensorflow/core/common_runtime/gpu_fusion_pass.h"
 
@@ -505,7 +505,7 @@ Status ROCmFMAPass::Run(const GraphOptimizationPassOptions& options) {
 
 Status ROCmFusionPassBase::Run(const GraphOptimizationPassOptions& options,
                                int grouping) {
-  VLOG(1) << "ROCm Fusion is enabled.";
+  VLOG(0) << "ROCm Fusion is enabled.";
 
   // Check if the graph is present, should be either in
   // - options.graph (for all but POST_PARTITIONING grouping)

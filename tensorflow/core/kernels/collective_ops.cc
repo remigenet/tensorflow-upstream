@@ -35,10 +35,6 @@ limitations under the License.
 #include "tensorflow/core/platform/refcount.h"
 #include "tensorflow/core/platform/status.h"
 #include "tensorflow/core/platform/types.h"
-#include "tensorflow/core/profiler/lib/connected_traceme.h"
-#include "tensorflow/core/profiler/lib/context_types.h"
-#include "tensorflow/core/profiler/lib/traceme.h"
-#include "tensorflow/core/profiler/lib/traceme_encode.h"
 
 namespace tensorflow {
 
@@ -220,8 +216,7 @@ class CollectiveGatherOpKernel : public CollectiveOpV1Kernel {
   }
 
  private:
-  CollectiveGatherOpKernel(const CollectiveGatherOpKernel&) = delete;
-  void operator=(const CollectiveGatherOpKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CollectiveGatherOpKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("CollectiveGather").Device(DEVICE_CPU),
@@ -331,8 +326,7 @@ class CollectiveReduceOpKernel : public CollectiveOpV1Kernel {
  private:
   std::unique_ptr<OpKernel> merge_op_;
   std::unique_ptr<OpKernel> final_op_;
-  CollectiveReduceOpKernel(const CollectiveReduceOpKernel&) = delete;
-  void operator=(const CollectiveReduceOpKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CollectiveReduceOpKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("CollectiveReduce").Device(DEVICE_CPU),
@@ -409,8 +403,7 @@ class CollectiveBcastSendOpKernel : public CollectiveOpV1Kernel {
   }
 
  private:
-  CollectiveBcastSendOpKernel(const CollectiveBcastSendOpKernel&) = delete;
-  void operator=(const CollectiveBcastSendOpKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CollectiveBcastSendOpKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("CollectiveBcastSend").Device(DEVICE_CPU),
@@ -480,8 +473,7 @@ class CollectiveBcastRecvOpKernel : public CollectiveOpV1Kernel {
   }
 
  private:
-  CollectiveBcastRecvOpKernel(const CollectiveBcastRecvOpKernel&) = delete;
-  void operator=(const CollectiveBcastRecvOpKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CollectiveBcastRecvOpKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("CollectiveBcastRecv").Device(DEVICE_CPU),
@@ -645,29 +637,11 @@ class CollectiveOpV2Kernel : public AsyncOpKernel {
   // method. col_params must live until done is called.
   void Run(OpKernelContext* c, CollectiveParams* col_params,
            DoneCallback done) {
-    // Trace the Run event.
-    profiler::TraceMeProducer producer(
-        [this] {
-          return profiler::TraceMeEncode("CollectiveOpV2Kernel::Run",
-                                         {{"name", name()}});
-        },
-        profiler::ContextType::kTfExecutor);
-    auto xprof_ctx_id = producer.GetContextId();
-
     CollectiveExecutor* col_exec = c->collective_executor();
     OP_REQUIRES_ASYNC(
         c, col_exec,
         errors::Internal(
             "Failed to get CollectiveExecutor from OpKernelContext for Op ",
-            name_),
-        done);
-    std::string device_type = c->device()->attributes().device_type();
-    OP_REQUIRES_ASYNC(
-        c,
-        !(col_params->is_stateless &&
-          device_type == DeviceType(DEVICE_GPU).type()),
-        errors::Internal(
-            "is_stateless is not supported with device type GPU for Op ",
             name_),
         done);
 
@@ -686,43 +660,20 @@ class CollectiveOpV2Kernel : public AsyncOpKernel {
     // Resolve the collective params.
     // Schedule the `CompleteParamsAsync` call on a work queue that can handle
     // blocking work because it's not guaranteed that this call cannot block.
-    c->collective_executor()->RunClosure([c, activity_id, xprof_ctx_id,
+    c->collective_executor()->RunClosure([c, activity_id,
                                           done = std::move(done), col_params,
                                           col_exec]() mutable {
-      profiler::TraceMeConsumer consumer(
-          [&] {
-            return profiler::TraceMeEncode("CollectiveExecutor::RunClosure",
-                                           {{"name", c->op_kernel().name()}});
-          },
-          profiler::ContextType::kTfExecutor, xprof_ctx_id);
-
       VLOG(1) << "Collective CompleteParams for " << col_params->name
               << " device " << c->device()->name() << " group "
               << col_params->group.group_key << " instance "
               << col_params->instance.instance_key;
       col_exec->CompleteParamsAsync(
           c->device()->attributes(), col_params, c->cancellation_manager(),
-          [c, activity_id, xprof_ctx_id, done = std::move(done), col_params,
+          [c, activity_id, done = std::move(done), col_params,
            col_exec](const Status& s) mutable {
-            profiler::TraceMeConsumer consumer(
-                [&] {
-                  return profiler::TraceMeEncode(
-                      "CollectiveExecutor::CompleteParamsAsync::Done",
-                      {{"name", c->op_kernel().name()}});
-                },
-                profiler::ContextType::kTfExecutor, xprof_ctx_id);
-
             if (s.ok()) {
-              auto actual_done = [c, activity_id, col_params, xprof_ctx_id,
+              auto actual_done = [c, activity_id, col_params,
                                   done = std::move(done)](const Status& s) {
-                profiler::TraceMeConsumer consumer(
-                    [&] {
-                      return profiler::TraceMeEncode(
-                          "CollectiveExecutor::ExecuteAsync::Done",
-                          {{"name", c->op_kernel().name()}});
-                    },
-                    profiler::ContextType::kTfExecutor, xprof_ctx_id);
-
                 VLOG(1) << "Collective ExecuteAsync done for "
                         << col_params->name << " device " << c->device()->name()
                         << " group " << col_params->group.group_key

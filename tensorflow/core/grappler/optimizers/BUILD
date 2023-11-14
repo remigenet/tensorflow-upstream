@@ -1060,7 +1060,7 @@ tf_cc_test(
         "//tensorflow/core:test",
         "//tensorflow/core:test_main",
         "//tensorflow/core:testlib",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 
@@ -1191,8 +1191,8 @@ cc_library(
         ["//tensorflow/core/platform:tensor_float_32_hdr_lib"],
     ) + if_rocm_is_configured([
         "//tensorflow/core/platform:stream_executor",
-        "@local_tsl//tsl/protobuf:dnn_proto_cc",
-        "@local_xla//xla/stream_executor/rocm:miopen_plugin"
+        "//tensorflow/compiler/xla/stream_executor:dnn_proto_cc",
+        "//tensorflow/compiler/xla/stream_executor/rocm:miopen_plugin"
     ]),
 )
 

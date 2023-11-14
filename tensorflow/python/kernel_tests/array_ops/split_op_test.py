@@ -26,20 +26,8 @@ from tensorflow.python.ops import gradients_impl
 from tensorflow.python.ops import math_ops
 from tensorflow.python.platform import test
 
-_TEST_DTYPES = (
-    dtypes.int8,
-    dtypes.float32,
-    dtypes.float64,
-    dtypes.complex64,
-    dtypes.complex128,
-    dtypes.bfloat16,
-    dtypes.float8_e5m2,
-    dtypes.float8_e4m3fn,
-)
-
-if not test_util.is_xla_enabled():
-  # TODO(b/183567451): Support int4 in XLA
-  _TEST_DTYPES += (dtypes.int4,)
+_TEST_DTYPES = (dtypes.int8, dtypes.float32, dtypes.float64, dtypes.complex64,
+                dtypes.complex128, dtypes.bfloat16)
 
 
 class SplitOpTest(test.TestCase):
@@ -337,10 +325,7 @@ class SplitOpTest(test.TestCase):
   @test_util.run_deprecated_v1
   def testGradientsAll(self):
     for dtype in _TEST_DTYPES:
-      if not dtype.is_integer and dtype not in [
-          dtypes.float8_e5m2,
-          dtypes.float8_e4m3fn,
-      ]:
+      if not dtype.is_integer:
         self._testGradientsSimple(dtype)
         self._testGradientsSimpleVariable(dtype)
 

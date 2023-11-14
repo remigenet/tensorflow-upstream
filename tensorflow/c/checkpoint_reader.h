@@ -73,8 +73,7 @@ class CheckpointReader {
   std::unique_ptr<TensorSliceReader::VarToShapeMap> var_to_shape_map_;
   std::unique_ptr<TensorSliceReader::VarToDataTypeMap> var_to_data_type_map_;
 
-  CheckpointReader(const CheckpointReader&) = delete;
-  void operator=(const CheckpointReader&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CheckpointReader);
 };
 
 }  // namespace checkpoint

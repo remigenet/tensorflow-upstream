@@ -24,11 +24,11 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/shape_util.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/constants.h"
-#include "xla/client/lib/dynamic_shaped_ops.h"
-#include "xla/client/lib/prng.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/lib/constants.h"
+#include "tensorflow/compiler/xla/client/lib/dynamic_shaped_ops.h"
+#include "tensorflow/compiler/xla/client/lib/prng.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/rng_alg.h"
 #include "tensorflow/core/framework/tensor_shape.h"
@@ -116,8 +116,7 @@ class StatelessRandomUniformOp : public XlaOpKernel {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessRandomUniformOp(const StatelessRandomUniformOp&) = delete;
-  void operator=(const StatelessRandomUniformOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessRandomUniformOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessRandomUniformV2")
@@ -165,8 +164,7 @@ class StatelessRandomUniformIntOp : public XlaOpKernel {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessRandomUniformIntOp(const StatelessRandomUniformIntOp&) = delete;
-  void operator=(const StatelessRandomUniformIntOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessRandomUniformIntOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessRandomUniformIntV2")
@@ -213,9 +211,7 @@ class StatelessRandomUniformFullIntOp : public XlaOpKernel {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessRandomUniformFullIntOp(const StatelessRandomUniformFullIntOp&) =
-      delete;
-  void operator=(const StatelessRandomUniformFullIntOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessRandomUniformFullIntOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessRandomUniformFullIntV2")
@@ -283,8 +279,7 @@ class StatelessRandomNormalOp : public XlaOpKernel {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessRandomNormalOp(const StatelessRandomNormalOp&) = delete;
-  void operator=(const StatelessRandomNormalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessRandomNormalOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessRandomNormalV2")
@@ -318,8 +313,7 @@ class StatelessTruncatedNormalOp : public XlaOpKernel {
   DataType dtype_;
   string device_type_string_;
 
-  StatelessTruncatedNormalOp(const StatelessTruncatedNormalOp&) = delete;
-  void operator=(const StatelessTruncatedNormalOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StatelessTruncatedNormalOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessTruncatedNormalV2")
@@ -357,8 +351,7 @@ class GetKeyCounterOp : public XlaOpKernel {
  private:
   string device_type_string_;
 
-  GetKeyCounterOp(const GetKeyCounterOp&) = delete;
-  void operator=(const GetKeyCounterOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GetKeyCounterOp);
 };
 
 // TODO(hinsu): Dis-allow unsupported int64 seed types.
@@ -380,8 +373,7 @@ class GetAlgOp : public XlaOpKernel {
  private:
   string device_type_string_;
 
-  GetAlgOp(const GetAlgOp&) = delete;
-  void operator=(const GetAlgOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GetAlgOp);
 };
 
 REGISTER_XLA_OP(Name("StatelessRandomGetAlg"), GetAlgOp);
@@ -418,8 +410,7 @@ class GetKeyCounterAlgOp : public XlaOpKernel {
  private:
   string device_type_string_;
 
-  GetKeyCounterAlgOp(const GetKeyCounterAlgOp&) = delete;
-  void operator=(const GetKeyCounterAlgOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GetKeyCounterAlgOp);
 };
 
 // TODO(hinsu): Dis-allow unsupported int64 seed types.

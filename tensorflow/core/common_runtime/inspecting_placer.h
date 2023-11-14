@@ -87,8 +87,7 @@ class InspectingPlacer {
   const bool allow_soft_placement_;
   const bool log_device_placement_;
 
-  InspectingPlacer(const InspectingPlacer&) = delete;
-  void operator=(const InspectingPlacer&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InspectingPlacer);
 };
 
 }  // namespace tensorflow

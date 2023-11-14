@@ -91,8 +91,7 @@ class OpticalFlow {
   // Size of the internally allocated images (after original is downsampled).
   const Size working_size_;
 
-  OpticalFlow(const OpticalFlow&) = delete;
-  void operator=(const OpticalFlow&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(OpticalFlow);
 };
 
 }  // namespace tf_tracking

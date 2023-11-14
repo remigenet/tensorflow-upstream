@@ -34,8 +34,7 @@ class FakeTask : public BatchTask {
  private:
   const size_t size_;
 
-  FakeTask(const FakeTask&) = delete;
-  void operator=(const FakeTask&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FakeTask);
 };
 
 TEST(BatchTest, Basic) {

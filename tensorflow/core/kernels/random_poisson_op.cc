@@ -317,8 +317,7 @@ class RandomPoissonOp : public OpKernel {
  private:
   GuardedPhiloxRandom generator_;
 
-  RandomPoissonOp(const RandomPoissonOp&) = delete;
-  void operator=(const RandomPoissonOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RandomPoissonOp);
 };
 }  // namespace
 

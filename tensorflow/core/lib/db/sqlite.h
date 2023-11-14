@@ -60,7 +60,7 @@ class SqliteTransaction;
 class TF_LOCKABLE Sqlite : public core::RefCounted {
  public:
   /// \brief Closes SQLite connection, which can take milliseconds.
-  ~Sqlite() override;
+  virtual ~Sqlite();
 
   /// \brief Opens SQLite database file.
   ///
@@ -129,8 +129,7 @@ class TF_LOCKABLE Sqlite : public core::RefCounted {
   sqlite3_stmt* const rollback_;
   bool is_in_transaction_ = false;
 
-  Sqlite(const Sqlite&) = delete;
-  void operator=(const Sqlite&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Sqlite);
 };
 
 /// \brief SQLite prepared statement.
@@ -375,8 +374,7 @@ class SqliteStatement {
   int bind_error_parameter_ = 0;
   uint64 size_ = 0;
 
-  SqliteStatement(const SqliteStatement&) = delete;
-  void operator=(const SqliteStatement&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SqliteStatement);
 };
 
 /// \brief Reentrant SQLite connection object lock
@@ -402,8 +400,7 @@ class TF_SCOPED_LOCKABLE SqliteLock {
  private:
   sqlite3_mutex* const mutex_;
   bool is_locked_ = true;
-  SqliteLock(const SqliteLock&) = delete;
-  void operator=(const SqliteLock&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SqliteLock);
 };
 #define SqliteLock(x) static_assert(0, "sqlite_lock_decl_missing_name");
 
@@ -434,8 +431,7 @@ class TF_SCOPED_LOCKABLE SqliteTransaction {
   void Begin();
   Sqlite* const db_;
 
-  SqliteTransaction(const SqliteTransaction&) = delete;
-  void operator=(const SqliteTransaction&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SqliteTransaction);
 };
 
 #define SQLITE_EXCLUSIVE_TRANSACTIONS_REQUIRED(...) \

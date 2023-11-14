@@ -20,7 +20,6 @@ limitations under the License.
 #include <utility>
 
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/SourceMgr.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"  // from @llvm-project
 #include "mlir/Parser/Parser.h"  // from @llvm-project
@@ -37,7 +36,8 @@ namespace mlir {
 namespace quant {
 namespace {
 
-using QuantMethod = tensorflow::quantization::QuantizationMethod::PresetMethod;
+using QuantMethod =
+    tensorflow::quantization::QuantizationMethod::ExperimentalMethod;
 
 class InsertQuantizedFunctionsPass
     : public PassWrapper<InsertQuantizedFunctionsPass,
@@ -81,18 +81,16 @@ class InsertQuantizedFunctionsPass
 
   Option<QuantMethod> quantization_method_{
       *this, "quantization-method",
-      llvm::cl::init(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_INT8),
+      llvm::cl::init(
+          tensorflow::quantization::QuantizationMethod::STATIC_RANGE),
       llvm::cl::desc("Choose quantization method."),
       llvm::cl::values(
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_INT8,
+          clEnumValN(tensorflow::quantization::QuantizationMethod::STATIC_RANGE,
                      "ptq", "Post-training static-range quantization"),
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_DYNAMIC_RANGE_INT8,
-                     "drq", "Post-training dynamic-range quantizaiton"),
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_WEIGHT_ONLY_INT8,
+          clEnumValN(
+              tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE,
+              "drq", "Post-training dynamic-range quantizaiton"),
+          clEnumValN(tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY,
                      "weight_only", "Post-training weight_only quantizaiton"))};
 
   Option<OpSet> op_set_{
@@ -110,15 +108,14 @@ llvm::StringRef InsertQuantizedFunctionsPass::GetFunctionLibrary(
     QuantMethod quantization_method, OpSet op_set) {
   absl::flat_hash_map<OpSet, llvm::StringRef> function_library_map;
   if (quantization_method ==
-      tensorflow::quantization::QuantizationMethod::METHOD_DYNAMIC_RANGE_INT8) {
+      tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE) {
     function_library_map = {
         {OpSet::TF, kQuantizedFunctionLibraryInMLIR_TF_DRQ},
         {OpSet::UNIFORM_QUANTIZED,
          kQuantizedFunctionLibraryInMLIR_UNIFORM_QUANTIZED_DRQ},
         {OpSet::XLA, kQuantizedFunctionLibraryInMLIR_TF_DRQ}};
   } else if (quantization_method ==
-             tensorflow::quantization::QuantizationMethod::
-                 METHOD_STATIC_RANGE_WEIGHT_ONLY_INT8) {
+             tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY) {
     // Uniform quantized opset is not supported for weight-only as inputs for
     // weight quantization are floats. And only dequantize_i8 is used from the
     // quantized function library.

@@ -135,8 +135,7 @@ class SelectOp : public OpKernel {
   }
 
  private:
-  SelectOp(const SelectOp&) = delete;
-  void operator=(const SelectOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SelectOp);
 };
 template <typename Device, typename T>
 class SelectV2Op : public OpKernel {
@@ -240,8 +239,7 @@ class SelectV2Op : public OpKernel {
   }
 
  private:
-  SelectV2Op(const SelectV2Op&) = delete;
-  void operator=(const SelectV2Op&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SelectV2Op);
 };
 
 #define REGISTER_SELECT(type)                                        \

@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow/core/distributed_runtime/coordination/coordination_service_barrier_proxy.h"
 
-#include <cstdint>
 #include <map>
 #include <memory>
 #include <optional>
@@ -28,11 +27,11 @@ limitations under the License.
 #include "tensorflow/core/platform/statusor.h"
 #include "tensorflow/core/platform/test.h"
 #include "tensorflow/core/platform/threadpool.h"
-#include "tsl/distributed_runtime/call_options.h"
-#include "tsl/distributed_runtime/coordination/coordination_client.h"
-#include "tsl/distributed_runtime/coordination/coordination_service_agent.h"
-#include "tsl/protobuf/coordination_config.pb.h"
-#include "tsl/protobuf/coordination_service.pb.h"
+#include "tensorflow/tsl/distributed_runtime/call_options.h"
+#include "tensorflow/tsl/distributed_runtime/coordination/coordination_client.h"
+#include "tensorflow/tsl/distributed_runtime/coordination/coordination_service_agent.h"
+#include "tensorflow/tsl/protobuf/coordination_config.pb.h"
+#include "tensorflow/tsl/protobuf/coordination_service.pb.h"
 
 namespace tensorflow {
 namespace {
@@ -41,6 +40,7 @@ using ::testing::_;
 using ::testing::Return;
 using tsl::CallOptions;
 using tsl::CoordinationClient;
+using tsl::CoordinationClientCache;
 using tsl::CoordinationServiceAgent;
 
 class MockCoordinationServiceAgent : public CoordinationServiceAgent {
@@ -81,8 +81,6 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
   MOCK_METHOD(StatusOr<std::string>, GetKeyValue, (const std::string& key),
               (override));
   MOCK_METHOD(StatusOr<std::string>, GetKeyValue,
-              (const char* key, int64_t key_size), (override));
-  MOCK_METHOD(StatusOr<std::string>, GetKeyValue,
               (const std::string& key, absl::Duration timeout), (override));
   MOCK_METHOD(std::shared_ptr<CallOptions>, GetKeyValueAsync,
               (const std::string& key, StatusOrValueCallback done), (override));
@@ -95,13 +93,7 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
               (override));
   MOCK_METHOD(Status, InsertKeyValue,
               (const std::string& key, const std::string& value), (override));
-  MOCK_METHOD(Status, InsertKeyValue,
-              (const char* key, int64_t key_size, const char* value,
-               int64_t value_size),
-              (override));
   MOCK_METHOD(Status, DeleteKeyValue, (const std::string& key), (override));
-  MOCK_METHOD(Status, DeleteKeyValue, (const char* key, int64_t key_size),
-              (override));
   MOCK_METHOD(Status, UpdateKeyValue,
               (const std::string& key, const std::string& value), (override));
   MOCK_METHOD(Status, StartWatchKey,

@@ -121,16 +121,21 @@ Status ReadVariableHelper(const OpConverterParams* params,
   TRT_ENSURE(ctx->op_device_context()->stream() != nullptr);
 
   // Copy tensor.
-  cudaStream_t stream = reinterpret_cast<cudaStream_t>(CHECK_NOTNULL(
-      ctx->op_device_context()->stream()->platform_specific_handle().stream));
+  const cudaStream_t* stream = CHECK_NOTNULL(
+      reinterpret_cast<const cudaStream_t*>(ctx->op_device_context()
+                                                ->stream()
+                                                ->implementation()
+                                                ->GpuStreamMemberHack()));
+
+  TRT_ENSURE(stream != nullptr);
 
   auto ret = cudaMemcpyAsync(tensor_flat.data(), rets->at(0).flat<T>().data(),
                              rets->at(0).NumElements() * sizeof(T),
-                             cudaMemcpyDeviceToHost, stream);
+                             cudaMemcpyDeviceToHost, *stream);
   if (ret != 0) {
     return errors::Internal("Could not copy the variable ", attrs.name);
   }
-  cudaStreamSynchronize(stream);
+  cudaStreamSynchronize(*stream);
 
   TF_RETURN_IF_ERROR(
       TfTensorToTrtWeights(tensor, params->weight_store, weights));

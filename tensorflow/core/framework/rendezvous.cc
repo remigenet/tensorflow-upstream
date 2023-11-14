@@ -169,8 +169,7 @@ class LocalRendezvousWrapper : public Rendezvous {
  private:
   LocalRendezvous impl_;
 
-  LocalRendezvousWrapper(const LocalRendezvousWrapper&) = delete;
-  void operator=(const LocalRendezvousWrapper&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(LocalRendezvousWrapper);
 };
 }  // namespace
 

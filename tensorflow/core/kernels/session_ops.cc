@@ -67,8 +67,7 @@ class GetSessionHandleOp : public OpKernel {
     }
   }
 
-  GetSessionHandleOp(const GetSessionHandleOp&) = delete;
-  void operator=(const GetSessionHandleOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GetSessionHandleOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("GetSessionHandle").Device(DEVICE_CPU),
@@ -111,8 +110,7 @@ class GetSessionTensorOp : public OpKernel {
     ctx->set_output(0, val);
   }
 
-  GetSessionTensorOp(const GetSessionTensorOp&) = delete;
-  void operator=(const GetSessionTensorOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GetSessionTensorOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("GetSessionTensor").Device(DEVICE_CPU),
@@ -146,8 +144,7 @@ class DeleteSessionTensorOp : public OpKernel {
     OP_REQUIRES_OK(ctx, session_state->DeleteTensor(name));
   }
 
-  DeleteSessionTensorOp(const DeleteSessionTensorOp&) = delete;
-  void operator=(const DeleteSessionTensorOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DeleteSessionTensorOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("DeleteSessionTensor").Device(DEVICE_CPU),

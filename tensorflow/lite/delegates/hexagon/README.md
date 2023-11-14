@@ -31,7 +31,6 @@ Usage:
         ::tflite::TfLiteHexagonDelegateDelete(delegate);
       });
   interpreter->ModifyGraphWithDelegate(delegate.get());
-  // IMPORTANT: AllocateTensors can be called only after ModifyGraphWithDelegate
   TfLiteHexagonTearDown();  // Needed once at end of app/DSP usage.
 ```
 

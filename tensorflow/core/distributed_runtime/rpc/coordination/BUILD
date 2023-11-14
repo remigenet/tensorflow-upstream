@@ -13,7 +13,7 @@ cc_library(
     hdrs = ["grpc_coordination_client.h"],
     # copybara:uncomment copts = ["-Wthread-safety-analysis"],
     deps = [
-        "@local_tsl//tsl/distributed_runtime/rpc/coordination:grpc_coordination_client",
+        "//tensorflow/tsl/distributed_runtime/rpc/coordination:grpc_coordination_client",
     ],
 )
 
@@ -22,6 +22,6 @@ cc_library(
     hdrs = ["grpc_coordination_service_impl.h"],
     # copybara:uncomment copts = ["-Wthread-safety-analysis"],
     deps = [
-        "@local_tsl//tsl/distributed_runtime/rpc/coordination:grpc_coordination_service_impl",
+        "//tensorflow/tsl/distributed_runtime/rpc/coordination:grpc_coordination_service_impl",
     ],
 )

@@ -24,7 +24,6 @@ def _get_configurations(
         disable,
         enable,
         disable_tfrt,
-        disable_tfrt_tpu,  # buildifier: disable=unused-variable
         backend_tags,
         backend_deps,
         additional_backends,  # buildifier: disable=unused-variable
@@ -98,7 +97,6 @@ def dtensor_test(
         disable = [],
         enable = [],
         disable_tfrt = [],
-        disable_tfrt_tpu = [],
         data = [],
         tags = [],
         backend_tags = {},
@@ -129,7 +127,6 @@ def dtensor_test(
       enable: list of specific configs on which the test should be enabled,
         e.g., ["tpu"]. This overrides 'disable'.
       disable_tfrt: list of backends that are disabled for tfrt. This overrides 'enable'.
-      disable_tfrt_tpu: list of backends that are disabled for tfrt tpu.
       data: data dependencies
       tags: test tags
       backend_tags: a dictionary keyed by backend name of per-backend tags.
@@ -139,13 +136,11 @@ def dtensor_test(
       shard_count: a dictionary keyed by backend name of per-backend shard counts.
       size: the test size.
       get_configurations: a function that returns the list of configurations. Used to generate non-OSS test targets.
-      test_rule: test rule
     """
     configurations = get_configurations(
         disable = disable,
         enable = enable,
         disable_tfrt = disable_tfrt,
-        disable_tfrt_tpu = disable_tfrt_tpu,
         backend_tags = backend_tags,
         backend_deps = backend_deps,
         additional_backends = additional_backends,

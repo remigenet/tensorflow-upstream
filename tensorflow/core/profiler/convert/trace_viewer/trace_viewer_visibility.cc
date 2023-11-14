@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <cstdint>
 
-#include "tsl/profiler/utils/timespan.h"
+#include "tensorflow/tsl/profiler/utils/timespan.h"
 
 namespace tensorflow {
 namespace profiler {

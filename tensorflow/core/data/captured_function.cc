@@ -17,7 +17,6 @@ limitations under the License.
 #include <functional>
 #include <map>
 #include <memory>
-#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -35,6 +34,7 @@ limitations under the License.
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/stats_aggregator.h"
 #include "tensorflow/core/lib/core/errors.h"
+#include "tensorflow/core/lib/gtl/optional.h"
 #include "tensorflow/core/lib/random/random.h"
 #include "tensorflow/core/lib/strings/strcat.h"
 #include "tensorflow/core/platform/errors.h"
@@ -300,9 +300,8 @@ class CallFrameBase : public CallFrameInterface {
 
  private:
   DataTypeSlice ret_types_;
-  std::vector<std::optional<Tensor>> retvals_;
-  CallFrameBase(const CallFrameBase&) = delete;
-  void operator=(const CallFrameBase&) = delete;
+  std::vector<gtl::optional<Tensor>> retvals_;
+  TF_DISALLOW_COPY_AND_ASSIGN(CallFrameBase);
 };
 
 class OwnedArgsCallFrame : public CallFrameBase {

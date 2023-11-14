@@ -43,7 +43,6 @@ from tensorflow.python.framework import errors
 from tensorflow.python.framework import function
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import sparse_tensor
-from tensorflow.python.framework import tensor
 from tensorflow.python.framework import tensor_util
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import cond
@@ -139,8 +138,8 @@ class Foo:
 
 @dataclasses.dataclass
 class MyDataclass:
-  value1: tensor.Tensor
-  value2: tensor.Tensor
+  value1: ops.Tensor
+  value2: ops.Tensor
 
   def __tf_flatten__(self):
     metadata = tuple()
@@ -156,7 +155,7 @@ class MyDataclass:
 @dataclasses.dataclass
 class MaskedTensor:
   mask: bool
-  value: tensor.Tensor
+  value: ops.Tensor
 
   def __tf_flatten__(self):
     metadata = (self.mask,)

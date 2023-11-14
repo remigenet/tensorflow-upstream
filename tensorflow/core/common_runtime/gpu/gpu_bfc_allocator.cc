@@ -21,8 +21,8 @@ limitations under the License.
 #include <string>
 #include <utility>
 
-#include "tsl/framework/bfc_allocator.h"
-#include "tsl/platform/logging.h"
+#include "tensorflow/tsl/framework/bfc_allocator.h"
+#include "tensorflow/tsl/platform/logging.h"
 
 namespace tensorflow {
 

@@ -23,7 +23,7 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/literal.h"
+#include "tensorflow/compiler/xla/literal.h"
 #include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/partial_tensor_shape.h"
@@ -117,8 +117,7 @@ class StackOp : public XlaOpKernel {
   DataType dtype_;
   string stack_name_;
 
-  StackOp(const StackOp&) = delete;
-  void operator=(const StackOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StackOp);
 };
 
 REGISTER_XLA_OP(
@@ -167,8 +166,7 @@ class StackPushOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StackPushOp(const StackPushOp&) = delete;
-  void operator=(const StackPushOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StackPushOp);
 };
 
 REGISTER_XLA_OP(Name("StackPushV2").CompilationOnly(), StackPushOp);
@@ -223,8 +221,7 @@ class StackPopOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  StackPopOp(const StackPopOp&) = delete;
-  void operator=(const StackPopOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StackPopOp);
 };
 
 REGISTER_XLA_OP(Name("StackPopV2").CompilationOnly(), StackPopOp);
@@ -238,8 +235,7 @@ class StackCloseOp : public XlaOpKernel {
   }
 
  private:
-  StackCloseOp(const StackCloseOp&) = delete;
-  void operator=(const StackCloseOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(StackCloseOp);
 };
 
 REGISTER_XLA_OP(Name("StackCloseV2").CompilationOnly(), StackCloseOp);

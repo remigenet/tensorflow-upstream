@@ -1,6 +1,5 @@
 load(
     "//tensorflow:tensorflow.bzl",
-    "if_cuda_or_rocm",
     "tf_copts",
     "tf_cuda_library",
 )
@@ -10,18 +9,23 @@ load(
     "tf_cuda_cc_test",
 )
 load(
+    "//tensorflow/core/platform:rules_cc.bzl",
+    "cc_library",
+)
+load(
     "//tensorflow/core/platform:build_config_root.bzl",
     "if_static",
     "tf_cuda_tests_tags",
 )
-load(
-    "//tensorflow/core/platform:rules_cc.bzl",
-    "cc_library",
-)
 
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
-    default_visibility = ["//tensorflow:internal"],
+    default_visibility = [
+        "//tensorflow:internal",
+        "//tensorflow_models:__subpackages__",
+    ],
+    # features = ["-parse_headers"],
+    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
@@ -34,7 +38,7 @@ cc_library(
     deps = [
         "//tensorflow/core:lib",
         "//tensorflow/core/platform:types",
-        "@local_tsl//tsl/framework:device_id",
+        "//tensorflow/tsl/framework:device_id",
     ] + if_static([
         ":device_id_impl",
     ]),
@@ -50,7 +54,7 @@ cc_library(
         "//tensorflow/core:framework",
         "//tensorflow/core:lib",
         "//tensorflow/core:lib_internal",
-        "@local_tsl//tsl/framework:device_id_impl",
+        "//tensorflow/tsl/framework:device_id_impl",
     ],
 )
 
@@ -66,12 +70,11 @@ tf_cuda_library(
     visibility = ["//visibility:public"],
     deps = [
         ":device_id",
+        "//tensorflow/compiler/xla/stream_executor:device_mem_allocator",
         "//tensorflow/core:lib",
         "//tensorflow/core:lib_internal",
         "//tensorflow/core/framework:allocator",
         "//tensorflow/core/platform:stream_executor",
-        "@local_tsl//tsl/framework:device_id",
-        "@local_xla//xla/stream_executor/integrations:device_mem_allocator",
     ],
 )
 
@@ -83,7 +86,7 @@ filegroup(
         "device_id.h",
         "device_id_manager.h",
         "device_mem_allocator.h",
-        "@local_tsl//tsl/framework:device_runtime_headers",
+        "//tensorflow/tsl/framework:device_runtime_headers",
     ],
 )
 
@@ -98,12 +101,12 @@ cc_library(
     copts = tf_copts(),
     visibility = ["//visibility:public"],
     deps = [
+        "//tensorflow/core:framework",
         "//tensorflow/core:framework_internal",
         "//tensorflow/core:lib",
         "//tensorflow/core:lib_internal",
         "//tensorflow/core:protos_all_cc",
         "//tensorflow/core/platform:stream_executor",
-        "@com_google_absl//absl/container:flat_hash_map",
     ],
 )
 
@@ -122,7 +125,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/core:lib",
-        "//tensorflow/core/platform:regexp",
     ],
 )
 
@@ -151,7 +153,6 @@ tf_cuda_cc_test(
         "//tensorflow/core/common_runtime:core_cpu_internal",
         "//tensorflow/core/common_runtime:direct_session_internal",
         "//tensorflow/core/kernels:ops_util",
-        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -170,11 +171,6 @@ tf_cuda_cc_test(
         "//tensorflow/core:test_main",
         "//tensorflow/core:testlib",
         "//tensorflow/core/kernels:cwise_op",
-        "@local_tsl//tsl/framework:device_id",
-    ] + if_cuda_or_rocm([
-        "@local_xla//xla/stream_executor/gpu:gpu_init",
-        "//tensorflow/core/common_runtime:dma_helper",
-        "//tensorflow/core/common_runtime/gpu:gpu_runtime",
-        "//tensorflow/core/platform:stream_executor",
-    ]),
+        "//tensorflow/tsl/framework:device_id",
+    ],
 )

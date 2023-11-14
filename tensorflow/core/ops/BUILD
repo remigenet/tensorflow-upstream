@@ -460,7 +460,7 @@ tf_cc_test(
         "//tensorflow/core/kernels:cwise_op",
         "//tensorflow/core/kernels:function_ops",
         "//tensorflow/core/kernels:math",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 
@@ -488,7 +488,7 @@ tf_cc_test(
         "//tensorflow/core/kernels:data_flow",
         "//tensorflow/core/kernels:function_ops",
         "//tensorflow/core/kernels:math",
-        "@eigen_archive//:eigen3",
+        "//third_party/eigen3",
     ],
 )
 

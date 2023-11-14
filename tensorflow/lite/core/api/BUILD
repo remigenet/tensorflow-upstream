@@ -138,10 +138,7 @@ cc_test(
     deps = [
         ":api",
         "//tensorflow/lite:string",
-        "//tensorflow/lite/c:c_api_types",
         "//tensorflow/lite/core/c:common",
-        "//tensorflow/lite/schema:schema_fbs",
         "@com_google_googletest//:gtest_main",
-        "@flatbuffers//:runtime_cc",
     ],
 )

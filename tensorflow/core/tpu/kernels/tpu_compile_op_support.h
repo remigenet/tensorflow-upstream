@@ -15,7 +15,6 @@ limitations under the License.
 #ifndef TENSORFLOW_CORE_TPU_KERNELS_TPU_COMPILE_OP_SUPPORT_H_
 #define TENSORFLOW_CORE_TPU_KERNELS_TPU_COMPILE_OP_SUPPORT_H_
 
-#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -23,30 +22,30 @@ limitations under the License.
 #include <variant>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
 #include "absl/types/span.h"
+#include "tensorflow/cc/framework/ops.h"
 #include "tensorflow/compiler/tf2xla/xla_compiler.h"
-#include "xla/hlo/ir/hlo_module.h"
-#include "xla/hlo/ir/hlo_sharding.h"
-#include "xla/service/computation_placer.h"
-#include "xla/service/hlo_module_config.h"
-#include "xla/shape.h"
-#include "xla/shape_tree.h"
-#include "xla/xla.pb.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/hlo/ir/hlo_module_group.h"
+#include "tensorflow/compiler/xla/hlo/ir/hlo_sharding.h"
+#include "tensorflow/compiler/xla/service/hlo_module_config.h"
+#include "tensorflow/compiler/xla/shape.h"
+#include "tensorflow/compiler/xla/shape_tree.h"
+#include "tensorflow/compiler/xla/statusor.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/attr_value.pb.h"
 #include "tensorflow/core/framework/function.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor.pb.h"
 #include "tensorflow/core/framework/tensor_shape.h"
-#include "tensorflow/core/protobuf/config.pb.h"
+#include "tensorflow/core/framework/types.pb.h"
 #include "tensorflow/core/protobuf/tpu/compile_metadata.pb.h"
 #include "tensorflow/core/tpu/kernels/tpu_compile.pb.h"
 
 namespace tensorflow {
 namespace tpu {
+
+namespace se = ::stream_executor;
 
 // List of parameters for lowering Mlir to HLO IR.
 struct MlirToHloArgs {
@@ -95,7 +94,7 @@ struct ShardingAndIndex {
 xla::Shape GetPerDeviceShape(const xla::Shape& shape,
                              const xla::HloSharding& sharding, int64_t device);
 
-absl::StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
+tsl::StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
     const xla::ProgramShape& program_shape,
     absl::Span<const xla::Shape> argument_shapes,
     std::optional<const xla::Shape> result_layout,
@@ -106,7 +105,7 @@ absl::StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
     const xla::FusionConfigCollection* fusion_config_collection,
     const std::vector<std::vector<bool>>* fusion_config);
 
-absl::StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
+tsl::StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
     const xla::ProgramShape& program_shape,
     absl::Span<const xla::Shape> argument_shapes,
     std::optional<const xla::Shape> result_layout,
@@ -121,7 +120,7 @@ xla::ShapeTree<xla::HloSharding> GetSubtree(
 xla::Shape GetPerDeviceShape(const xla::Shape& shape,
                              const xla::HloSharding& sharding, int64_t device);
 
-absl::Status AddVariableUpdatesToCores(
+Status AddVariableUpdatesToCores(
     const TPUCompileMetadataProto& metadata,
     const XlaCompiler::CompilationResult& compilation_result,
     const std::vector<ShardingAndIndex>& arg_core_mapping,
@@ -129,36 +128,34 @@ absl::Status AddVariableUpdatesToCores(
     std::vector<std::vector<xla::Shape>>* per_core_output_shapes,
     std::vector<std::vector<std::pair<int, bool>>>* per_core_variable_indices);
 
-absl::Status ComputeOutputShapesForEachCore(
+tsl::Status ComputeOutputShapesForEachCore(
     const tpu::TPUCompileMetadataProto& metadata,
     const XlaCompiler::CompilationResult& compilation_result,
     std::vector<std::vector<xla::Shape>>* per_core_output_shapes);
 
-absl::Status CreateHloModules(
+tsl::Status CreateHloModules(
     const TPUCompileMetadataProto& metadata,
     const XlaCompiler::CompilationResult& compilation_result,
     const std::optional<xla::DeviceAssignment>& device_assignment,
     std::vector<std::unique_ptr<xla::HloModule>>* hlo_modules);
 
-absl::StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
+tsl::StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
     const std::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
     const TPUCompileMetadataProto& metadata,
     const std::vector<TensorShape>& arg_shapes);
 
-absl::Status CompileOpMetadataFromContext(OpKernelConstruction* ctx,
-                                          TPUCompileMetadataProto* metadata,
-                                          NameAttrList* function_name,
-                                          std::string* mlir_module);
+tsl::Status CompileOpMetadataFromContext(OpKernelConstruction* ctx,
+                                         TPUCompileMetadataProto* metadata,
+                                         NameAttrList* function_name,
+                                         std::string* mlir_module);
 
 // Computes shapes for each argument. Uses both the static shape from the
 // metadata, and the dynamic shapes where the static shape is not
 // defined. There must be one dynamic_shape for each argument with a
 // partially defined shape, in index order.
-absl::Status ComputeArgumentShapes(
-    const TPUCompileMetadataProto& metadata,
-    const std::vector<TensorShape>& dynamic_shapes,
-    std::vector<TensorShape>* arg_shapes);
-
+Status ComputeArgumentShapes(const TPUCompileMetadataProto& metadata,
+                             const std::vector<TensorShape>& dynamic_shapes,
+                             std::vector<TensorShape>* arg_shapes);
 }  // namespace tpu
 }  // namespace tensorflow
 

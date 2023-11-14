@@ -33,7 +33,7 @@ limitations under the License.
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/types/span.h"
-#include "Eigen/Core"  // from @eigen_archive
+#include "third_party/eigen3/Eigen/Core"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor_types.h"
 #include "tensorflow/core/framework/types.h"
@@ -1099,8 +1099,7 @@ class DecodeProtoOp : public OpKernel {
   // security review.
   bool sanitize_;
 
-  DecodeProtoOp(const DecodeProtoOp&) = delete;
-  void operator=(const DecodeProtoOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DecodeProtoOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("DecodeProtoV2").Device(DEVICE_CPU),

@@ -32,7 +32,7 @@ namespace {
 TEST(SignatureRunnerTest, TestMultiSignatures) {
   TestErrorReporter reporter;
   auto model = FlatBufferModel::BuildFromFile(
-      "tensorflow/lite/testdata/multi_signatures.bin", &reporter);
+      "third_party/tensorflow/lite/testdata/multi_signatures.bin", &reporter);
   ASSERT_TRUE(model);
   ops::builtin::BuiltinOpResolver resolver;
   InterpreterBuilder builder(*model, resolver);

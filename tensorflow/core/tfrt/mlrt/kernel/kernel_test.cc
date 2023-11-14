@@ -29,7 +29,6 @@ limitations under the License.
 #include "absl/strings/substitute.h"
 #include "absl/synchronization/notification.h"
 #include "absl/types/span.h"
-#include "tensorflow/core/framework/device.h"
 #include "tensorflow/core/framework/tensor_testutil.h"
 #include "tensorflow/core/tfrt/fallback/device_with_custom_allocator.h"
 #include "tensorflow/core/tfrt/fallback/fallback_state.h"
@@ -39,8 +38,8 @@ limitations under the License.
 #include "tensorflow/core/tfrt/mlrt/interpreter/interpreter_testutil.h"
 #include "tensorflow/core/tfrt/mlrt/kernel/batch_kernel.h"
 #include "tensorflow/core/tfrt/mlrt/kernel/context.h"
-#include "tsl/lib/core/status_test_util.h"
-#include "tsl/platform/status_matchers.h"
+#include "tensorflow/tsl/lib/core/status_test_util.h"
+#include "tensorflow/tsl/platform/status_matchers.h"
 #include "tfrt/concurrency/ref_count.h"  // from @tf_runtime
 #include "tfrt/host_context/concurrent_work_queue.h"  // from @tf_runtime
 #include "tfrt/host_context/execution_context.h"  // from @tf_runtime
@@ -317,7 +316,7 @@ TEST(KernelTest, CreateExecuteDeviceOp) {
   };
 
   mlrt::Value arg;
-  arg.Set<std::shared_ptr<Device>>(std::make_shared<TestDevice>(
+  arg.Set<std::unique_ptr<Device>>(std::make_unique<TestDevice>(
       fallback_request_state.cpu_device(),
       fallback_request_state.cpu_device()->GetAllocator({})));
   mlrt::Value results[2];
@@ -424,8 +423,7 @@ class TestAsyncIdentityKernel : public AsyncOpKernel {
   }
 
  private:
-  TestAsyncIdentityKernel(const TestAsyncIdentityKernel&) = delete;
-  void operator=(const TestAsyncIdentityKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TestAsyncIdentityKernel);
 };
 
 REGISTER_KERNEL_BUILDER(Name("TestAsyncIdentity").Device(DEVICE_CPU),

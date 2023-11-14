@@ -201,7 +201,7 @@ def get_pybind_export_symbols(symbols_file, lib_paths_file):
   # `[//tensorflow/python:safe_ptr]`
   # `[//tensorflow:target_name_v2_25]`
   # `[//tensorflow/-/24/util_:port-5]`
-  section_header_filter = r"^\[\/\/(\w+(\/[\w-]+)*(:|\/)[\w-]+)\]"
+  section_header_filter = r"^\[\/\/(tensorflow(\/[\w-]+)*(:|\/)[\w-]+)\]"
 
   # Create a dict of target libs and their symbols to be exported and populate
   # it. (key = cc_library target, value = list of symbols) that we need to
@@ -306,6 +306,7 @@ def main():
     def_fp.write("\t ??_7DeviceProperties@tensorflow@@6B@\n")
     def_fp.write("\t ??_7MetaGraphDef@tensorflow@@6B@\n")
     def_fp.write("\t ??_7SavedModel@tensorflow@@6B@\n")
+    def_fp.write("\t ??0CoordinatedTask@tensorflow@@QEAA@XZ\n") # for _pywrap_tfe
     def_fp.write("\t ?Set@ArenaStringPtr@internal@protobuf@google@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEAVArena@34@@Z\n") # _pywrap_tfe
     def_fp.write("\t ??1CoordinatedTask@tensorflow@@UEAA@XZ\n") # for _pywrap_tfe
     def_fp.write("\t ?CopyFrom@CoordinatedTask@tensorflow@@QEAAXAEBV12@@Z\n") # for _pywrap_tfe
@@ -361,4 +362,3 @@ def main():
 
 if __name__ == "__main__":
   sys.exit(main())
-  

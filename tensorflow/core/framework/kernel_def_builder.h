@@ -86,8 +86,7 @@ class KernelDefBuilder {
  private:
   KernelDef* kernel_def_;
 
-  KernelDefBuilder(const KernelDefBuilder&) = delete;
-  void operator=(const KernelDefBuilder&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(KernelDefBuilder);
 };
 
 // IMPLEMENTATION

@@ -65,7 +65,6 @@ tf.math.unsorted_segment_sum(c, tf.constant([0, 1, 0]), num_segments=2)
 #       [-1, -2, -3, -4]]
 ```
 
-API docstring: tensorflow.math
 """
 import builtins
 import numbers
@@ -1860,15 +1859,13 @@ def _add_dispatch(x, y, name=None):
   Returns:
     The result of the elementwise `+` operation.
   """
-  if ops.is_auto_dtype_conversion_enabled():
-    return add(x, y, name=name)
-  if not isinstance(y, tensor_lib.Tensor) and not isinstance(
-      y, sparse_tensor.SparseTensor):
+  if (
+      not ops.is_auto_dtype_conversion_enabled()
+      and not isinstance(y, tensor_lib.Tensor)
+      and not isinstance(y, sparse_tensor.SparseTensor)
+  ):
     y = ops.convert_to_tensor(y, dtype_hint=x.dtype.base_dtype, name="y")
-  if x.dtype == dtypes.string:
-    return gen_math_ops.add(x, y, name=name)
-  else:
-    return gen_math_ops.add_v2(x, y, name=name)
+  return add(x, y, name=name)
 
 
 def _mul_dispatch(x, y, name=None):
@@ -3625,6 +3622,8 @@ def matmul(a,
            a_is_sparse=False,
            b_is_sparse=False,
            output_type=None,
+           grad_a=False,
+           grad_b=False,
            name=None):
   """Multiplies matrix `a` by matrix `b`, producing `a` * `b`.
 
@@ -3790,10 +3789,12 @@ def matmul(a,
         adjoint_b = True
       if use_batch_matmul_v3:
         return gen_math_ops.batch_mat_mul_v3(
-            a, b, adj_x=adjoint_a, adj_y=adjoint_b, Tout=output_type, name=name)
+          a, b, adj_x=adjoint_a, adj_y=adjoint_b, Tout=output_type,
+          grad_x=grad_a, grad_y=grad_b, name=name)
       else:
         return gen_math_ops.batch_mat_mul_v2(
-            a, b, adj_x=adjoint_a, adj_y=adjoint_b, name=name)
+          a, b, adj_x=adjoint_a, adj_y=adjoint_b,
+          grad_x=grad_a, grad_y=grad_b, name=name)
 
     # Neither matmul nor sparse_matmul support adjoint, so we conjugate
     # the matrix and use transpose instead. Conj() is a noop for real
@@ -3837,10 +3838,12 @@ def matmul(a,
         adjoint_a = adjoint_a or transpose_a
         adjoint_b = adjoint_b or transpose_b
         return gen_math_ops.batch_mat_mul_v3(
-            a, b, adj_x=adjoint_a, adj_y=adjoint_b, Tout=output_type, name=name)
+          a, b, adj_x=adjoint_a, adj_y=adjoint_b, Tout=output_type,
+          grad_x=grad_a, grad_y=grad_b, name=name)
       else:
         return gen_math_ops.mat_mul(
-            a, b, transpose_a=transpose_a, transpose_b=transpose_b, name=name)
+          a, b, transpose_a=transpose_a, transpose_b=transpose_b,
+          grad_a=grad_a, grad_b=grad_b, name=name)
 
 
 @tf_export("linalg.matvec")
@@ -4769,14 +4772,11 @@ def unsorted_segment_sqrt_n(data, segment_ids, num_segments, name=None):
 
 @tf_export(v1=["sparse.segment_sum", "sparse_segment_sum"])
 @deprecation.deprecated_endpoints("sparse_segment_sum")
-def sparse_segment_sum(
-    data,
-    indices,
-    segment_ids,
-    name=None,
-    num_segments=None,
-    sparse_gradient=False,
-):
+def sparse_segment_sum(data,
+                       indices,
+                       segment_ids,
+                       name=None,
+                       num_segments=None):
   r"""Computes the sum along sparse segments of a tensor.
 
   Read [the section on
@@ -4829,10 +4829,6 @@ def sparse_segment_sum(
     name: A name for the operation (optional).
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (`IndexedSlices`) instead of
-      dense (`Tensor`). The sparse gradient will contain one non-zero row for
-      each unique index in `indices`.
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -4845,28 +4841,18 @@ def sparse_segment_sum(
         indices=indices,
         segment_ids=segment_ids,
         num_segments=num_segments,
-        sparse_gradient=sparse_gradient,
-        name=name,
-    )
+        name=name)
   else:
     return gen_math_ops.sparse_segment_sum(
-        data=data,
-        indices=indices,
-        segment_ids=segment_ids,
-        sparse_gradient=sparse_gradient,
-        name=name,
-    )
+        data=data, indices=indices, segment_ids=segment_ids, name=name)
 
 
 @tf_export("sparse.segment_sum", v1=[])
-def sparse_segment_sum_v2(
-    data,
-    indices,
-    segment_ids,
-    num_segments=None,
-    name=None,
-    sparse_gradient=False,
-):
+def sparse_segment_sum_v2(data,
+                          indices,
+                          segment_ids,
+                          num_segments=None,
+                          name=None):
   r"""Computes the sum along sparse segments of a tensor.
 
   Read [the section on
@@ -4919,10 +4905,6 @@ def sparse_segment_sum_v2(
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
     name: A name for the operation (optional).
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (`IndexedSlices`) instead of
-      dense (`Tensor`). The sparse gradient will contain one non-zero row for
-      each unique index in `indices`.
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -4930,25 +4912,16 @@ def sparse_segment_sum_v2(
     inferred for the last element in `segments_ids`.
   """
   return sparse_segment_sum(
-      data,
-      indices,
-      segment_ids,
-      name=name,
-      num_segments=num_segments,
-      sparse_gradient=sparse_gradient,
-  )
+      data, indices, segment_ids, name=name, num_segments=num_segments)
 
 
 @tf_export(v1=["sparse.segment_mean", "sparse_segment_mean"])
 @deprecation.deprecated_endpoints("sparse_segment_mean")
-def sparse_segment_mean(
-    data,
-    indices,
-    segment_ids,
-    name=None,
-    num_segments=None,
-    sparse_gradient=False,
-):
+def sparse_segment_mean(data,
+                        indices,
+                        segment_ids,
+                        name=None,
+                        num_segments=None):
   r"""Computes the mean along sparse segments of a tensor.
 
   Read [the section on
@@ -4971,10 +4944,6 @@ def sparse_segment_mean(
     name: A name for the operation (optional).
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (`IndexedSlices`) instead of
-      dense (`Tensor`). The sparse gradient will contain one non-zero row for
-      each unique index in `indices`.
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -4987,28 +4956,18 @@ def sparse_segment_mean(
         indices=indices,
         segment_ids=segment_ids,
         num_segments=num_segments,
-        name=name,
-        sparse_gradient=sparse_gradient,
-    )
+        name=name)
   else:
     return gen_math_ops.sparse_segment_mean(
-        data=data,
-        indices=indices,
-        segment_ids=segment_ids,
-        name=name,
-        sparse_gradient=sparse_gradient,
-    )
+        data=data, indices=indices, segment_ids=segment_ids, name=name)
 
 
 @tf_export("sparse.segment_mean", v1=[])
-def sparse_segment_mean_v2(
-    data,
-    indices,
-    segment_ids,
-    num_segments=None,
-    name=None,
-    sparse_gradient=False,
-):
+def sparse_segment_mean_v2(data,
+                           indices,
+                           segment_ids,
+                           num_segments=None,
+                           name=None):
   r"""Computes the mean along sparse segments of a tensor.
 
   Read [the section on
@@ -5031,10 +4990,6 @@ def sparse_segment_mean_v2(
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
     name: A name for the operation (optional).
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (`IndexedSlices`) instead of
-      dense (`Tensor`). The sparse gradient will contain one non-zero row for
-      each unique index in `indices`.
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -5042,25 +4997,16 @@ def sparse_segment_mean_v2(
     inferred for the last element in `segments_ids`.
   """
   return sparse_segment_mean(
-      data,
-      indices,
-      segment_ids,
-      name=name,
-      num_segments=num_segments,
-      sparse_gradient=sparse_gradient,
-  )
+      data, indices, segment_ids, name=name, num_segments=num_segments)
 
 
 @tf_export(v1=["sparse.segment_sqrt_n", "sparse_segment_sqrt_n"])
 @deprecation.deprecated_endpoints("sparse_segment_sqrt_n")
-def sparse_segment_sqrt_n(
-    data,
-    indices,
-    segment_ids,
-    name=None,
-    num_segments=None,
-    sparse_gradient=False,
-):
+def sparse_segment_sqrt_n(data,
+                          indices,
+                          segment_ids,
+                          name=None,
+                          num_segments=None):
   r"""Computes the sum along sparse segments of a tensor divided by the sqrt(N).
 
   `N` is the size of the segment being reduced.
@@ -5074,9 +5020,6 @@ def sparse_segment_sqrt_n(
     name: A name for the operation (optional).
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (IndexedSlices) instead of dense
-      (Tensor).
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -5089,28 +5032,18 @@ def sparse_segment_sqrt_n(
         indices=indices,
         segment_ids=segment_ids,
         num_segments=num_segments,
-        name=name,
-        sparse_gradient=sparse_gradient,
-    )
+        name=name)
   else:
     return gen_math_ops.sparse_segment_sqrt_n(
-        data=data,
-        indices=indices,
-        segment_ids=segment_ids,
-        name=name,
-        sparse_gradient=sparse_gradient,
-    )
+        data=data, indices=indices, segment_ids=segment_ids, name=name)
 
 
 @tf_export("sparse.segment_sqrt_n", v1=[])
-def sparse_segment_sqrt_n_v2(
-    data,
-    indices,
-    segment_ids,
-    num_segments=None,
-    name=None,
-    sparse_gradient=False,
-):
+def sparse_segment_sqrt_n_v2(data,
+                             indices,
+                             segment_ids,
+                             num_segments=None,
+                             name=None):
   r"""Computes the sum along sparse segments of a tensor divided by the sqrt(N).
 
   Read [the section on
@@ -5129,10 +5062,6 @@ def sparse_segment_sqrt_n_v2(
     num_segments: An optional int32 scalar. Indicates the size of the output
       `Tensor`.
     name: A name for the operation (optional).
-    sparse_gradient: An optional `bool`. Defaults to `False`. If `True`, the
-      gradient of this function will be sparse (`IndexedSlices`) instead of
-      dense (`Tensor`). The sparse gradient will contain one non-zero row for
-      each unique index in `indices`.
 
   Returns:
     A `tensor` of the shape as data, except for dimension 0 which
@@ -5140,13 +5069,7 @@ def sparse_segment_sqrt_n_v2(
     inferred for the last element in `segments_ids`.
   """
   return sparse_segment_sqrt_n(
-      data,
-      indices,
-      segment_ids,
-      name=name,
-      num_segments=num_segments,
-      sparse_gradient=sparse_gradient,
-  )
+      data, indices, segment_ids, name=name, num_segments=num_segments)
 
 
 @tf_export("tensordot", "linalg.tensordot")

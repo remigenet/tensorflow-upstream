@@ -17,13 +17,7 @@ limitations under the License.
 
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/strings/str_format.h"
-#include "xla/client/xla_builder.h"
-#include "xla/shape.h"
-#include "xla/xla_data.pb.h"
-#include "tensorflow/core/platform/statusor.h"
-#include "tsl/platform/logging.h"  // IWYU pragma: keep
+#include "tensorflow/core/platform/errors.h"
 
 namespace tensorflow {
 namespace tpu {
@@ -46,7 +40,7 @@ StatusOr<xla::OpSharding> SpmdShardingAnnotationOnFirstDim(
     // Split tensors with rank >= 1 (used for embedding activations, gradients,
     // and deduplication data).
     if (shape.dimensions(0) % core_count_per_replica != 0) {
-      return absl::InvalidArgumentError(absl::StrFormat(
+      return errors::InvalidArgument(absl::StrFormat(
           "Number of elements %d in the split dimension must be a multiple of "
           "the number of cores per replica %d",
           shape.dimensions(0), core_count_per_replica));

@@ -96,8 +96,7 @@ class TensorSliceWriter {
   std::map<string, string> data_;
   // Total number of slices written
   int slices_;
-  TensorSliceWriter(const TensorSliceWriter&) = delete;
-  void operator=(const TensorSliceWriter&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorSliceWriter);
 };
 
 template <typename T>

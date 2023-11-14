@@ -17,7 +17,7 @@ limitations under the License.
 // Must be included first.
 #include "tensorflow/python/lib/core/py_func.h"
 
-#include "tsl/python/lib/core/numpy.h"
+#include "tensorflow/tsl/python/lib/core/numpy.h"
 // clang-format: on
 
 #include <Python.h>
@@ -403,8 +403,7 @@ class PyFuncOp : public OpKernel {
 
   bool eager_async_;
 
-  PyFuncOp(const PyFuncOp&) = delete;
-  void operator=(const PyFuncOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(PyFuncOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("PyFunc").Device(DEVICE_CPU), PyFuncOp);

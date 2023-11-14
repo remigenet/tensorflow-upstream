@@ -34,19 +34,13 @@ def EmbedTFFrameworkPass
 }
 
 def RewriteTFFrameworkAssert : Pass<"rewrite-tf-framework-assert", "ModuleOp"> {
-  let dependentDialects = ["cf::ControlFlowDialect"];
   let summary = "Pass to rewrite TFAssertOps to CondBranchOp";
   let constructor = "tf_framework::CreateRewriteTFFrameworkAssert()";
 }
 
-def FuncToJITInvocationPass : Pass<"func-to-jit-invocation", "mlir::func::FuncOp"> {
-  let dependentDialects = [
-      "mlir::kernel_gen::tf_framework::TFFrameworkDialect",
-      "scf::SCFDialect",
-      "shape::ShapeDialect"
-  ];
-  let summary = "Pass to rewrite a function to JIT invocations";
-  let constructor = "transforms::CreateFuncToJITInvocationPass()";
+def TFToJITInvocationPass : Pass<"tf-to-jit-invocation", "mlir::func::FuncOp"> {
+  let summary = "Pass to rewrite all TF operations to JIT invocations";
+  let constructor = "transforms::CreateTFToJITInvocationPass()";
   let options = [
       ListOption<"tile_sizes_", "tile-sizes", "int64_t", "Tiling sizes",
                  "llvm::cl::ZeroOrMore">,

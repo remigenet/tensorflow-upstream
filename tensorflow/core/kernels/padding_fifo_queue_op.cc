@@ -62,8 +62,7 @@ class PaddingFIFOQueueOp : public TypedQueueOp {
 
   std::vector<PartialTensorShape> component_shapes_;
 
-  PaddingFIFOQueueOp(const PaddingFIFOQueueOp&) = delete;
-  void operator=(const PaddingFIFOQueueOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(PaddingFIFOQueueOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("PaddingFIFOQueue").Device(DEVICE_CPU),

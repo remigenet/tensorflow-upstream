@@ -247,8 +247,7 @@ class RefSelectOp : public OpKernel {
 
   ~RefSelectOp() override {}
 
-  RefSelectOp(const RefSelectOp&) = delete;
-  void operator=(const RefSelectOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RefSelectOp);
 
  private:
   int num_ref_inputs_;

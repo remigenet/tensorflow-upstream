@@ -28,8 +28,6 @@ limitations under the License.
 
 #include <gtest/gtest.h>
 #include "absl/algorithm/container.h"
-#include "tensorflow/lite/builtin_ops.h"
-#include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow/lite/core/interpreter.h"
 #include "tensorflow/lite/core/subgraph.h"
 #include "tensorflow/lite/interpreter_test_util.h"
@@ -93,38 +91,13 @@ class SubgraphBuilder {
   // Build a body subgraph with only a counter.
   void BuildCounterOnlySubgraph(Subgraph* subgraph);
 
-  // Build a subgraph with a single binary op.
-  //
-  // The op must take in two inputs and have one output.
-  void BuildBinaryOpSubgraph(Subgraph* subgraph,
-                             TfLiteRegistration* (*Register_OP)(),
-                             TfLiteBuiltinOperator builtin_code, void* params,
-                             TfLiteType input1_type, TfLiteType input2_type,
-                             TfLiteType output_type);
-
   // Build a subgraph with a single Add op.
   // 2 inputs. 1 output.
-  void BuildAddSubgraph(Subgraph* subgraph,
-                        TfLiteType operand_type = kTfLiteInt32);
-
-  // Build a subgraph with a single Maximum op.
-  // 2 inputs. 1 output.
-  void BuildMaximumSubgraph(Subgraph* subgraph,
-                            TfLiteType operand_type = kTfLiteInt32);
-
-  // Build a subgraph with a single Minimum op.
-  // 2 inputs. 1 output.
-  void BuildMinimumSubgraph(Subgraph* subgraph,
-                            TfLiteType operand_type = kTfLiteInt32);
-
-  // Build a subgraph with no ops inside.
-  // 2 inputs. 1 output. Routes the second input to the output.
-  void BuildOutputIsSecondInputSubgraph(Subgraph* subgraph);
+  void BuildAddSubgraph(Subgraph* subgraph);
 
   // Build a subgraph with a single Mul op.
   // 2 inputs. 1 output.
-  void BuildMulSubgraph(Subgraph* subgraph,
-                        TfLiteType operand_type = kTfLiteInt32);
+  void BuildMulSubgraph(Subgraph* subgraph);
 
   // Build a subgraph with a single Pad op.
   // 2 inputs. 1 output.
@@ -277,7 +250,9 @@ class ControlFlowOpTest : public InterpreterTest {
  public:
   ControlFlowOpTest() : builder_(new SubgraphBuilder) {}
 
-  ~ControlFlowOpTest() override { builder_.reset(); }
+  ~ControlFlowOpTest() override {
+    builder_.reset();
+  }
 
  protected:
   std::unique_ptr<SubgraphBuilder> builder_;

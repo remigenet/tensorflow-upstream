@@ -29,8 +29,7 @@ class SyncDeviceOp : public OpKernel {
   void Compute(OpKernelContext* context) override {}
 
  private:
-  SyncDeviceOp(const SyncDeviceOp&) = delete;
-  void operator=(const SyncDeviceOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SyncDeviceOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("SyncDevice").Device(DEVICE_DEFAULT),
@@ -50,8 +49,7 @@ class SyncDeviceGpuOp : public OpKernel {
   }
 
  private:
-  SyncDeviceGpuOp(const SyncDeviceGpuOp&) = delete;
-  void operator=(const SyncDeviceGpuOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SyncDeviceGpuOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("SyncDevice").Device(DEVICE_GPU), SyncDeviceGpuOp);

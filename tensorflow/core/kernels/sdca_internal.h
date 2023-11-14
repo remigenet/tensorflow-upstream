@@ -27,7 +27,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/device_base.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -117,8 +117,7 @@ class Regularizations {
   // L1 divided by L2, pre-computed for use during weight shrinking.
   double shrinkage_ = 0;
 
-  Regularizations(const Regularizations&) = delete;
-  void operator=(const Regularizations&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Regularizations);
 };
 
 class ModelWeights;
@@ -308,8 +307,7 @@ class ModelWeights {
   std::vector<FeatureWeightsSparseStorage> sparse_weights_;
   std::vector<FeatureWeightsDenseStorage> dense_weights_;
 
-  ModelWeights(const ModelWeights&) = delete;
-  void operator=(const ModelWeights&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ModelWeights);
 };
 
 // Examples contains all the training examples that SDCA uses for a mini-batch.
@@ -384,8 +382,7 @@ class Examples {
 
   int num_features_ = 0;
 
-  Examples(const Examples&) = delete;
-  void operator=(const Examples&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Examples);
 };
 
 }  // namespace sdca

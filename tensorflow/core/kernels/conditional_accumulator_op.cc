@@ -51,8 +51,7 @@ class ConditionalAccumulatorOp : public ConditionalAccumulatorBaseOp {
     ctx->set_output_ref(0, &mu_, &accumulator_);
   }
 
-  ConditionalAccumulatorOp(const ConditionalAccumulatorOp&) = delete;
-  void operator=(const ConditionalAccumulatorOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ConditionalAccumulatorOp);
 };
 
 #define REGISTER_KERNELS(type, dev)                           \
@@ -94,9 +93,7 @@ class ResourceConditionalAccumulatorOp : public ConditionalAccumulatorBaseOp {
                             TypeIndex::Make<ConditionalAccumulatorBase>()));
   }
 
-  ResourceConditionalAccumulatorOp(const ResourceConditionalAccumulatorOp&) =
-      delete;
-  void operator=(const ResourceConditionalAccumulatorOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ResourceConditionalAccumulatorOp);
 };
 
 #define REGISTER_RESOURCE_KERNELS(type, dev)                     \
@@ -144,8 +141,7 @@ class AccumulatorApplyGradientOp
   }
 
  private:
-  AccumulatorApplyGradientOp(const AccumulatorApplyGradientOp&) = delete;
-  void operator=(const AccumulatorApplyGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(AccumulatorApplyGradientOp);
 };
 
 REGISTER_KERNEL_BUILDER(Name("AccumulatorApplyGradient").Device(DEVICE_CPU),
@@ -166,9 +162,7 @@ class ResourceAccumulatorApplyGradientOp
   }
 
  private:
-  ResourceAccumulatorApplyGradientOp(
-      const ResourceAccumulatorApplyGradientOp&) = delete;
-  void operator=(const ResourceAccumulatorApplyGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ResourceAccumulatorApplyGradientOp);
 };
 
 REGISTER_KERNEL_BUILDER(
@@ -191,8 +185,7 @@ class AccumulatorTakeGradientOp
   }
 
  private:
-  AccumulatorTakeGradientOp(const AccumulatorTakeGradientOp&) = delete;
-  void operator=(const AccumulatorTakeGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(AccumulatorTakeGradientOp);
 };
 REGISTER_KERNEL_BUILDER(Name("AccumulatorTakeGradient").Device(DEVICE_CPU),
                         AccumulatorTakeGradientOp);
@@ -209,9 +202,7 @@ class ResourceAccumulatorTakeGradientOp
   }
 
  private:
-  ResourceAccumulatorTakeGradientOp(const ResourceAccumulatorTakeGradientOp&) =
-      delete;
-  void operator=(const ResourceAccumulatorTakeGradientOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ResourceAccumulatorTakeGradientOp);
 };
 
 REGISTER_KERNEL_BUILDER(

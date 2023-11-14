@@ -17,7 +17,8 @@ limitations under the License.
 
 #include <gtest/gtest.h>
 
-namespace mlir::quant::stablehlo {
+namespace mlir {
+namespace stablehlo {
 namespace {
 
 TEST(UtilsTest, QuantizeMultiplierNormalMultipliers) {
@@ -59,4 +60,5 @@ TEST(UtilsTest, QuantizeMultiplierInvalidArgument) {
 }
 
 }  // namespace
-}  // namespace mlir::quant::stablehlo
+}  // namespace stablehlo
+}  // namespace mlir

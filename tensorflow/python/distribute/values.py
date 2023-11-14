@@ -27,12 +27,10 @@ from tensorflow.python.distribute import values_util
 from tensorflow.python.eager import context
 from tensorflow.python.eager import record
 from tensorflow.python.framework import composite_tensor
-from tensorflow.python.framework import device as pydev
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import tensor as tensor_lib
 from tensorflow.python.framework import tensor_conversion_registry
-from tensorflow.python.framework import tensor_shape
 from tensorflow.python.framework import tensor_util
 from tensorflow.python.framework import type_spec
 from tensorflow.python.ops import array_ops
@@ -148,9 +146,7 @@ class DistributedValues(ds_types.DistributedValues):
   def _get_cross_replica(self):
     raise NotImplementedError(
         "DistributedValues._get_cross_replica should be implemented by "
-        "sub-classes which support cross-replica accesses. "
-        f"Type name is {type(self)}"
-    )
+        "sub-classes which support cross-replica accesses.")
 
   def _get_on_device_or_primary(self):
     """Returns value in same replica or device if possible, else the _primary."""
@@ -487,10 +483,10 @@ class DistributedVariableTraceType(trace.TraceType):
   def placeholder_value(self, placeholder_context=None):
     return self.distributed_variable
 
-  def to_tensors(self, value):
+  def _to_tensors(self, value):
     return []
 
-  def cast(self, value, _):
+  def _cast(self, value, _):
     return value
 
   def __hash__(self) -> int:
@@ -742,14 +738,14 @@ class DistributedVariable(DistributedDelegate, variables_lib.Variable,
   def distribute_strategy(self):
     return self._distribute_strategy
 
-  def get_shape(self) -> tensor_shape.TensorShape:
+  def get_shape(self):
     return self._primary.get_shape()
 
   def to_proto(self, export_scope=None):
     return self._primary.to_proto(export_scope=export_scope)
 
   @property
-  def op(self) -> ops.Operation:
+  def op(self):
     if values_util.is_saving_non_distributed():
       return self._primary.op
     # We want cross-replica code that does some var.op.X calls
@@ -947,9 +943,7 @@ class DistributedVariable(DistributedDelegate, variables_lib.Variable,
         "DistributedVariable._as_graph_element requires a valid "
         "VariablePolicy. Please set the policy via the `var_policy` argument "
         "in the constructor, or override this method in sub-classes which "
-        "support cross-replica accesses. "
-        f"Type name is {type(self)}"
-    )
+        "support cross-replica accesses.")
 
   def _get_cross_replica(self):
     if values_util.is_saving_non_distributed():
@@ -961,9 +955,7 @@ class DistributedVariable(DistributedDelegate, variables_lib.Variable,
         "DistributedVariable._get_cross_replica requires a valid "
         "VariablePolicy. Please set the policy via the `var_policy` argument "
         "in the constructor, or override this method in sub-classes which "
-        "support cross-replica accesses. "
-        f"Type name is {type(self)}"
-    )
+        "support cross-replica accesses.")
 
   def _update_cross_replica(self, update_fn, value, **kwargs):
     """Applies updates across replicas.
@@ -999,9 +991,7 @@ class DistributedVariable(DistributedDelegate, variables_lib.Variable,
         "DistributedVariable._update_replica requires a valid VariablePolicy. "
         "Please set the policy via the `var_policy` argument in the "
         "constructor, or override this method in sub-classes which support "
-        "cross-replica accesses. "
-        f"Type name is {type(self)}"
-    )
+        "cross-replica accesses.")
 
   def _update(self, update_fn, value, **kwargs):
     """Applies updates depending on the context.
@@ -1087,27 +1077,6 @@ class DistributedVariable(DistributedDelegate, variables_lib.Variable,
           self._primary.handle]
       resource_list.append(self._packed_var.packed_handle)
     return resource_list
-
-  def _copy_trackable_to_cpu(self, object_map):
-    """For implementing `Trackable`."""
-    if self not in object_map:
-      # If not populated, initialize the cpu copy first.
-      op_device = pydev.DeviceSpec.from_string(self.device).replace(
-          device_type="CPU", device_index=0).to_string()
-      with ops.device(op_device):
-        new_var = resource_variable_ops.UninitializedVariable(
-            trainable=self.trainable,
-            shape=self.shape,
-            dtype=self.dtype,
-            name=self._shared_name,
-            distribute_strategy=self._distribute_strategy,
-            aggregation=self._aggregation)  # pylint: disable=protected-access
-      object_map[self] = new_var
-
-    # Then copy value of self to the copy.
-    destination_var = object_map[self]
-    with ops.device(destination_var.device):
-      destination_var.assign(self.read_value())
 
   def _write_object_proto(self, proto, options):
     """Update a SavedObject proto for the caller.
@@ -1532,33 +1501,23 @@ class VariablePolicy(object):
 
   def value(self):
     raise NotImplementedError(
-        "VariablePolicy.value should be overridden by sub-classes. "
-        f"Type name is {type(self)}"
-    )
+        "VariablePolicy.value should be overriden by sub-classes.")
 
   def _is_mirrored(self):
     raise NotImplementedError(
-        "VariablePolicy._is_mirrored should be overridden by sub-classes. "
-        f"Type name is {type(self)}"
-    )
+        "VariablePolicy._is_mirrored should be overriden by sub-classes.")
 
   def _as_graph_element(self, _):
     raise NotImplementedError(
-        "VariablePolicy._as_graph_element should be overridden by sub-classes. "
-        f"Type name is {type(self)}"
-    )
+        "VariablePolicy._as_graph_element should be overriden by sub-classes.")
 
   def _get_cross_replica(self, var):
     raise NotImplementedError(
-        "VariablePolicy._get_cross_replica should be overridden by"
-        f" sub-classes. Type name is {type(self)}"
-    )
+        "VariablePolicy._get_cross_replica should be overriden by sub-classes.")
 
   def _update_replica(self, var, update_fn, value, **kwargs):
     raise NotImplementedError(
-        "VariablePolicy._update_replica should be overridden by sub-classes. "
-        f"Type name is {type(self)}"
-    )
+        "VariablePolicy._update_replica should be overriden by sub-classes.")
 
 
 class OnReadPolicy(VariablePolicy):

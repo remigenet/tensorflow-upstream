@@ -14,6 +14,7 @@
 # ==============================================================================
 """Tests for conversion module."""
 
+import imp
 import sys
 import types
 import weakref
@@ -47,7 +48,7 @@ class ConversionTest(test.TestCase):
 
   def test_is_allowlisted_tensorflow_like(self):
 
-    tf_like = types.ModuleType('tensorflow_foo')
+    tf_like = imp.new_module('tensorflow_foo')
     def test_fn():
       pass
     tf_like.test_fn = test_fn
@@ -57,7 +58,7 @@ class ConversionTest(test.TestCase):
 
   def test_is_allowlisted_callable_allowlisted_call(self):
 
-    allowlisted_mod = types.ModuleType('test_allowlisted_call')
+    allowlisted_mod = imp.new_module('test_allowlisted_call')
     sys.modules['test_allowlisted_call'] = allowlisted_mod
     config.CONVERSION_RULES = ((config.DoNotConvert('test_allowlisted_call'),) +
                                config.CONVERSION_RULES)
@@ -88,7 +89,7 @@ class ConversionTest(test.TestCase):
     self.assertFalse(conversion.is_allowlisted(tc.converted_method))
 
   def test_is_allowlisted_tfmethodwrapper(self):
-    allowlisted_mod = types.ModuleType('test_allowlisted_call')
+    allowlisted_mod = imp.new_module('test_allowlisted_call')
     sys.modules['test_allowlisted_call'] = allowlisted_mod
     config.CONVERSION_RULES = ((config.DoNotConvert('test_allowlisted_call'),) +
                                config.CONVERSION_RULES)

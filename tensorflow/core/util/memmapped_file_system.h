@@ -118,8 +118,7 @@ class MemmappedFileSystem : public FileSystem {
   std::unique_ptr<ReadOnlyMemoryRegion> mapped_memory_;
   DirectoryType directory_;
 
-  MemmappedFileSystem(const MemmappedFileSystem&) = delete;
-  void operator=(const MemmappedFileSystem&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MemmappedFileSystem);
 };
 
 class MemmappedEnv : public EnvWrapper {

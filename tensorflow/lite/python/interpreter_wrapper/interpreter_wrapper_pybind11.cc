@@ -93,7 +93,7 @@ PYBIND11_MODULE(_pywrap_tensorflow_interpreter_wrapper, m) {
         }
         return wrapper;
       });
-  py::class_<InterpreterWrapper>(m, "InterpreterWrapper", py::module_local())
+  py::class_<InterpreterWrapper>(m, "InterpreterWrapper")
       .def(
           "AllocateTensors",
           [](InterpreterWrapper& self, int subgraph_index) {

@@ -35,12 +35,12 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #ifdef TF_GPU_USE_PJRT
 #include "tensorflow/compiler/jit/pjrt_device_context.h"
 #include "tensorflow/compiler/tf2xla/layout_util.h"
-#include "xla/pjrt/local_device_state.h"
-#include "xla/stream_executor/integrations/tf_allocator_adapter.h"
+#include "tensorflow/compiler/xla/pjrt/local_device_state.h"
+#include "tensorflow/compiler/xla/stream_executor/tf_allocator_adapter.h"
 #endif  // TF_GPU_USE_PJRT
 #include "tensorflow/core/common_runtime/device_factory.h"
 #include "tensorflow/core/common_runtime/gpu/gpu_event_mgr.h"
@@ -60,7 +60,7 @@ limitations under the License.
 #include "tensorflow/core/platform/stream_executor.h"
 #include "tensorflow/core/platform/types.h"
 #include "tensorflow/core/public/session_options.h"
-#include "tsl/framework/device_id.h"
+#include "tensorflow/tsl/framework/device_id.h"
 
 namespace Eigen {
 class StreamInterface;
@@ -73,11 +73,11 @@ class ConcretePerOpGpuDevice : public PerOpGpuDevice {
  public:
   ConcretePerOpGpuDevice();
 
-  void Reinitialize(OpKernelContext* context, void* gpu_stream,
+  void Reinitialize(OpKernelContext* context, const void* gpu_stream,
                     tsl::TfDeviceId tf_device_id, Allocator* base_allocator,
                     char* scratch);
 
-  void Reinitialize(OpKernelContext* context, void* gpu_stream,
+  void Reinitialize(OpKernelContext* context, const void* gpu_stream,
                     tsl::PlatformDeviceId platform_device_id,
                     Allocator* base_allocator, char* scratch);
 
@@ -174,6 +174,10 @@ class BaseGPUDevice : public LocalDevice {
 
   // Helper method for unit tests to reset the streams. Never use in production.
   static void TestOnlyReset();
+
+  void* GetStream() {
+    return stream_->compute->implementation()->GpuStreamMemberHack();
+  }
 
   se::Stream* compute_stream() { return stream_->compute; }
 

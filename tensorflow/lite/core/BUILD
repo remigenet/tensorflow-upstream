@@ -39,7 +39,6 @@ cc_library(
         "macros.h",
         "model.h",
         "model_builder.h",
-        "signature_runner.h",
     ],
     compatible_with = get_compatible_with_portable(),
     copts = tflite_copts() + tflite_copts_warnings(),
@@ -166,7 +165,6 @@ cc_library(
         "interpreter_builder.h",
         "model.h",
         "model_builder.h",
-        "signature_runner.h",
     ],
     compatible_with = get_compatible_with_portable(),
     visibility = [
@@ -225,7 +223,11 @@ cc_library(
 alias(
     name = "cc_api",
     actual = "cc_api_experimental",
-    visibility = ["//tensorflow/lite:__subpackages__"],
+    visibility = [
+        "//tensorflow/lite:__subpackages__",
+        "//tensorflow/lite/delegates/flex:__subpackages__",
+        "//tensorflow/lite/kernels:__subpackages__",
+    ],
 )
 
 # The key parts of the C++ API, including experimental APIs.
@@ -374,6 +376,7 @@ cc_test(
     ],
     deps = [
         ":framework",
+        "//tensorflow/core/platform:resource_loader",
         "//tensorflow/lite:framework",
         "//tensorflow/lite:interpreter_test_util",
         "//tensorflow/lite:string",

@@ -47,7 +47,7 @@ using gpusparseSpMMAlg_t = cusparseSpMMAlg_t;
 #elif TENSORFLOW_USE_ROCM
 
 #include "rocm/rocm_config.h"
-#include "xla/stream_executor/rocm/hipsparse_wrapper.h"
+#include "tensorflow/compiler/xla/stream_executor/rocm/hipsparse_wrapper.h"
 
 using gpusparseStatus_t = hipsparseStatus_t;
 using gpusparseOperation_t = hipsparseOperation_t;
@@ -65,7 +65,7 @@ using gpusparseSpMMAlg_t = hipsparseSpMMAlg_t;
 
 #endif
 
-#include "xla/stream_executor/data_type.h"
+#include "tensorflow/compiler/xla/stream_executor/data_type.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/tensor_types.h"
@@ -74,7 +74,7 @@ using gpusparseSpMMAlg_t = hipsparseSpMMAlg_t;
 #include "tensorflow/core/public/version.h"
 
 #if GOOGLE_CUDA
-#include "xla/stream_executor/cuda/cuda_blas_utils.h"
+#include "tensorflow/compiler/xla/stream_executor/cuda/cuda_blas_utils.h"
 #endif
 
 // Macro that specializes a sparse method for all 4 standard
@@ -222,8 +222,7 @@ class GpuSparseSpGEMMDescr {
   bool initialized_;
   cusparseSpGEMMDescr_t descr_;
 
-  GpuSparseSpGEMMDescr(const GpuSparseSpGEMMDescr&) = delete;
-  void operator=(const GpuSparseSpGEMMDescr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparseSpGEMMDescr);
 };
 
 class GpuSparseSpMatDescr {
@@ -256,8 +255,7 @@ class GpuSparseSpMatDescr {
  private:
   bool initialized_;
   cusparseSpMatDescr_t descr_;
-  GpuSparseSpMatDescr(const GpuSparseSpMatDescr&) = delete;
-  void operator=(const GpuSparseSpMatDescr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparseSpMatDescr);
 };
 
 class GpuSparseConstSpMatDescr {
@@ -290,8 +288,7 @@ class GpuSparseConstSpMatDescr {
  private:
   bool initialized_;
   cusparseConstSpMatDescr_t descr_;
-  GpuSparseConstSpMatDescr(const GpuSparseConstSpMatDescr&) = delete;
-  void operator=(const GpuSparseConstSpMatDescr&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparseConstSpMatDescr);
 };
 
 #endif
@@ -583,8 +580,7 @@ class GpuSparse {
   gpuStream_t gpu_stream_;
   gpusparseHandle_t* gpusparse_handle_;  // not owned.
 
-  GpuSparse(const GpuSparse&) = delete;
-  void operator=(const GpuSparse&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparse);
 };
 
 // A wrapper class to ensure that a CUDA sparse matrix descriptor is initialized
@@ -648,8 +644,7 @@ class GpuSparseMatrixDescriptor {
   bool initialized_;
   gpusparseMatDescr_t descr_;
 
-  GpuSparseMatrixDescriptor(const GpuSparseMatrixDescriptor&) = delete;
-  void operator=(const GpuSparseMatrixDescriptor&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparseMatrixDescriptor);
 };
 
 #if GOOGLE_CUDA
@@ -708,9 +703,7 @@ class GpuSparseCsrSortingConversionInfo {
   bool initialized_;
   csru2csrInfo_t info_;
 
-  GpuSparseCsrSortingConversionInfo(const GpuSparseCsrSortingConversionInfo&) =
-      delete;
-  void operator=(const GpuSparseCsrSortingConversionInfo&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GpuSparseCsrSortingConversionInfo);
 };
 
 #endif  // GOOGLE_CUDA

@@ -18,7 +18,6 @@ limitations under the License.
 #include <map>
 #include <mutex>
 #include <numeric>
-#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -26,6 +25,7 @@ limitations under the License.
 #include "tensorflow/core/framework/resource_mgr.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/tensor_shape.h"
+#include "tensorflow/core/lib/gtl/optional.h"
 #include "tensorflow/core/lib/strings/strcat.h"
 #include "tensorflow/core/platform/env.h"
 #include "tensorflow/core/platform/mutex.h"
@@ -84,7 +84,7 @@ class StagingMap : public ResourceBase {
  public:
   // Public typedefs
   using Tuple = std::vector<Tensor>;
-  using OptionalTensor = std::optional<Tensor>;
+  using OptionalTensor = gtl::optional<Tensor>;
   using OptionalTuple = std::vector<OptionalTensor>;
 
   using MapType = typename MapTraits<Ordered, OptionalTuple>::MapType;

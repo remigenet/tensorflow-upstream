@@ -22,9 +22,7 @@ limitations under the License.
 #include "absl/cleanup/cleanup.h"
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow/c/tf_status_helper.h"
-#include "xla/stream_executor/tpu/status_helper.h"
-#include "xla/stream_executor/tpu/tpu_api.h"
-#include "tsl/platform/errors.h"
+#include "tensorflow/compiler/xla/stream_executor/tpu/tpu_api.h"
 
 #if defined(LIBTPU_ON_GCE)
 #include "tensorflow/core/tpu/kernels/tpu_util.h"
@@ -78,8 +76,10 @@ ConstructCacheService(ResourceMgr* rmgr, int serving_port,
 }  // namespace
 
 Status GetServerAddressAndPort(std::string* server_address, int* serving_port) {
+  TF_Status* status = TF_NewStatus();
   char* server_address_output = nullptr;
-  auto cleanup = absl::MakeCleanup([&server_address_output]() {
+  auto cleanup = absl::MakeCleanup([&status, &server_address_output]() {
+    TF_DeleteStatus(status);
     stream_executor::tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
         server_address_output);
   });
@@ -92,12 +92,11 @@ Status GetServerAddressAndPort(std::string* server_address, int* serving_port) {
   params.server_address_output_size = &server_address_output_size;
   params.server_address_output = &server_address_output;
   params.port_output = serving_port;
-  StatusHelper status;
-  params.status = status.c_status;
+  params.status = status;
 
   stream_executor::tpu::OpsApiFn()
       ->TpuConfigurationApi_GetServerAddressAndPortFn(&params);
-  TF_RETURN_IF_ERROR(status.status());
+  TF_RETURN_IF_ERROR(StatusFromTF_Status(status));
   *server_address =
       std::string(server_address_output, server_address_output_size);
   CHECK_NE(*serving_port, -1);
@@ -154,6 +153,10 @@ Status ConstructTpuPodState(
     ResourceMgr* rmgr, const std::vector<int32_t>& num_devices_per_host,
     tpu::TpuCompilationCacheInterface* compilation_cache,
     std::string* host_config_proto) {
+  TF_Status* status = TF_NewStatus();
+  auto status_cleanup =
+      absl::MakeCleanup([&status]() { TF_DeleteStatus(status); });
+
   int serving_port;
   std::string server_address;
   TF_RETURN_IF_ERROR(GetServerAddressAndPort(&server_address, &serving_port));
@@ -174,11 +177,10 @@ Status ConstructTpuPodState(
   params.server_address = server_address.data();
   params.host_config_output_size = &host_config_output_size;
   params.host_config_output = &host_config_output;
-  StatusHelper status;
-  params.status = status.c_status;
+  params.status = status;
 
   stream_executor::tpu::OpsApiFn()->ConfigureDistributedTpuOp_DoWorkFn(&params);
-  TF_RETURN_IF_ERROR(status.status());
+  TF_RETURN_IF_ERROR(StatusFromTF_Status(status));
   *host_config_proto = std::string(host_config_output, host_config_output_size);
 
   TF_ASSIGN_OR_RETURN(

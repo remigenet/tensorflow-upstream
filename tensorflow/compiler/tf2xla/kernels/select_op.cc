@@ -22,7 +22,7 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/kernel_def_builder.h"
 #include "tensorflow/core/util/bcast.h"
@@ -76,8 +76,7 @@ class SelectOp : public XlaOpKernel {
   }
 
  private:
-  SelectOp(const SelectOp&) = delete;
-  void operator=(const SelectOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SelectOp);
 };
 
 REGISTER_XLA_OP(Name("Select"), MlirXlaOpKernel);
@@ -130,8 +129,7 @@ class SelectOpV2 : public XlaOpKernel {
   }
 
  private:
-  SelectOpV2(const SelectOpV2&) = delete;
-  void operator=(const SelectOpV2&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SelectOpV2);
 };
 
 REGISTER_XLA_OP(Name("SelectV2"), SelectOpV2);

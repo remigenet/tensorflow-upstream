@@ -23,7 +23,8 @@ limitations under the License.
 #define TENSORFLOW_CORE_TPU_GRAPH_REWRITE_DISTRIBUTED_TPU_CONFIGURATION_REWRITE_PASS_H_
 
 #include "tensorflow/core/common_runtime/optimization_registry.h"
-#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/graph/graph.h"
+#include "tensorflow/core/platform/env.h"
 
 namespace tensorflow {
 

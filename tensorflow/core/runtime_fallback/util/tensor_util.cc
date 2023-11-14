@@ -14,22 +14,8 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow/core/runtime_fallback/util/tensor_util.h"
 
-#include <cstddef>
-#include <cstdint>
-
-#include "tensorflow/c/tf_datatype.h"
-#include "tensorflow/c/tf_tensor.h"
-#include "tensorflow/c/tf_tensor_internal.h"
-#include "tensorflow/core/framework/tensor.h"
-#include "tensorflow/core/framework/tensor_shape.h"
-#include "tensorflow/core/framework/types.pb.h"
-#include "tensorflow/core/platform/tstring.h"
 #include "tensorflow/core/runtime_fallback/util/type_util.h"
-#include "tfrt/dtype/dtype.h"  // from @tf_runtime
-#include "tfrt/host_context/host_buffer.h"  // from @tf_runtime
-#include "tfrt/support/forward_decls.h"  // from @tf_runtime
-#include "tfrt/tensor/string_host_tensor.h"  // from @tf_runtime
-#include "tfrt/tensor/tensor_shape.h"  // from @tf_runtime
+#include "tfrt/support/error_util.h"  // from @tf_runtime
 
 namespace tensorflow {
 namespace tfd {
@@ -59,7 +45,7 @@ tensorflow::Tensor MoveHostBufferToTfTensor(RCReference<HostBuffer> host_buffer,
   OwnedTFTensor tf_tensor{TF_NewTensor(
       static_cast<TF_DataType>(GetTfDataType(dtype)), dims.data(), dims.size(),
       data, size, deallocator, host_buffer.release())};
-  return TensorFromInterface(tf_tensor->tensor);
+  return down_cast<TensorInterface*>(tf_tensor->tensor)->Tensor();
 }
 
 tensorflow::Tensor CopyShtToTfTensor(const StringHostTensor& sht) {

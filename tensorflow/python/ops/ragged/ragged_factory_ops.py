@@ -14,8 +14,6 @@
 # ==============================================================================
 """Operations for constructing RaggedTensors."""
 
-from typing import Union
-
 import numpy as np
 
 from tensorflow.python.framework import constant_op
@@ -34,14 +32,8 @@ from tensorflow.python.util.tf_export import tf_export
 #===============================================================================
 @tf_export("ragged.constant")
 @dispatch.add_dispatch_support
-def constant(
-    pylist,
-    dtype=None,
-    ragged_rank=None,
-    inner_shape=None,
-    name=None,
-    row_splits_dtype=dtypes.int64,
-) -> Union[ragged_tensor.RaggedTensor, ops._EagerTensorBase, ops.Operation]:
+def constant(pylist, dtype=None, ragged_rank=None, inner_shape=None,
+             name=None, row_splits_dtype=dtypes.int64):
   """Constructs a constant RaggedTensor from a nested Python list.
 
   Example:
@@ -93,13 +85,8 @@ def constant(
 
 @tf_export(v1=["ragged.constant_value"])
 @dispatch.add_dispatch_support
-def constant_value(
-    pylist,
-    dtype=None,
-    ragged_rank=None,
-    inner_shape=None,
-    row_splits_dtype="int64",
-) -> Union[ragged_tensor_value.RaggedTensorValue, np.ndarray]:
+def constant_value(pylist, dtype=None, ragged_rank=None, inner_shape=None,
+                   row_splits_dtype="int64"):
   """Constructs a RaggedTensorValue from a nested Python list.
 
   Warning: This function returns a `RaggedTensorValue`, not a `RaggedTensor`.

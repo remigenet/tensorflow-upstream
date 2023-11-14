@@ -134,8 +134,7 @@ class RandomIndexShuffleOp : public OpKernel {
  private:
   int32_t rounds_;  // Number of rounds for the block cipher.
 
-  RandomIndexShuffleOp(const RandomIndexShuffleOp&) = delete;
-  void operator=(const RandomIndexShuffleOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RandomIndexShuffleOp);
 };
 
 #define REGISTER(TYPE)                                        \

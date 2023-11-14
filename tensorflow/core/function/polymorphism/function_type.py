@@ -29,14 +29,7 @@ from tensorflow.python.types import trace
 
 # Represents a defined parameter default value that is saved alongside the
 # function's captures.
-class CapturedDefaultValue:
-  def __repr__(self):
-    return "<captured_default_value>"
-
-  def __str__(self):
-    return "<captured_default_value>"
-
-CAPTURED_DEFAULT_VALUE = CapturedDefaultValue()
+CAPTURED_DEFAULT_VALUE = object()
 
 PROTO_TO_PY_ENUM = {
     function_type_pb2.Parameter.Kind.POSITIONAL_ONLY:
@@ -164,7 +157,7 @@ class Parameter(inspect.Parameter):
                              self.type_constraint))
 
 
-class FunctionType(core.FunctionType):
+class FunctionType(inspect.Signature):
   """Represents the type of a TensorFlow function.
 
   FunctionType is the canonical way to represent the input/output contract of
@@ -274,7 +267,7 @@ class FunctionType(core.FunctionType):
     for arg_name in with_default_args:
       constraint = self.parameters[arg_name].type_constraint
       if constraint:
-        with_default_args[arg_name] = constraint.cast(
+        with_default_args[arg_name] = constraint._cast(  # pylint: disable=protected-access
             with_default_args[arg_name],
             trace_type.InternalCastContext(allow_specs=True),
         )
@@ -364,7 +357,7 @@ class FunctionType(core.FunctionType):
     if not hasattr(self, "_cached_flat_inputs"):
       cached_flat_inputs = []
       for p in self.parameters.values():
-        cached_flat_inputs.extend(p.type_constraint.flatten())
+        cached_flat_inputs.extend(p.type_constraint._flatten())  # pylint: disable=protected-access
       self._cached_flat_inputs = cached_flat_inputs
 
     return self._cached_flat_inputs
@@ -388,7 +381,7 @@ class FunctionType(core.FunctionType):
     flat = []
     for p in sorted_parameters:
       flat.extend(
-          p.type_constraint.to_tensors(bound_parameters.arguments[p.name])
+          p.type_constraint._to_tensors(bound_parameters.arguments[p.name])  # pylint: disable=protected-access
       )
 
     dealiased_inputs = []
@@ -409,7 +402,7 @@ class FunctionType(core.FunctionType):
     if not hasattr(self, "_cached_flat_captures"):
       cached_flat_captures = []
       for t in self.captures.values():
-        cached_flat_captures.extend(t.flatten())
+        cached_flat_captures.extend(t._flatten())  # pylint: disable=protected-access
       self._cached_flat_captures = cached_flat_captures
 
     return self._cached_flat_captures
@@ -418,7 +411,7 @@ class FunctionType(core.FunctionType):
     """Unpacks captures to flat tensors."""
     flat = []
     for v, t in zip(captures, self.captures.values()):
-      flat.extend(t.to_tensors(v))
+      flat.extend(t._to_tensors(v))  # pylint: disable=protected-access
     if len(flat) != len(self.flat_captures):
       raise TypeError(
           f"Flattening captures {captures} with type {self!r} produced"
@@ -431,7 +424,7 @@ class FunctionType(core.FunctionType):
     """Flat tensor outputs returned by this FunctionType."""
     if not hasattr(self, "_cached_flat_outputs"):
       if self.output is not None:
-        self._cached_flat_outputs = self.output.flatten()
+        self._cached_flat_outputs = self.output._flatten()   # pylint: disable=protected-access
 
     return self._cached_flat_outputs
 
@@ -443,7 +436,7 @@ class FunctionType(core.FunctionType):
     if self.output is None:
       raise ValueError("Can not pack outputs for undefined output type.")
     else:
-      return self.output.from_tensors(iter(flat_values))
+      return self.output._from_tensors(iter(flat_values))   # pylint: disable=protected-access
 
   def __eq__(self, other: Any) -> bool:
     if not isinstance(other, FunctionType):
@@ -456,27 +449,8 @@ class FunctionType(core.FunctionType):
     return hash((tuple(self.parameters.items()), tuple(self.captures.items())))
 
   def __repr__(self):
-    if hasattr(self, "_cached_repr"):
-      return self._cached_repr
-
-    lines = ["Input Parameters:"]
-    for parameter in self.parameters.values():
-      lines.append(
-          f"  {parameter.name} ({parameter.kind}): {parameter.type_constraint}"
-      )
-
-    lines.append("Output Type:")
-    lines.append(f"  {self.output}")
-
-    lines.append("Captures:")
-    if self.captures:
-      for capture_id, capture_type in self.captures.items():
-        lines.append(f"  {capture_id}: {capture_type}")
-    else:
-      lines.append("  None")
-
-    self._cached_repr = "\n".join(lines)
-    return self._cached_repr
+    return (f"FunctionType(parameters={list(self.parameters.values())!r}, "
+            f"captures={self.captures})")
 
 
 MAX_SANITIZATION_WARNINGS = 5

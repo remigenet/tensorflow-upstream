@@ -44,8 +44,7 @@ class TfToHloCompiler {
                                  XlaCompilationResult* result) = 0;
 
  private:
-  TfToHloCompiler(const TfToHloCompiler&) = delete;
-  void operator=(const TfToHloCompiler&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TfToHloCompiler);
 };
 
 }  // namespace tensorflow

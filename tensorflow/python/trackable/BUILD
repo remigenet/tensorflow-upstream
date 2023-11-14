@@ -120,13 +120,11 @@ tf_py_strict_test(
         ":base_delegate",
         "//tensorflow/python:extra_py_tests_deps",
         "//tensorflow/python/checkpoint",
-        "//tensorflow/python/checkpoint:checkpoint_options",
         "//tensorflow/python/eager:test",
         "//tensorflow/python/framework:test_lib",
         "//tensorflow/python/ops:variables",
         "//tensorflow/python/saved_model:load",
         "//tensorflow/python/saved_model:save",
-        "@absl_py//absl/testing:parameterized",
     ],
 )
 
@@ -140,7 +138,7 @@ py_strict_library(
         "//tensorflow/python/framework:dtypes",
         "//tensorflow/python/framework:ops",
         "//tensorflow/python/framework:tensor_conversion_registry",
-        "//tensorflow/python/lib/io:file_io",
+        "//tensorflow/python/lib/io:lib",
         "//tensorflow/python/ops:array_ops",
         "//tensorflow/python/ops:resource_variable_ops",
         "//tensorflow/python/saved_model:path_helpers",
@@ -225,7 +223,7 @@ py_strict_library(
         "//tensorflow/python/ops:variables",
         "//tensorflow/python/util:compat",
         "//tensorflow/python/util:tf_export",
-        "@pypi_wrapt//:pkg",
+        "@wrapt",
     ],
 )
 
@@ -233,7 +231,6 @@ tf_py_strict_test(
     name = "data_structures_test",
     srcs = ["data_structures_test.py"],
     tags = [
-        "no_oss",  # Keras is not available in OSS test
         "no_windows",
         "nomac",
     ],
@@ -247,6 +244,7 @@ tf_py_strict_test(
         "//tensorflow/python/eager:test",
         "//tensorflow/python/framework:constant_op",
         "//tensorflow/python/framework:tensor_shape",
+        "//tensorflow/python/layers",
         "//tensorflow/python/module",
         "//tensorflow/python/ops:array_ops",
         "//tensorflow/python/ops:resource_variable_ops",

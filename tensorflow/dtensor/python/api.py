@@ -502,32 +502,24 @@ def relayout_like(
   )
 
 
-@tf_export("experimental.dtensor._reset_dtensor_device", v1=[])
-def reset_dtensor_device(is_async: bool) -> None:
-  """Resets the Eager execution device for DTensor.
-
-  This function is only intended for testing and diagnostics.
-
-  Args:
-    is_async: If True, the device uses async execution.
-  """
+def _set_dtensor_device(device: dtensor_device.DTensorDevice) -> None:
   global _dtensor_singleton
-  device = dtensor_device.DTensorDevice(meshes=[], is_async=is_async)
   _dtensor_singleton = device
 
 
 def _dtensor_device() -> dtensor_device.DTensorDevice:
   with _dtensor_singleton_lock:
     if _dtensor_singleton is None:
-      reset_dtensor_device(is_async=True)
-    return _dtensor_singleton
+      _set_dtensor_device(
+          dtensor_device.DTensorDevice(meshes=[], is_async=True))
+  return _dtensor_singleton
 
 
 def _reset() -> None:
   global _dtensor_singleton
+  if _dtensor_singleton is not None:
+    _dtensor_singleton.clear_tpu_core_ids()
   with _dtensor_singleton_lock:
-    if _dtensor_singleton is not None:
-      _dtensor_singleton.clear_tpu_core_ids()
     _dtensor_singleton = None
 
 

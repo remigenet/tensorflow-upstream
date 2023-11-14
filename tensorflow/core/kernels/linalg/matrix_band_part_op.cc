@@ -27,7 +27,7 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -107,8 +107,7 @@ class MatrixBandPartOp : public OpKernel {
   }
 
  private:
-  MatrixBandPartOp(const MatrixBandPartOp&) = delete;
-  void operator=(const MatrixBandPartOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixBandPartOp);
 };
 
 #define REGISTER_MATRIX_BAND_PART(type)                                    \

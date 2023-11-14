@@ -233,8 +233,7 @@ class ObjectTracker {
   friend std::ostream& operator<<(std::ostream& stream,
                                   const ObjectTracker& tracker);
 
-  ObjectTracker(const ObjectTracker&) = delete;
-  void operator=(const ObjectTracker&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ObjectTracker);
 };
 
 inline std::ostream& operator<<(std::ostream& stream,

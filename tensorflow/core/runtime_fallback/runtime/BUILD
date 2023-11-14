@@ -10,6 +10,7 @@ package_group(
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
     default_visibility = [":internal"],
+    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
@@ -54,8 +55,6 @@ cc_library(
         ":kernel_utils",
         ":op_logger",
         ":runtime_fallback_tensor",
-        "//tensorflow/core/kernels/batching_util:adaptive_shared_batch_scheduler",
-        "//tensorflow/core/platform:statusor",
         "//tensorflow/core/runtime_fallback/kernel:kernel_fallback_compat_request_state",
         "//tensorflow/core/runtime_fallback/kernel:kernel_fallback_execute_compat",
         "//tensorflow/core/runtime_fallback/kernel:kernel_fallback_tensor",
@@ -64,10 +63,8 @@ cc_library(
         "//tensorflow/core/runtime_fallback/util:type_util",
         "//tensorflow/core/tfrt/runtime:work_queue_interface",
         "//tensorflow/core/tfrt/utils:error_util",
-        "//tensorflow/core/tfrt/utils:fallback_tensor",
         "//tensorflow/core/tfrt/utils:tensor_util",
         "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/strings:str_format",
         "@com_google_absl//absl/synchronization",
         "@com_google_absl//absl/types:span",
         "@llvm-project//llvm:Support",
@@ -150,6 +147,7 @@ cc_library(
     hdrs = ["kernel_utils.h"],
     visibility = [
         ":internal",
+        # copybara:uncomment "//learning/brain/experimental/tfrt:__subpackages__",
         "//tensorflow/compiler/mlir/tfrt:__pkg__",
         "//tensorflow/core/runtime_fallback:__subpackages__",
     ],
@@ -188,9 +186,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/core:framework",
-        "//tensorflow/core:lib",
         "//tensorflow/core/framework:op_requires",
-        "//tensorflow/core/kernels:batch_kernels",
         "//tensorflow/core/kernels/batching_util:adaptive_shared_batch_scheduler",
         "//tensorflow/core/kernels/batching_util:batch_resource_base",
         "//tensorflow/core/kernels/batching_util:bounded_executor",
@@ -203,11 +199,11 @@ cc_library(
         "//tensorflow/core/tfrt/fallback:op_kernel_runner",
         "//tensorflow/core/tfrt/utils:error_util",
         "//tensorflow/core/tfrt/utils:fallback_tensor",
+        "//tensorflow/tsl/platform:errors",
+        "//tensorflow/tsl/platform:status",
+        "//tensorflow/tsl/platform:statusor",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/strings",
-        "@local_tsl//tsl/platform:errors",
-        "@local_tsl//tsl/platform:status",
-        "@local_tsl//tsl/platform:statusor",
         "@tf_runtime//:hostcontext",
     ],
 )

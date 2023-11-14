@@ -57,7 +57,7 @@ FUZZ_TEST(End2EndFuzz, FuzzEndToEnd)
     .WithDomains(
         fuzztest::Arbitrary<SavedModel>(),
         fuzztest::VectorOf(fuzztest::PairOf(fuzztest::Arbitrary<std::string>(),
-                                            fuzzing::AnyValidNumericTensor(
+                                            fuzzing::AnyValidTensor(
                                                 fuzzing::AnyValidTensorShape(
                                                     /*max_rank=*/3,
                                                     /*dim_lower_bound=*/0,

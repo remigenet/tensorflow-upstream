@@ -18,8 +18,6 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/status/statusor.h"
 #include "absl/time/time.h"
 #include "tensorflow/core/data/service/common.pb.h"
 #include "tensorflow/core/data/service/snapshot/path_utils.h"
@@ -27,12 +25,15 @@ limitations under the License.
 #include "tensorflow/core/data/service/snapshot/test_utils.h"
 #include "tensorflow/core/data/service/task_runner.h"
 #include "tensorflow/core/data/service/test_util.h"
-#include "tsl/lib/core/status_test_util.h"
-#include "tsl/lib/io/compression.h"
-#include "tsl/platform/env.h"
-#include "tsl/platform/random.h"
-#include "tsl/platform/status_matchers.h"
-#include "tsl/platform/test.h"
+#include "tensorflow/tsl/lib/core/status_test_util.h"
+#include "tensorflow/tsl/lib/io/compression.h"
+#include "tensorflow/tsl/platform/env.h"
+#include "tensorflow/tsl/platform/errors.h"
+#include "tensorflow/tsl/platform/random.h"
+#include "tensorflow/tsl/platform/status.h"
+#include "tensorflow/tsl/platform/status_matchers.h"
+#include "tensorflow/tsl/platform/statusor.h"
+#include "tensorflow/tsl/platform/test.h"
 
 namespace tensorflow {
 namespace data {
@@ -42,10 +43,10 @@ using ::testing::UnorderedElementsAre;
 using ::testing::ValuesIn;
 using ::tsl::testing::IsOkAndHolds;
 
-absl::StatusOr<std::string> CreateSnapshotDirectory() {
+StatusOr<std::string> CreateSnapshotDirectory() {
   std::string snapshot_path;
   if (!Env::Default()->LocalTempFilename(&snapshot_path)) {
-    return absl::FailedPreconditionError(
+    return errors::FailedPrecondition(
         "Failed to create local temp file for snapshot.");
   }
   TF_RETURN_IF_ERROR(Env::Default()->RecursivelyCreateDir(
@@ -53,8 +54,8 @@ absl::StatusOr<std::string> CreateSnapshotDirectory() {
   return snapshot_path;
 }
 
-absl::StatusOr<int64_t> NumCheckpoints(const std::string& snapshot_path,
-                                       int64_t stream_index) {
+StatusOr<int64_t> NumCheckpoints(const std::string& snapshot_path,
+                                 int64_t stream_index) {
   std::string checkpoints_directory =
       CheckpointsDirectory(snapshot_path, stream_index);
   std::vector<std::string> checkpoint_filenames;

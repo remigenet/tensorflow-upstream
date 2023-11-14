@@ -198,10 +198,8 @@ TEST(ListGetItemTest, GetPresentItem_ReturnsElement_ScalarFallsBackDynamic) {
 }
 
 TEST(ListGetItemTest, GetPresentItem_ReturnsElement_Static) {
-  TensorData output_spec({TensorType_INT32, {2, 2}});
-  output_spec.shape_signature = {2, 2};
   ListGetItemModel m({TensorType_INT32, {}}, {TensorType_INT32, {2}},
-                     output_spec);
+                     {TensorType_INT32, {2, 2}});
 
   m.PopulateListTensor(m.list_input_, {2, 2}, 3, kTfLiteInt32);
   m.ListSetItem(m.list_input_, 1, {2, 2}, kTfLiteInt32,
@@ -221,10 +219,8 @@ TEST(ListGetItemTest, GetPresentItem_ReturnsElement_Static) {
 }
 
 TEST(ListGetItemTest, GetPresentItem_OutputShapeMismatched_Fails_Static) {
-  TensorData output_spec({TensorType_INT32, {2, 2}});
-  output_spec.shape_signature = {2, 2};
   ListGetItemModel m({TensorType_INT32, {}}, {TensorType_INT32, {}},
-                     output_spec);
+                     {TensorType_INT32, {2, 2}});
 
   m.PopulateListTensor(m.list_input_, {}, 3, kTfLiteInt32);
   m.ListSetItem(m.list_input_, 1, {3, 3}, kTfLiteInt32,
@@ -235,10 +231,8 @@ TEST(ListGetItemTest, GetPresentItem_OutputShapeMismatched_Fails_Static) {
 }
 
 TEST(ListGetItemTest, GetUnsetItem_Static) {
-  TensorData output_spec({TensorType_INT32, {2, 2}});
-  output_spec.shape_signature = {2, 2};
   ListGetItemModel m({TensorType_INT32, {}}, {TensorType_INT32, {2}},
-                     output_spec);
+                     {TensorType_INT32, {2, 2}});
 
   m.PopulateListTensor(m.list_input_, {2, 2}, 3, kTfLiteInt32);
   m.PopulateTensor(m.element_shape_input_, {2, 2});

@@ -26,7 +26,7 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -153,8 +153,7 @@ class MatrixDiagPartOp : public OpKernel {
   bool left_align_superdiagonal_ = true;
   bool left_align_subdiagonal_ = true;
   static constexpr int kNumV1Inputs = 1;
-  MatrixDiagPartOp(const MatrixDiagPartOp&) = delete;
-  void operator=(const MatrixDiagPartOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixDiagPartOp);
 };
 
 template <typename Device, typename T>
@@ -291,8 +290,7 @@ class MatrixDiagOp : public OpKernel {
   bool left_align_superdiagonal_ = true;
   bool left_align_subdiagonal_ = true;
   static constexpr int kNumV1Inputs = 1;
-  MatrixDiagOp(const MatrixDiagOp&) = delete;
-  void operator=(const MatrixDiagOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MatrixDiagOp);
 };
 
 #define REGISTER_MATRIX_DIAG(type)                                           \

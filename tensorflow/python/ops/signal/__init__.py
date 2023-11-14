@@ -32,6 +32,4 @@ guide.
 [mel]: https://en.wikipedia.org/wiki/Mel_scale
 [mfcc]: https://en.wikipedia.org/wiki/Mel-frequency_cepstrum
 [stft]: https://en.wikipedia.org/wiki/Short-time_Fourier_transform
-
-API docstring: tensorflow.signal
 """

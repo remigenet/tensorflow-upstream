@@ -189,8 +189,7 @@ class ImplementationSelector : public CustomGraphOptimizer {
 
   std::unique_ptr<FunctionLibraryApiInfo> lib_info_;
 
-  ImplementationSelector(const ImplementationSelector&) = delete;
-  void operator=(const ImplementationSelector&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(ImplementationSelector);
 };
 
 }  // namespace grappler

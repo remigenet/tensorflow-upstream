@@ -270,13 +270,4 @@ string DumpFunctionDefToFile(const string& name, FunctionDef const& fdef,
                     });
 }
 
-string DumpProtoToFile(const string& name,
-                       tensorflow::protobuf::Message const& proto,
-                       const string& dirname) {
-  return DumpToFile(name, dirname, ".pbtxt", proto.GetTypeName(),
-                    [&](WritableFile* file) {
-                      return WriteTextProtoToUniqueFile(proto, file);
-                    });
-}
-
 }  // namespace tensorflow

@@ -21,7 +21,7 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_compiler.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/framework/op_kernel.h"
 
 namespace tensorflow {
@@ -86,8 +86,7 @@ class XlaPadOp : public XlaOpKernel {
   }
 
  private:
-  XlaPadOp(const XlaPadOp&) = delete;
-  void operator=(const XlaPadOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaPadOp);
 };
 
 REGISTER_XLA_OP(Name("XlaPad")

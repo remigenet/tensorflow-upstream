@@ -17,7 +17,6 @@ limitations under the License.
 
 #include <string>
 
-#include "llvm/Support/CommandLine.h"
 #include "mlir/Pass/Pass.h"  // from @llvm-project
 #include "tensorflow/compiler/mlir/tfrt/translate/tfrt_compile_options.h"
 
@@ -101,12 +100,6 @@ struct TfrtPipelineOptions
       llvm::cl::desc("If true, target GPU compiler passes."),
       llvm::cl::init(false)};
 
-  // TODO(b/294895431): Remove the flag and default to the fused op.
-  Option<bool> use_gpu_compile_and_execute_op{
-      *this, "use-gpu-compile-and-execute-op",
-      llvm::cl::desc("If true, gpurt.compile_and_execute is used for GPU"),
-      llvm::cl::init(false)};
-
   Option<bool> func_use_fallback_tensor{
       *this, "func-use-fallback-tensor",
       llvm::cl::desc(
@@ -143,6 +136,12 @@ struct TfrtPipelineOptions
           "The cost threshold to decide whether a sequence of operations is "
           "cheap, and then whether it can be executed inline."),
       llvm::cl::init(1)};
+
+  Option<int64_t> upper_cost_threshold{
+      *this, "tfrt-upper-cost-threshold",
+      llvm::cl::desc(
+          "The threshold to limit the merging of dependent sequence."),
+      llvm::cl::init(-1)};
 
   Option<bool> merge_inter_dependent_streams{
       *this, "tfrt-merge-inter-dependent-streams",

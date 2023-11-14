@@ -194,15 +194,10 @@ class DTensorSPMDTest(test_util.DTensorBaseTest):
       os.environ, {'DTENSOR_ENABLE_REPLICATED_SPMD_AS_DEFAULT_TF.MOD': '1'}
   )
   def testDefaultReplicatedSpmd(self, shard_specs):
-    if test_util.is_gpu_present():
-      dtype = dtypes.int32
-    else:
-      dtype = dtypes.float32
-
     x = stateless_random_ops.stateless_random_uniform(
-        shape=[4, 8], seed=[0, 1], maxval=7, dtype=dtype
+        shape=[4, 8], seed=[0, 1], dtype=dtypes.float32
     )
-    y = constant_op.constant(7, dtype=dtype)
+    y = constant_op.constant(7, dtype=dtypes.float32)
 
     expected_result = math_ops.Mod(x=x, y=y)
     expected_layout = Layout.replicated(self.mesh, rank=2)
@@ -784,12 +779,8 @@ class DTensorSPMDTest(test_util.DTensorBaseTest):
 
   @parameterized.named_parameters(test_util_ops.BINARY_INT_OPS)
   def testBinaryIntOpsWithFullyShardedInputs(self, op):
-    dtype = dtypes.int64
-    if test_util.is_gpu_present() and op is gen_math_ops.truncate_mod:
-      dtype = dtypes.int32
-
-    a = constant_op.constant(np.arange(8).reshape((2, 4)), dtype=dtype)
-    b = constant_op.constant(np.arange(8).reshape((2, 4)) + 1, dtype=dtype)
+    a = constant_op.constant(np.arange(8).reshape((2, 4)))
+    b = constant_op.constant(np.arange(8).reshape((2, 4)) + 1)
     expected_result = op(a, b)
 
     sharded_layout_2d = Layout([_MESH_DIM_X, _MESH_DIM_Y], self.mesh)
@@ -820,12 +811,8 @@ class DTensorSPMDTest(test_util.DTensorBaseTest):
 
   @parameterized.named_parameters(test_util_ops.BINARY_INT_OPS)
   def testBinaryIntOpsWithBatchShardedInputs(self, op):
-    dtype = dtypes.int64
-    if test_util.is_gpu_present() and op is gen_math_ops.truncate_mod:
-      dtype = dtypes.int32
-
-    a = constant_op.constant(np.array([[1, 2], [3, 4]]), dtype=dtype)
-    b = constant_op.constant(np.array([[5, 6], [7, 4]]), dtype=dtype)
+    a = constant_op.constant(np.array([[1, 2], [3, 4]]))
+    b = constant_op.constant(np.array([[5, 6], [7, 4]]))
     expected_result = op(a, b)
 
     a = api.relayout(a, self.first_dimension_sharded_layout)
@@ -1095,11 +1082,6 @@ class DTensorSPMDTest(test_util.DTensorBaseTest):
   @parameterized.named_parameters(test_util_ops.REDUCTION_OPS)
   def testReductionOpsWithBatchParallelInputsWithInt64Dtype(self, op):
     self.skipForDeviceType(['TPU'], 'reduce on TPU only supports int32')
-    # TODO(b/303662238): Replicate soft placement (or implement these kernels).
-    if test_util.use_multi_device_mode() and (
-        op is math_ops.reduce_min or op is math_ops.reduce_mean
-    ):
-      self.skipForDeviceType(['GPU'], 'reduce on GPU only supports floats')
 
     sharded_layout_1d = Layout([_MESH_DIM_X], self.mesh)
     for axis, expected_layout in [
@@ -2308,9 +2290,6 @@ class DTensorSPMDTest(test_util.DTensorBaseTest):
                                   ('Replicated', 'replicated'))
   def testStringFormat(self, shard_spec):
     self.skipForDeviceType(['TPU'], 'StringFormat not supported on TPU.')
-    # TODO(b/303662238): See whether we can replicate soft placement here.
-    if test_util.use_multi_device_mode():
-      self.skipForDeviceType(['GPU'], 'StringFormat not supported on GPU.')
 
     np.random.seed(123)
     inputs = constant_op.constant(

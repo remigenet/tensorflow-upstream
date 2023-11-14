@@ -438,8 +438,7 @@ class DirectSession : public Session {
   // pool according to other specifications of RunOptions and ConfigProto.
   bool run_in_caller_thread_ = false;
 
-  DirectSession(const DirectSession&) = delete;
-  void operator=(const DirectSession&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DirectSession);
 
   // EXPERIMENTAL: debugger (tfdbg) related
   friend class DebugGateway;

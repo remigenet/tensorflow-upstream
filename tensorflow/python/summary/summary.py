@@ -17,8 +17,6 @@
 
 See the [Summaries and
 TensorBoard](https://www.tensorflow.org/guide/summaries_and_tensorboard) guide.
-
-API docstring: tensorflow.summary
 """
 
 import contextlib
@@ -97,7 +95,7 @@ def scalar(name, tensor, collections=None, family=None):
   TF 2.0](https://www.tensorflow.org/tensorboard/migrate#in_tf_1x) for concrete
   steps for migration. `tf.summary.scalar` can also log training metrics in
   Keras, you can check [Logging training metrics in
-  Keras](https://www.tensorflow.org/tensorboard/scalars_and_keras) for details.
+  Keras](https://www.tensorflow.org/tensorboard/scalars_and_keras) for detials.
 
   #### How to Map Arguments
 

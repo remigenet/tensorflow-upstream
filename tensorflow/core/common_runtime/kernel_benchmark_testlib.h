@@ -73,8 +73,7 @@ class Benchmark {
   FunctionLibraryRuntime* flr_;  // Not owned.
   std::unique_ptr<Executor> exec_;
 
-  Benchmark(const Benchmark&) = delete;
-  void operator=(const Benchmark&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(Benchmark);
 };
 
 // Returns the rendezvous key associated with the given Send/Recv node.

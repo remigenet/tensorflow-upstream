@@ -76,8 +76,7 @@ class CreateTRTResourceHandle : public OpKernel {
   mutex mutex_;
   bool initialized_ TF_GUARDED_BY(mutex_) = false;
 
-  CreateTRTResourceHandle(const CreateTRTResourceHandle&) = delete;
-  void operator=(const CreateTRTResourceHandle&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CreateTRTResourceHandle);
 };
 
 REGISTER_KERNEL_BUILDER(Name("CreateTRTResourceHandle")
@@ -177,8 +176,7 @@ class InitializeTRTResource : public OpKernel {
   // Maximum number of cached engines
   int max_cached_engines_;
 
-  InitializeTRTResource(const InitializeTRTResource&) = delete;
-  void operator=(const InitializeTRTResource&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(InitializeTRTResource);
 };
 
 REGISTER_KERNEL_BUILDER(Name("InitializeTRTResource")
@@ -297,8 +295,7 @@ class SerializeTRTResource : public OpKernel {
   bool delete_resource_ = false;
   bool save_gpu_specific_engines_ = true;
 
-  SerializeTRTResource(const SerializeTRTResource&) = delete;
-  void operator=(const SerializeTRTResource&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SerializeTRTResource);
 };
 
 REGISTER_KERNEL_BUILDER(Name("SerializeTRTResource").Device(DEVICE_GPU),

@@ -67,8 +67,7 @@ class FIFOQueue : public TypedQueue<std::deque<Tensor> > {
                                              Tensor* out_tensor);
 
  private:
-  FIFOQueue(const FIFOQueue&) = delete;
-  void operator=(const FIFOQueue&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FIFOQueue);
 };
 
 // Defines a FIFOQueueOp, which produces a Queue (specifically, one
@@ -84,8 +83,7 @@ class FIFOQueueOp : public TypedQueueOp {
       TF_EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
   std::vector<TensorShape> component_shapes_;
-  FIFOQueueOp(const FIFOQueueOp&) = delete;
-  void operator=(const FIFOQueueOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FIFOQueueOp);
 };
 
 }  // namespace tensorflow

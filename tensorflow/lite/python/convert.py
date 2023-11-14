@@ -586,7 +586,6 @@ def build_conversion_flags(
     mlir_print_ir_module_scope=None,
     mlir_elide_elementsattrs_if_larger=None,
     use_buffer_offset=False,
-    reduce_type_precision=False,
     **_
 ):
   """Builds protocol buffer describing a conversion of a model.
@@ -708,9 +707,6 @@ def build_conversion_flags(
     use_buffer_offset: Force the model use buffer_offset & buffer_size fields
       instead of data. i.e. store the constant tensor and custom op binaries
       outside of Flatbuffers
-    reduce_type_precision: Convert some tensor types to a lower precision if all
-      values within that tensor are within the range of the lower precision.
-      This could have side effects e.g. reduced flatbuffer size.
 
   Returns:
     conversion_flags: protocol buffer describing the conversion process.
@@ -822,8 +818,6 @@ def build_conversion_flags(
 
   if use_buffer_offset is not None:
     conversion_flags.use_buffer_offset = use_buffer_offset
-  if reduce_type_precision is not None:
-    conversion_flags.reduce_type_precision = reduce_type_precision
   return conversion_flags
 
 

@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/python/saved_model/pywrap_saved_model_fingerprinting.h"
-
 #include <exception>
 #include <string>
 
@@ -133,7 +131,7 @@ void DefineFingerprintingModule(py::module main_module) {
           "there is none."));
 
   m.def(
-      "SingleprintFromFP",
+      "SingleprintFromSM",
       [](std::string export_dir) {
         StatusOr<std::string> singleprint =
             fingerprinting::Singleprint(export_dir);
@@ -142,40 +140,10 @@ void DefineFingerprintingModule(py::module main_module) {
         }
         throw FingerprintException(
             absl::StrCat(
-                std::string("Could not create singleprint from the fingerprint "
-                            "specified by the export_dir."),
+                std::string(
+                    "Could not create singleprint from the saved_model."),
                 "\n", singleprint.status().ToString())
                 .c_str());
-      },
-      py::arg("export_dir"),
-      py::doc("Canonical fingerprinting ID for a SavedModel."));
-
-  m.def(
-      "SingleprintFromSM",
-      [](std::string export_dir) {
-        StatusOr<FingerprintDef> fingerprint_def =
-            fingerprinting::CreateFingerprintDef(export_dir);
-        if (!fingerprint_def.ok()) {
-          throw FingerprintException(
-              absl::StrCat(
-                  std::string(
-                      "Could not create singleprint from the saved_model."),
-                  "\n", fingerprint_def.status().ToString())
-                  .c_str());
-        }
-
-        StatusOr<std::string> singleprint =
-            fingerprinting::Singleprint(fingerprint_def.value());
-        if (!singleprint.ok()) {
-          throw FingerprintException(
-              absl::StrCat(
-                  std::string(
-                      "Could not create singleprint from the saved_model."),
-                  "\n", singleprint.status().ToString())
-                  .c_str());
-        }
-
-        return py::str(singleprint.value());
       },
       py::arg("export_dir"),
       py::doc("Canonical fingerprinting ID for a SavedModel."));

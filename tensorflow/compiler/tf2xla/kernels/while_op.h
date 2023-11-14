@@ -66,8 +66,7 @@ class XlaWhileOp : public XlaOpKernel {
   // overheads.
   bool propagate_compile_time_consts_ = false;
 
-  XlaWhileOp(const XlaWhileOp&) = delete;
-  void operator=(const XlaWhileOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaWhileOp);
 };
 
 }  // namespace tensorflow

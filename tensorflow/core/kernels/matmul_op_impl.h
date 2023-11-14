@@ -26,7 +26,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/register_types.h"
 #include "tensorflow/core/framework/tensor.h"
@@ -43,26 +43,24 @@ limitations under the License.
 #include "tensorflow/core/util/work_sharder.h"
 
 #if defined(TENSORFLOW_USE_CUSTOM_CONTRACTION_KERNEL)
-#include "tsl/framework/contraction/eigen_contraction_kernel.h"
+#include "tensorflow/tsl/framework/contraction/eigen_contraction_kernel.h"
 #endif
 
 #if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
-#include "xla/stream_executor/host_or_device_scalar.h"
 #include "tensorflow/core/kernels/gpu_utils.h"
-#include "tensorflow/core/kernels/matmul_util.h"
 #include "tensorflow/core/kernels/numeric_options_utils.h"
 #include "tensorflow/core/platform/stream_executor.h"
-#include "xla/stream_executor/host_or_device_scalar.h"
+#include "tensorflow/compiler/xla/stream_executor/host_or_device_scalar.h"
 #include "tensorflow/core/kernels/matmul_util.h"
 #endif  // GOOGLE_CUDA || TENSORFLOW_USE_ROCM
 #if GOOGLE_CUDA
 #include "third_party/gpus/cuda/include/cuda.h"
-#include "xla/stream_executor/cuda/cuda_blas_lt.h"
+#include "tensorflow/compiler/xla/stream_executor/cuda/cuda_blas_lt.h"
 #endif  // GOOGLE_CUDA
 #if TENSORFLOW_USE_ROCM
 #include "rocm/rocm_config.h"
 #if TF_HIPBLASLT
-#include "xla/stream_executor/rocm/hip_blas_lt.h"
+#include "tensorflow/compiler/xla/stream_executor/rocm/hip_blas_lt.h"
 #endif
 #endif
 
@@ -412,7 +410,8 @@ template <typename Scalar>
 struct LaunchBatchMatMul<CPUDevice, Scalar> {
   static void Launch(OpKernelContext* context, const Tensor& in_x,
                      const Tensor& in_y, bool adj_x, bool adj_y, bool trans_x,
-                     bool trans_y, const MatMulBCast& bcast, Tensor* out) {
+                     bool trans_y, bool grad_x, bool grad_y,
+                     const MatMulBCast& bcast, Tensor* out) {
     typedef ParallelMatMulKernel<Scalar, Eigen::NumTraits<Scalar>::IsComplex>
         ParallelMatMulKernel;
     bool conjugate_result = false;
@@ -541,7 +540,8 @@ template <typename Scalar>
 struct LaunchBatchMatMul<GPUDevice, Scalar> {
   static void Launch(OpKernelContext* context, const Tensor& in_x,
                      const Tensor& in_y, bool adj_x, bool adj_y, bool trans_x,
-                     bool trans_y, const MatMulBCast& bcast, Tensor* out) {
+                     bool trans_y, bool grad_x, bool grad_y,
+                     const MatMulBCast& bcast, Tensor* out) {
     se::blas::Transpose trans[] = {se::blas::Transpose::kNoTranspose,
                                    se::blas::Transpose::kTranspose,
                                    se::blas::Transpose::kConjugateTranspose};
@@ -584,14 +584,24 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
                                     std::is_same_v<Scalar, Eigen::bfloat16>;
     using Coefficient = std::conditional_t<is_16bit_input, float, Scalar>;
 
+    se::blas::CallContext call_context = se::blas::CallContext::kNone;
+    if (grad_x) {
+      call_context = se::blas::CallContext::kBackpropInput1;
+    }
+    if (grad_y) {
+      call_context = se::blas::CallContext::kBackpropInput2;
+    }
+
 #if GOOGLE_CUDA || TF_HIPBLASLT
     static const bool use_autotune = MatmulAutotuneEnable();
     bool bCublasLtSupport = true;
 #if TF_HIPBLASLT
-    if (!std::is_same_v<Scalar, float>) bCublasLtSupport = false;
+    if(!std::is_same_v<Scalar, float>)
+      bCublasLtSupport = false;
     auto cap = stream->GetRocmComputeCapability();
     // as of ROCm 5.5, hipblaslt only supports MI200.
-    if (cap.gcn_arch_name().substr(0, 6) != "gfx90a") bCublasLtSupport = false;
+    if(cap.gcn_arch_name().substr(0,6) != "gfx90a")
+      bCublasLtSupport = false;
 #endif
     if (EnableCublasLtGemm() && bCublasLtSupport) {
       static const int64_t max_scratch_size =
@@ -622,38 +632,42 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
         std::optional<int> max_algorithm_count;
         if (!use_autotune) max_algorithm_count = 1;
         absl::Mutex* pmu = nullptr;
-        auto plan_and_algorithms_or = GetPlanAndAlgorithms(
-            stream, matmul_params, &pmu, max_algorithm_count);
+        auto plan_and_algorithms_or =
+            GetPlanAndAlgorithms(stream, matmul_params, &pmu, max_algorithm_count);
         OP_REQUIRES_OK(context, plan_and_algorithms_or.status());
         absl::MutexLock lock(pmu);
         const auto* plan_and_algorithms =
             std::move(plan_and_algorithms_or).value();
-        auto n_algorithms = plan_and_algorithms->algorithms.size();
+        const auto& plan = plan_and_algorithms->plan;
+        const auto& algorithms = plan_and_algorithms->algorithms;
+        se::gpu::BlasLt* blas_lt = se::gpu::GetBlasLt(stream);
+        OP_REQUIRES(context, blas_lt != nullptr,
+                    errors::Internal("blaslt not supported"));
 
         se::blas::AlgorithmConfig algorithm_config(se::blas::kNoAlgorithm);
         if (!use_autotune) {
           algorithm_config.set_algorithm(0);
         } else if (!AutoTuneBatchMatmul::GetInstance()->Find(
                        matmul_params, &algorithm_config)) {
-          VLOG(4) << "Autotuning BlasLtMatmul over " << n_algorithms
+          VLOG(4) << "Autotuning BlasLtMatmul over " << algorithms.size()
                   << " algorithms.";
           se::blas::ProfileResult best_result;
           se::blas::ProfileResult profile_result;
 
-          for (size_t i = 0; i != n_algorithms; ++i) {
+          for (size_t i = 0; i != algorithms.size(); ++i) {
+            const auto& profile_algorithm = algorithms[i];
             // Create a new scratch allocator with every autotuning run so that
             // scratch space is deallocated between runs.
             BlasScratchAllocator scratch_allocator(context, max_scratch_size);
             Status cublas_launch_status =
-                DoBlasLtMatmul(stream, *plan_and_algorithms, *a_ptrs[0],
-                               *b_ptrs[0], *c_ptrs[0], i, scratch_allocator,
+                DoBlasLtMatmul(stream, plan, *a_ptrs[0], *b_ptrs[0], *c_ptrs[0],
+                               profile_algorithm, scratch_allocator,
                                /*bias = */ {}, &profile_result);
 
             VLOG(4) << "  Autotune algorithm " << i
                     << " result: " << profile_result.elapsed_time_in_ms()
                     << " ms, valid=" << profile_result.is_valid()
-                    << ", workspace_size="
-                    << plan_and_algorithms->algorithms[i].workspace_size;
+                    << ", workspace_size=" << profile_algorithm.workspace_size;
 
             if (cublas_launch_status.ok() && profile_result.is_valid() &&
                 profile_result.elapsed_time_in_ms() <
@@ -674,8 +688,10 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
                                                      algorithm_config);
         }
         se::blas::AlgorithmType algorithm_idx = algorithm_config.algorithm();
-        OP_REQUIRES(context, 0 <= algorithm_idx && algorithm_idx < n_algorithms,
+        OP_REQUIRES(context,
+                    0 <= algorithm_idx && algorithm_idx < algorithms.size(),
                     errors::Internal("Missing/invalid BatchMatmul algorithm"));
+        const auto& algorithm = algorithms[algorithm_idx];
         BlasScratchAllocator scratch_allocator(context, max_scratch_size);
         VLOG(4) << "Calling BlasLtMatMul: a.shape=(" << bcast.x_batch_size()
                 << ", " << in_x.dim_size(1) << ", " << in_x.dim_size(2)
@@ -686,9 +702,8 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
                 << "adj_x = " << adj_x << "adj_y = " << adj_y;
 
         OP_REQUIRES_OK(
-            context,
-            DoBlasLtMatmul(stream, *plan_and_algorithms, *a_ptrs[0], *b_ptrs[0],
-                           *c_ptrs[0], algorithm_idx, scratch_allocator));
+            context, DoBlasLtMatmul(stream, plan, *a_ptrs[0], *b_ptrs[0],
+                                    *c_ptrs[0], algorithm, scratch_allocator));
       } else {  // requires mixed broadcasting
         const std::vector<int64_t>& a_batch_indices = bcast.x_batch_indices();
         const std::vector<int64_t>& b_batch_indices = bcast.y_batch_indices();
@@ -713,8 +728,7 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
                     static_cast<Coefficient>(1.0), b_ptrs,
                     adj_y || trans_y ? k : n, a_ptrs, adj_x || trans_x ? m : k,
                     static_cast<Coefficient>(0.0), c_ptrs, n, batch_size,
-                    GetNumericOptions(), &scratch_allocator,
-                    se::blas::CallContext::kNone)
+                    GetNumericOptions(), &scratch_allocator, call_context)
                 .ok();
         if (!blas_launch_status) {
           context->SetStatus(errors::Internal(
@@ -808,22 +822,22 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
           }
         }
 
-        OP_REQUIRES_OK(context,
-                       stream->ThenBlasGemm(
-                           blas_transpose_b, blas_transpose_a, n, m, k,
-                           *(b_ptrs[0]), adj_y || trans_y ? k : n, *(a_ptrs[0]),
-                           adj_x || trans_x ? m : k, c_ptrs[0], n,
-                           GetNumericOptions(), se::blas::CallContext::kNone));
+        OP_REQUIRES_OK(context, stream->ThenBlasGemm(
+                                    blas_transpose_b, blas_transpose_a, n, m, k,
+                                    *(b_ptrs[0]), adj_y || trans_y ? k : n,
+                                    *(a_ptrs[0]), adj_x || trans_x ? m : k,
+                                    c_ptrs[0], n, GetNumericOptions(),
+                                    call_context));
       } else if (use_strided_batched) {
         OP_REQUIRES_OK(
-            context,
-            stream->ThenBlasGemmStridedBatched(
-                blas_transpose_b, blas_transpose_a, n, m, k,
-                static_cast<Coefficient>(1.0), *b_ptrs[0],
-                adj_y || trans_y ? k : n, b_stride, *a_ptrs[0],
-                adj_x || trans_x ? m : k, a_stride,
-                static_cast<Coefficient>(0.0), c_ptrs[0], n, c_stride,
-                batch_size, GetNumericOptions(), se::blas::CallContext::kNone));
+            context, stream->ThenBlasGemmStridedBatched(
+                         blas_transpose_b, blas_transpose_a, n, m, k,
+                         static_cast<Coefficient>(1.0), *b_ptrs[0],
+                         adj_y || trans_y ? k : n, b_stride, *a_ptrs[0],
+                         adj_x || trans_x ? m : k, a_stride,
+                         static_cast<Coefficient>(0.0), c_ptrs[0], n, c_stride,
+                         batch_size, GetNumericOptions(),
+                         call_context));
       } else {
         BlasScratchAllocator scratch_allocator(context);
         bool blas_launch_status =
@@ -834,7 +848,7 @@ struct LaunchBatchMatMul<GPUDevice, Scalar> {
                     adj_y || trans_y ? k : n, a_ptrs, adj_x || trans_x ? m : k,
                     static_cast<Coefficient>(0.0), c_ptrs, n, batch_size,
                     GetNumericOptions(), &scratch_allocator,
-                    se::blas::CallContext::kNone)
+                    call_context)
                 .ok();
         if (!blas_launch_status) {
           context->SetStatus(errors::Internal(
@@ -864,11 +878,15 @@ class BaseBatchMatMulOp : public OpKernel {
       OP_REQUIRES_OK(context, context->GetAttr("transpose_b", &trans_y_));
       adj_x_ = false;
       adj_y_ = false;
+      OP_REQUIRES_OK(context, context->GetAttr("grad_a", &grad_input_1_));
+      OP_REQUIRES_OK(context, context->GetAttr("grad_b", &grad_input_2_));
     } else {
       OP_REQUIRES_OK(context, context->GetAttr("adj_x", &adj_x_));
       OP_REQUIRES_OK(context, context->GetAttr("adj_y", &adj_y_));
       trans_x_ = false;
       trans_y_ = false;
+      OP_REQUIRES_OK(context, context->GetAttr("grad_x", &grad_input_1_));
+      OP_REQUIRES_OK(context, context->GetAttr("grad_y", &grad_input_2_));
     }
   }
 
@@ -953,7 +971,7 @@ class BaseBatchMatMulOp : public OpKernel {
 
       LaunchBatchMatMul<Device, float>::Launch(
           ctx, in0_reshaped_float, in1_reshaped_float, adj_x_, adj_y_, trans_x_,
-          trans_y_, bcast, &out_reshaped_float);
+          trans_y_, grad_input_1_, grad_input_2_, bcast, &out_reshaped_float);
       FloatToBFloat16(out_reshaped_float.flat<float>().data(),
                       out_reshaped.flat<bfloat16>().data(), out->NumElements());
     } else {
@@ -965,9 +983,9 @@ class BaseBatchMatMulOp : public OpKernel {
       if (!std::is_same<Tb, Tout>::value) {
         in1_reshaped = CastTensor<Tb, Tout>(in1_reshaped);
       }
-      LaunchBatchMatMul<Device, Tout>::Launch(ctx, in0_reshaped, in1_reshaped,
-                                              adj_x_, adj_y_, trans_x_,
-                                              trans_y_, bcast, &out_reshaped);
+      LaunchBatchMatMul<Device, Tout>::Launch(
+          ctx, in0_reshaped, in1_reshaped, adj_x_, adj_y_, trans_x_, trans_y_,
+          grad_input_1_, grad_input_2_, bcast, &out_reshaped);
     }
   }
 
@@ -981,6 +999,8 @@ class BaseBatchMatMulOp : public OpKernel {
   bool adj_y_ = false;
   bool trans_x_ = false;
   bool trans_y_ = false;
+  bool grad_input_1_ = false;
+  bool grad_input_2_ = false;
 
   // Cast `t` from `SrcT` to `DstT`.
   template <typename SrcT, typename DstT>

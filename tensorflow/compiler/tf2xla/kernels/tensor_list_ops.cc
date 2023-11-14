@@ -26,10 +26,10 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/literal.h"
-#include "xla/status_macros.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/literal.h"
+#include "tensorflow/compiler/xla/status_macros.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/partial_tensor_shape.h"
@@ -101,8 +101,7 @@ class TensorListLengthOp : public XlaOpKernel {
   }
 
  private:
-  TensorListLengthOp(const TensorListLengthOp&) = delete;
-  void operator=(const TensorListLengthOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListLengthOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListLength").IsMetadataOp(), TensorListLengthOp);
@@ -203,8 +202,7 @@ class TensorListReserveOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  TensorListReserveOp(const TensorListReserveOp&) = delete;
-  void operator=(const TensorListReserveOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListReserveOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListReserve")
@@ -278,8 +276,7 @@ class EmptyTensorListOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  EmptyTensorListOp(const EmptyTensorListOp&) = delete;
-  void operator=(const EmptyTensorListOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(EmptyTensorListOp);
 };
 
 REGISTER_XLA_OP(Name("EmptyTensorList")
@@ -341,8 +338,7 @@ class TensorListElementShapeOp : public XlaOpKernel {
  private:
   DataType shape_type_;
 
-  TensorListElementShapeOp(const TensorListElementShapeOp&) = delete;
-  void operator=(const TensorListElementShapeOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListElementShapeOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListElementShape").IsMetadataOp(),
@@ -381,8 +377,7 @@ class TensorListGetItemOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  TensorListGetItemOp(const TensorListGetItemOp&) = delete;
-  void operator=(const TensorListGetItemOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListGetItemOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListGetItem"), TensorListGetItemOp);
@@ -435,8 +430,7 @@ class TensorListGatherOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  TensorListGatherOp(const TensorListGatherOp&) = delete;
-  void operator=(const TensorListGatherOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListGatherOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListGather"), TensorListGatherOp);
@@ -466,8 +460,7 @@ class TensorListStackOp : public XlaOpKernel {
   }
 
  private:
-  TensorListStackOp(const TensorListStackOp&) = delete;
-  void operator=(const TensorListStackOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListStackOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListStack"), TensorListStackOp);
@@ -522,8 +515,7 @@ class TensorListConcatOp : public XlaOpKernel {
   }
 
  private:
-  TensorListConcatOp(const TensorListConcatOp&) = delete;
-  void operator=(const TensorListConcatOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListConcatOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListConcatV2"), TensorListConcatOp);
@@ -581,8 +573,7 @@ class TensorListSplitOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  TensorListSplitOp(const TensorListSplitOp&) = delete;
-  void operator=(const TensorListSplitOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListSplitOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListSplit")
@@ -607,8 +598,7 @@ class TensorListFromTensorOp : public XlaOpKernel {
   }
 
  private:
-  TensorListFromTensorOp(const TensorListFromTensorOp&) = delete;
-  void operator=(const TensorListFromTensorOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListFromTensorOp);
 };
 
 REGISTER_XLA_OP(
@@ -643,8 +633,7 @@ class TensorListSetItemOp : public XlaOpKernel {
   }
 
  private:
-  TensorListSetItemOp(const TensorListSetItemOp&) = delete;
-  void operator=(const TensorListSetItemOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListSetItemOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListSetItem"), TensorListSetItemOp);
@@ -671,8 +660,7 @@ class TensorListPushBackOp : public XlaOpKernel {
   }
 
  private:
-  TensorListPushBackOp(const TensorListPushBackOp&) = delete;
-  void operator=(const TensorListPushBackOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListPushBackOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListPushBack").AllowVariantTypes(),
@@ -708,8 +696,7 @@ class TensorListPopBackOp : public XlaOpKernel {
  private:
   DataType dtype_;
 
-  TensorListPopBackOp(const TensorListPopBackOp&) = delete;
-  void operator=(const TensorListPopBackOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(TensorListPopBackOp);
 };
 
 REGISTER_XLA_OP(Name("TensorListPopBack").AllowVariantTypes(),

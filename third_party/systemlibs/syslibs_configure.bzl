@@ -32,6 +32,7 @@ VALID_LIBS = [
     "libjpeg_turbo",
     "nasm",
     "nsync",
+    "opt_einsum_archive",
     "org_sqlite",
     "pasta",
     "png",

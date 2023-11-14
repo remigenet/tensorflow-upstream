@@ -1,4 +1,3 @@
-# Placeholder: load py_proto_library
 load(
     "//tensorflow/core/platform:build_config.bzl",
     "tf_additional_all_protos",

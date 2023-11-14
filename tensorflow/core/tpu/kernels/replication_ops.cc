@@ -14,8 +14,10 @@ limitations under the License.
 ==============================================================================*/
 
 #include "tensorflow/compiler/jit/xla_device_ops.h"
+#include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/framework/types.h"
+#include "tensorflow/core/framework/shape_inference.h"
+#include "tensorflow/core/tpu/tpu_defs.h"
 
 namespace tensorflow {
 

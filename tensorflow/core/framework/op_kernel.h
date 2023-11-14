@@ -219,8 +219,7 @@ class OpKernel {
   const bool is_deferred_;
   bool expensive_;
 
-  OpKernel(const OpKernel&) = delete;
-  void operator=(const OpKernel&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(OpKernel);
 };
 
 class AsyncOpKernel : public OpKernel {
@@ -366,8 +365,7 @@ class OpKernelConstruction {
   // Allow access from OpKernel ctor.
   friend class OpKernel;
 
-  OpKernelConstruction(const OpKernelConstruction&) = delete;
-  void operator=(const OpKernelConstruction&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(OpKernelConstruction);
 };
 
 // TODO(mrry): Consider converting to a random_access_iterator, and upgrading
@@ -1320,8 +1318,7 @@ class OpKernelContext {
   friend void CheckNotInComputeAsync(OpKernelContext* ctx,
                                      const char* correct_macro_name);
 
-  OpKernelContext(const OpKernelContext&) = delete;
-  void operator=(const OpKernelContext&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(OpKernelContext);
 };
 
 template <>

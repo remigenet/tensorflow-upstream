@@ -521,8 +521,7 @@ class DepthwiseConv2dNativeOp : public BinaryOp<T> {
   bool cudnn_use_autotune_;
   DataType dtype_;
 
-  DepthwiseConv2dNativeOp(const DepthwiseConv2dNativeOp&) = delete;
-  void operator=(const DepthwiseConv2dNativeOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DepthwiseConv2dNativeOp);
 };
 
 #define REGISTER_CPU_KERNEL(T)                                                 \

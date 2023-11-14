@@ -19,7 +19,7 @@ limitations under the License.
 #define EIGEN_USE_GPU
 #endif
 
-#include "unsupported/Eigen/CXX11/Tensor"  // from @eigen_archive
+#include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor_shape.h"
@@ -381,8 +381,7 @@ struct CSRSparseMatrixAdd<GPUDevice, T>
   const T beta_;
   bool initialized_;
 
-  CSRSparseMatrixAdd(const CSRSparseMatrixAdd&) = delete;
-  void operator=(const CSRSparseMatrixAdd&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(CSRSparseMatrixAdd);
 };
 
 }  // namespace functor

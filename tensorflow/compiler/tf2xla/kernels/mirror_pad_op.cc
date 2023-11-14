@@ -16,8 +16,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/lib/constants.h"
-#include "xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/client/lib/constants.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/util/mirror_pad_mode.h"
 
 namespace tensorflow {
@@ -103,8 +103,7 @@ class MirrorPadOp : public XlaOpKernel {
   }
 
  private:
-  MirrorPadOp(const MirrorPadOp&) = delete;
-  void operator=(const MirrorPadOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MirrorPadOp);
 };
 
 REGISTER_XLA_OP(Name("MirrorPad").CompileTimeConstantInput("paddings"),
@@ -204,8 +203,7 @@ class MirrorPadGradOp : public XlaOpKernel {
   }
 
  private:
-  MirrorPadGradOp(const MirrorPadGradOp&) = delete;
-  void operator=(const MirrorPadGradOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(MirrorPadGradOp);
 };
 
 REGISTER_XLA_OP(Name("MirrorPadGrad").CompileTimeConstantInput("paddings"),

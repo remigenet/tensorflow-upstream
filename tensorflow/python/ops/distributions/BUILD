@@ -8,7 +8,7 @@ package(
 
 py_strict_library(
     name = "distributions",
-    srcs = ["__init__.py"],
+    srcs = ["distributions.py"],
     deprecation = ("TensorFlow Distributions has migrated to " +
                    "TensorFlow Probability " +
                    "(https://github.com/tensorflow/probability). " +
@@ -16,15 +16,6 @@ py_strict_library(
                    "will not receive new features, and will be removed by " +
                    "early 2019. You should update all usage of " +
                    "`tf.distributions` to `tfp.distributions`."),
-    srcs_version = "PY3",
-    deps = [
-        ":distributions_py",
-    ],
-)
-
-py_strict_library(
-    name = "distributions_py",
-    srcs = ["distributions.py"],
     srcs_version = "PY3",
     deps = [
         ":bernoulli",

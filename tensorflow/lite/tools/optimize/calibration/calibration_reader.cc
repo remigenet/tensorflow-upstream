@@ -15,17 +15,13 @@ limitations under the License.
 #include "tensorflow/lite/tools/optimize/calibration/calibration_reader.h"
 
 #include <memory>
-#include <tuple>
 #include <utility>
 
-#include "absl/container/flat_hash_map.h"
 #include "absl/memory/memory.h"
-#include "tensorflow/lite/core/c/c_api_types.h"
 
 namespace tflite {
 namespace optimize {
 namespace calibration {
-
 TfLiteStatus CalibrationReader::GetTensorStatsAsMap(
     absl::flat_hash_map<std::tuple<int, int>, CalibrationStats>*
         tensor_id_to_stats_map) const {
@@ -41,7 +37,7 @@ TfLiteStatus CalibrationReader::GetTensorStatsAsMap(
 }
 
 TfLiteStatus CalibrationReader::AddCalibrationToModel(ModelT* model,
-                                                      const bool update) const {
+                                                      bool update) const {
   if (!model || model->subgraphs.empty()) {
     return kTfLiteError;
   }

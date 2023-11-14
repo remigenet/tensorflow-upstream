@@ -175,11 +175,7 @@ pybind_extension(
     ],
     hdrs = ["test_registerer.h"],
     additional_exported_symbols = ["TF_TestRegisterer"],
-    enable_stub_generation = True,
     link_in_framework = True,
-    pytype_srcs = [
-        "_pywrap_test_registerer.pyi",
-    ],
     deps = [
         ":test_registerer",
         "//tensorflow/lite:framework",

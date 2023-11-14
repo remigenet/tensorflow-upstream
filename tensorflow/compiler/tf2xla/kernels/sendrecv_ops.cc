@@ -18,8 +18,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_helpers.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/kernel_def_builder.h"
 #include "tensorflow/core/framework/types.h"
 
@@ -34,8 +34,7 @@ class SendOp : public XlaOpKernel {
  private:
   string tensor_name_;
 
-  SendOp(const SendOp&) = delete;
-  void operator=(const SendOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(SendOp);
 };
 
 SendOp::SendOp(OpKernelConstruction* ctx) : XlaOpKernel(ctx) {
@@ -60,8 +59,7 @@ class RecvOp : public XlaOpKernel {
   string tensor_name_;
   xla::Shape shape_;
 
-  RecvOp(const RecvOp&) = delete;
-  void operator=(const RecvOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(RecvOp);
 };
 
 RecvOp::RecvOp(OpKernelConstruction* ctx) : XlaOpKernel(ctx) {

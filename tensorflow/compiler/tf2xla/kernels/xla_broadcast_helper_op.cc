@@ -22,8 +22,8 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_compiler.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
-#include "xla/client/xla_builder.h"
-#include "xla/xla_data.pb.h"
+#include "tensorflow/compiler/xla/client/xla_builder.h"
+#include "tensorflow/compiler/xla/xla_data.pb.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/lib/core/errors.h"
 
@@ -104,8 +104,7 @@ class XlaBroadcastHelperOp : public XlaOpKernel {
  private:
   xla::DotDimensionNumbers dnums_;
 
-  XlaBroadcastHelperOp(const XlaBroadcastHelperOp&) = delete;
-  void operator=(const XlaBroadcastHelperOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(XlaBroadcastHelperOp);
 };
 
 REGISTER_XLA_OP(

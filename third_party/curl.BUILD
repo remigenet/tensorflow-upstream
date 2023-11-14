@@ -93,6 +93,8 @@ cc_library(
         "lib/curl_hmac.h",
         "lib/curl_krb5.h",
         "lib/curl_ldap.h",
+        "lib/curl_log.c",
+        "lib/curl_log.h",
         "lib/curl_md4.h",
         "lib/curl_md5.h",
         "lib/curl_memory.h",
@@ -120,8 +122,6 @@ cc_library(
         "lib/curl_sspi.h",
         "lib/curl_threads.c",
         "lib/curl_threads.h",
-        "lib/curl_trc.c",
-        "lib/curl_trc.h",
         "lib/curlx.h",
         "lib/dict.c",
         "lib/dict.h",
@@ -327,6 +327,8 @@ cc_library(
         "lib/vssh/wolfssh.c",
         "lib/vtls/bearssl.c",
         "lib/vtls/bearssl.h",
+        "lib/vtls/gskit.c",
+        "lib/vtls/gskit.h",
         "lib/vtls/gtls.c",
         "lib/vtls/gtls.h",
         "lib/vtls/hostcheck.c",
@@ -337,6 +339,8 @@ cc_library(
         "lib/vtls/mbedtls.h",
         "lib/vtls/mbedtls_threadlock.c",
         "lib/vtls/mbedtls_threadlock.h",
+        "lib/vtls/nss.c",
+        "lib/vtls/nssg.h",
         "lib/vtls/openssl.c",
         "lib/vtls/openssl.h",
         "lib/vtls/rustls.c",
@@ -358,13 +362,13 @@ cc_library(
         "lib/ws.c",
         "lib/ws.h",
     ] + select({
-        "@local_tsl//tsl:macos": [
+        "@org_tensorflow//tensorflow/tsl:macos": [
             "lib/vtls/sectransp.c",
         ],
-        "@local_tsl//tsl:ios": [
+        "@org_tensorflow//tensorflow/tsl:ios": [
             "lib/vtls/sectransp.c",
         ],
-        "@local_tsl//tsl:windows": CURL_WIN_SRCS,
+        "@org_tensorflow//tensorflow/tsl:windows": CURL_WIN_SRCS,
         "//conditions:default": [
         ],
     }),
@@ -383,7 +387,7 @@ cc_library(
         "include/curl/websockets.h",
     ],
     copts = select({
-        "@local_tsl//tsl:windows": CURL_WIN_COPTS,
+        "@org_tensorflow//tensorflow/tsl:windows": CURL_WIN_COPTS,
         "//conditions:default": [
             "-Iexternal/curl/lib",
             "-D_GNU_SOURCE",
@@ -396,10 +400,10 @@ cc_library(
             "-Wno-string-plus-int",
         ],
     }) + select({
-        "@local_tsl//tsl:macos": [
+        "@org_tensorflow//tensorflow/tsl:macos": [
             "-fno-constant-cfstrings",
         ],
-        "@local_tsl//tsl:windows": [
+        "@org_tensorflow//tensorflow/tsl:windows": [
             # See curl.h for discussion of write size and Windows
             "/DCURL_MAX_WRITE_SIZE=16384",
         ],
@@ -410,10 +414,10 @@ cc_library(
     defines = ["CURL_STATICLIB"],
     includes = ["include"],
     linkopts = select({
-        "@local_tsl//tsl:android": [
+        "@org_tensorflow//tensorflow/tsl:android": [
             "-pie",
         ],
-        "@local_tsl//tsl:macos": [
+        "@org_tensorflow//tensorflow/tsl:macos": [
             "-Wl,-framework",
             "-Wl,CoreFoundation",
             "-Wl,-framework",
@@ -421,8 +425,8 @@ cc_library(
             "-Wl,-framework",
             "-Wl,Security",
         ],
-        "@local_tsl//tsl:ios": [],
-        "@local_tsl//tsl:windows": [
+        "@org_tensorflow//tensorflow/tsl:ios": [],
+        "@org_tensorflow//tensorflow/tsl:windows": [
             "-DEFAULTLIB:ws2_32.lib",
             "-DEFAULTLIB:advapi32.lib",
             "-DEFAULTLIB:crypt32.lib",
@@ -436,8 +440,8 @@ cc_library(
     deps = [
         "@zlib",
     ] + select({
-        "@local_tsl//tsl:ios": [],
-        "@local_tsl//tsl:windows": [],
+        "@org_tensorflow//tensorflow/tsl:ios": [],
+        "@org_tensorflow//tensorflow/tsl:windows": [],
         "//conditions:default": [
             "@boringssl//:ssl",
         ],
@@ -543,7 +547,7 @@ cc_binary(
         "src/tool_xattr.h",
     ],
     copts = select({
-        "@local_tsl//tsl:windows": CURL_BIN_WIN_COPTS,
+        "@org_tensorflow//tensorflow/tsl:windows": CURL_BIN_WIN_COPTS,
         "//conditions:default": [
             "-Iexternal/curl/lib",
             "-D_GNU_SOURCE",

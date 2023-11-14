@@ -40,8 +40,7 @@ class IdentityOp : public XlaOpKernel {
   }
 
  private:
-  IdentityOp(const IdentityOp&) = delete;
-  void operator=(const IdentityOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(IdentityOp);
 };
 
 // XLA_* devices also register a "real" Identity operator so we suppress the

@@ -280,8 +280,10 @@ StatusOr<RCReference<tfrt::RequestContext>> SetUpRequestContext(
     tfrt_stub::OpKernelRunnerTable* runner_table,
     tfd::FallbackResourceArray* resource_array,
     tfrt::RequestContext* src_req_ctx) {
-  // Connect to the batch step id propagated from batch task.
-  int64_t step_id = src_req_ctx->id();
+  // Using the same logic as in the c'tor of FunctionLibraryRuntime::Options,
+  // to avoid clash with any Session-generated step ID. DirectSession and
+  // MasterSession generates non-negative step IDs.
+  int64_t step_id = -std::abs(static_cast<int64_t>(random::New64()));
 
   tfrt::RequestContextBuilder request_context_builder(
       host_ctx, resource_context, step_id);

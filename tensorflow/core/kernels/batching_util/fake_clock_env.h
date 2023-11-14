@@ -66,8 +66,7 @@ class FakeClockEnv : public EnvWrapper {
   };
   std::vector<SleepingThread> sleeping_threads_ TF_GUARDED_BY(mu_);
 
-  FakeClockEnv(const FakeClockEnv&) = delete;
-  void operator=(const FakeClockEnv&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(FakeClockEnv);
 };
 
 }  // namespace test_util

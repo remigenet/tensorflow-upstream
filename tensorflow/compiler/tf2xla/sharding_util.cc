@@ -15,7 +15,6 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/sharding_util.h"
 
 #include "absl/strings/match.h"
-#include "tensorflow/compiler/mlir/tensorflow/utils/xla_sharding_util.h"
 #include "tensorflow/core/framework/node_def.pb.h"
 #include "tensorflow/core/lib/core/errors.h"
 #include "tensorflow/core/util/device_name_utils.h"
@@ -159,7 +158,7 @@ StatusOr<std::optional<xla::OpSharding>> GetShardingFromNodeDefInternal(
   string value;
   xla::OpSharding sharding;
   TF_RETURN_IF_ERROR(GetNodeAttr(node_def, attribute, &value));
-  if (tensorflow::DecodeShardingAttribute(value, sharding).failed()) {
+  if (!sharding.ParseFromString(value)) {
     return xla::InvalidArgument(
         "Experimental %s attribute was not a valid encoded xla::OpSharding "
         "proto.",

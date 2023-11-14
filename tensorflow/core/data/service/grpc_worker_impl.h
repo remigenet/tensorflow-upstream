@@ -70,8 +70,7 @@ class GrpcWorkerImpl : public WorkerService::Service {
   // the servers' methods to avoid RPC calls and data copy.
   std::shared_ptr<DataServiceWorkerImpl> impl_;
 
-  GrpcWorkerImpl(const GrpcWorkerImpl&) = delete;
-  void operator=(const GrpcWorkerImpl&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(GrpcWorkerImpl);
 };
 
 }  // namespace data

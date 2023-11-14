@@ -5,6 +5,8 @@ load(
 
 package(
     # copybara:uncomment default_applicable_licenses = ["//tensorflow:license"],
+    # To suppress build cleaner error about inclusion of schema_generate.h.
+    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
@@ -26,7 +28,6 @@ cc_library(
         ":types",
         "//tensorflow/core:framework",
         "//tensorflow/core:protos_all_cc",
-        "//tensorflow/lite:builtin_op_data",
         "//tensorflow/lite/delegates/flex:allowlisted_flex_ops_lib",
         "//tensorflow/lite/schema:schema_fbs",
         "//tensorflow/lite/toco:graph_transformations",
@@ -46,7 +47,6 @@ tf_cc_test(
         ":operator",
         "//tensorflow/core:ops",
         "//tensorflow/core:protos_all_cc",
-        "//tensorflow/lite/toco:model",
         "//tensorflow/lite/toco:tooling_util",
         "@com_google_googletest//:gtest_main",
         "@flatbuffers",
@@ -88,7 +88,6 @@ cc_library(
     hdrs = [
         "export.h",
     ],
-    features = ["-layering_check"],
     visibility = ["//visibility:public"],
     deps = [
         ":operator",
@@ -110,7 +109,6 @@ tf_cc_test(
     srcs = [
         "export_test.cc",
     ],
-    features = ["-layering_check"],
     deps = [
         ":export",
         ":operator",

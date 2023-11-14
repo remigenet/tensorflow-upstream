@@ -27,7 +27,6 @@ limitations under the License.
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Casting.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"  // from @llvm-project
 #include "mlir/Dialect/Quant/QuantOps.h"  // from @llvm-project
@@ -62,7 +61,8 @@ namespace mlir {
 namespace quant {
 namespace {
 
-using QuantMethod = tensorflow::quantization::QuantizationMethod::PresetMethod;
+using QuantMethod =
+    tensorflow::quantization::QuantizationMethod::ExperimentalMethod;
 
 constexpr absl::string_view kQuantizeCompositeFunctionsStepName =
     "_quantize_composite_functions";
@@ -132,19 +132,17 @@ class QuantizeCompositeFunctionsPass
   // These flags are only used for testing purpose.
   Option<QuantMethod> quantization_method_{
       *this, "quantization-method",
-      llvm::cl::init(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_INT8),
+      llvm::cl::init(
+          tensorflow::quantization::QuantizationMethod::STATIC_RANGE),
       llvm::cl::desc("Choose quantization method."),
       llvm::cl::values(
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_INT8,
+          clEnumValN(tensorflow::quantization::QuantizationMethod::STATIC_RANGE,
                      "ptq", "Post-training static-range quantization"),
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_DYNAMIC_RANGE_INT8,
-                     "drq", "Post-training dynamic-range quantizaiton"),
-          clEnumValN(tensorflow::quantization::QuantizationMethod::
-                         METHOD_STATIC_RANGE_WEIGHT_ONLY_INT8,
-                     "weight_only", "Post-training weight-only quantization"))};
+          clEnumValN(
+              tensorflow::quantization::QuantizationMethod::DYNAMIC_RANGE,
+              "drq", "Post-training dynamic-range quantizaiton"),
+          clEnumValN(tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY,
+                     "weight_only", "Post-training weight-only quantizaiton"))};
 
   Option<OpSet> target_opset_{
       *this, "target-opset", llvm::cl::init(OpSet::TF),
@@ -501,13 +499,6 @@ LogicalResult TransferTFAttributesToTFUniformAttributes(
               rewriter, uniform_op, identifier_to_attr, quantization_method,
               enable_per_channel_quantization)))
         return failure();
-    } else if (auto uniform_op =
-                   llvm::dyn_cast<TF::UniformQuantizeOp>(inner_op);
-               uniform_op != nullptr) {
-      if (failed(FillAttributesForUniformQuantizeOp(
-              rewriter, uniform_op, identifier_to_attr, quantization_method,
-              enable_per_channel_quantization)))
-        return failure();
     }
   }
   return success();
@@ -620,7 +611,7 @@ class QuantizeFunctionPattern
 
  private:
   QuantMethod quantization_method_ =
-      tensorflow::quantization::QuantizationMethod::METHOD_STATIC_RANGE_INT8;
+      tensorflow::quantization::QuantizationMethod::STATIC_RANGE;
   OpSet target_opset_ = OpSet::TF;
   bool enable_per_channel_quantization_;
 
@@ -636,8 +627,8 @@ class QuantizeFunctionPattern
     }
 
     bool has_quantized_types = false;
-    if (quantization_method_ == tensorflow::quantization::QuantizationMethod::
-                                    METHOD_STATIC_RANGE_WEIGHT_ONLY_INT8) {
+    if (quantization_method_ ==
+        tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY) {
       // Skipping input type check for weight-only quantization as it can be
       // dequantized beforehand for the legacy scheme.
       has_quantized_types = true;
@@ -783,8 +774,8 @@ class QuantizeFunctionPattern
     // Applies only for hybrid ops in SRQ.
     const bool is_hybrid =
         ContainsFloatResultType(result_types) &&
-        (quantization_method_ == tensorflow::quantization::QuantizationMethod::
-                                     METHOD_STATIC_RANGE_INT8);
+        (quantization_method_ ==
+         tensorflow::quantization::QuantizationMethod::STATIC_RANGE);
     const std::string quantized_function_name = GetQuantizedFunctionName(
         f_attr.getValue(), /*merged_with_dequantize=*/false,
         /*is_hybrid=*/is_hybrid);
@@ -1238,7 +1229,7 @@ void QuantizeCompositeFunctionsPass::runOnOperation() {
 
   // Apply activation-weight quantization.
   if (quantization_method_ ==
-      tensorflow::quantization::QuantizationMethod::METHOD_STATIC_RANGE_INT8) {
+      tensorflow::quantization::QuantizationMethod::STATIC_RANGE) {
     // For XLA case, weight quantization will be applied for the remaining f32
     // weights even in SRQ.
     pm.addNestedPass<func::FuncOp>(
@@ -1283,7 +1274,9 @@ void QuantizeCompositeFunctionsPass::runOnOperation() {
       ctx, target_opset_);
   patterns_2.add<QuantizeConstPattern>(ctx, target_opset_);
 
-  if (target_opset_ == OpSet::XLA && enable_per_channel_quantization_) {
+  if (target_opset_ == OpSet::XLA && enable_per_channel_quantization_ &&
+      quantization_method_ ==
+          tensorflow::quantization::QuantizationMethod::WEIGHT_ONLY) {
     patterns_2.add<RestoreWeightShapePattern>(ctx);
   }
 

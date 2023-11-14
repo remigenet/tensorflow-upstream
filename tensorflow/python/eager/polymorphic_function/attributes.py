@@ -30,7 +30,6 @@ from tensorflow.python.util import compat
 API_IMPLEMENTS = "api_implements"
 API_PREFERRED_DEVICE = "api_preferred_device"
 BACKWARD_FUNCTION = "backward_function_name"
-DISABLE_ACD = "_disable_acd"
 DISABLE_CALL_SHAPE_INFERENCE = "_disable_call_shape_inference"
 DISABLE_SUMMARIES_AT_RUNTIME = "disable_summaries_at_runtime"
 EAGER_RUNTIME_CONSTRUCTION_CONTEXT = "_construction_context"
@@ -68,7 +67,6 @@ XLA_SEPERATE_COMPILED_GRADIENTS = "_XlaSeparateCompiledGradients"
 POLYMORPHIC_FUNCTION_ALLOWLIST = frozenset({
     API_IMPLEMENTS,
     API_PREFERRED_DEVICE,
-    DISABLE_ACD,
     DISABLE_SUMMARIES_AT_RUNTIME,
     GO_BACKWARDS,
     IMPLEMENTS,
@@ -150,7 +148,7 @@ def _parse_func_attr_value(key, value):
     return attr_value_pb2.AttrValue(list=list_value)
   else:
     raise ValueError(
-        f"Attribute {key} must be bool, int, float, string, list, or "
+        f"Attribute {key} must be bool, int, float, string, list, or"
         f"AttrValue. Got {type(value)}."
     )
 

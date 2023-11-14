@@ -27,7 +27,7 @@ limitations under the License.
 #include "absl/synchronization/mutex.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/protobuf/config.pb.h"
-#include "tsl/platform/logging.h"
+#include "tensorflow/tsl/platform/logging.h"
 
 namespace tensorflow {
 namespace serving {
@@ -104,7 +104,8 @@ class WarmupStateRegistry {
   // metadata with the model. Returns an RAII handle that unregisters the model
   // at its destruction.
   absl::StatusOr<Handle> Register(const Key& model_key,
-                                  std::unique_ptr<PerModelData> per_model_data);
+                                  std::unique_ptr<PerModelData> per_model_data =
+                                      std::make_unique<PerModelData>());
 
   // Return model data. A nullptr indicates the key was not present.
   const PerModelData* Lookup(const Key& model_key);

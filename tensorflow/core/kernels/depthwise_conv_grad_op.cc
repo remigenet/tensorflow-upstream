@@ -706,9 +706,7 @@ class DepthwiseConv2dNativeBackpropInputOp : public OpKernel {
   bool cudnn_use_autotune_;
   DataType dtype_;
 
-  DepthwiseConv2dNativeBackpropInputOp(
-      const DepthwiseConv2dNativeBackpropInputOp&) = delete;
-  void operator=(const DepthwiseConv2dNativeBackpropInputOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DepthwiseConv2dNativeBackpropInputOp);
 };
 
 #define REGISTER_CPU_KERNEL(T)                                       \
@@ -1260,9 +1258,7 @@ class DepthwiseConv2dNativeBackpropFilterOp : public OpKernel {
   bool cudnn_use_autotune_;
   DataType dtype_;
 
-  DepthwiseConv2dNativeBackpropFilterOp(
-      const DepthwiseConv2dNativeBackpropFilterOp&) = delete;
-  void operator=(const DepthwiseConv2dNativeBackpropFilterOp&) = delete;
+  TF_DISALLOW_COPY_AND_ASSIGN(DepthwiseConv2dNativeBackpropFilterOp);
 };
 
 #define REGISTER_CPU_KERNEL(T)                    \

@@ -104,10 +104,6 @@ struct NcclAllReduceOrdering
   StringRef getName() final { return "NcclAllReduceOrdering"; }
 };
 
-struct GlobalIterId : public ::mlir::SideEffects::Resource::Base<GlobalIterId> {
-  StringRef getName() final { return "GlobalIterId"; }
-};
-
 struct XlaLaunch : public ::mlir::SideEffects::Resource::Base<XlaLaunch> {
   StringRef getName() final { return "XlaLaunch"; }
 };
